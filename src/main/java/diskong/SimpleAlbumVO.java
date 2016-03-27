@@ -1,5 +1,7 @@
 package diskong;
 
+import java.util.List;
+
 public class SimpleAlbumVO implements IAlbumVo {
 
 	private String title;
@@ -44,6 +46,12 @@ public class SimpleAlbumVO implements IAlbumVo {
 	public void setArtist(String artist) {
 		this.artist=artist;
 
+	}
+
+	@Override
+	public List<TrackInfo> getTracks() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

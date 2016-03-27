@@ -6,15 +6,20 @@ import java.util.List;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 
+import diskong.parser.fileutils.FilePath;
+
 public class AlbumVo implements IAlbumVo {
-	private List<Metadata> tracks = new ArrayList<Metadata>();
+	private List<TrackInfo> tracks = new ArrayList<TrackInfo>();
 	private String title;
 	private String artist;
 	private String genre;
 	private String style;
 
-	// add track to album
 	public void add(Metadata metadata) throws WrongTrackAlbumException, WrongTrackArtistException {
+		
+	}
+	// add track to album
+	public void add(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException, WrongTrackArtistException {
 		// check if all tracks in folder belong to same album
 		if (metadata.get(Metadata.CONTENT_TYPE).contains("flac")) {
 			if (title == null) {
@@ -39,7 +44,7 @@ public class AlbumVo implements IAlbumVo {
 			} else if (!style.equals(metadata.get(XMPDM.GENRE))) {
 				//TODO
 			}
-			tracks.add(metadata);
+			tracks.add(new TrackInfo(fPath, metadata));
 
 		} else {
 			System.err.println("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
@@ -52,11 +57,11 @@ public class AlbumVo implements IAlbumVo {
 				+ style + "]";
 	}
 
-	public List<Metadata> getTracks() {
+	public List<TrackInfo> getTracks() {
 		return tracks;
 	}
 
-	public void setTracks(List<Metadata> tracks) {
+	public void setTracks(List<TrackInfo> tracks) {
 		this.tracks = tracks;
 	}
 

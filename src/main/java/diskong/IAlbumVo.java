@@ -1,5 +1,7 @@
 package diskong;
 
+import java.util.List;
+
 public interface IAlbumVo {
 
 	String getTitle();
@@ -17,5 +19,7 @@ public interface IAlbumVo {
 	String getGenre();
 
 	void setStyle(String style);
+	
+	 List<TrackInfo> getTracks();
 
 }

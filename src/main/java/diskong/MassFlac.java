@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
 
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
+import diskong.parser.MetaUtils;
 import diskong.parser.NioDirectoryParser;
 import diskong.parser.fileutils.FilePath;
 
@@ -37,7 +38,7 @@ public class MassFlac {
 	public static void main(String[] args) throws URISyntaxException {
 		MassFlac mf = new MassFlac();
 		if (args == null || args.length < 1) {
-			mf.massTag(new File("/mnt/media1/music/Amen/Death Before Musick"));
+			mf.massTag(new File("/mnt/media1/music/Weezer"));//mnt/media1/music/Amen/Death Before Musick"));
 
 		} else {
 			mf.massTag(new File(args[0]));
@@ -63,7 +64,7 @@ public class MassFlac {
 				for (FilePath fPath : entry.getValue()) {
 
 					try {
-						album.add(ap.parse(fPath)); // (metafile)
+						album.add(fPath, ap.parse(fPath)); // (metafile)
 					} catch (WrongTrackAlbumException e) {
 						// put track in right album
 						AlbumFactory.orderingTrack(e.getTrack());
@@ -76,7 +77,7 @@ public class MassFlac {
 				}
 				System.out.println("fin parcours répertoire, infos album:");
 				System.out.println(album.toString() + album.getTracks().size() + " pistes");
-				System.out.println("Connecting to database:" + SearchAPI.DISCOGS);
+			
 				actionOnAlbum(album);
 			} catch (IOException | SAXException | TikaException e) {
 				// TODO Auto-generated catch block
@@ -88,17 +89,24 @@ public class MassFlac {
 
 	private void actionOnAlbum(IAlbumVo album) {
 		boolean isOK = isAllOK(album);
+		if (isOK){
+			System.out.println("OK");
+			return;
+		}
+		System.out.println("Connecting to database:" + SearchAPI.DISCOGS);
 		DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
 		IAlbumVo alInfos= ds.searchRelease(album);
 		System.out.println(alInfos.getStyle()+ " "+alInfos.getGenre());
 	}
 
 	private boolean isAllOK(IAlbumVo iAlbum) {
-//		AlbumVo album = (AlbumVo)iAlbum;
-//		for (String neededTag : neededTags){
-//			album.getTracks().
-//		}
-		return false;
+		String preferences="genre_exists";
+		for (TrackInfo track:iAlbum.getTracks()){
+			if (MetaUtils.getGenre(track.getMetadata()).isEmpty()){
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
