@@ -20,10 +20,16 @@ import org.xml.sax.SAXException;
 
 import diskong.parser.fileutils.FilePath;
 
+/**
+ * Parser for audio files using apache Tika
+ * @author christophe
+ *
+ */
 public class AudioParser {
 
 	public static void main(String[] args) {
-		String fic="X:/Music/Collective Soul/Dosage/08. Generate.flac";
+		String fic="/mnt/media1/music/Collective Soul/Dosage/02. Heavy.flac";
+		
 		AudioParser ap = new AudioParser();
 		try {
 			ap.parse(new File(fic));
@@ -76,8 +82,14 @@ public class AudioParser {
 		    parser.parse(is, ch, metadata, new ParseContext());
 		    is.close();
 
-		    System.out.println("artist:"+metadata.get(XMPDM.ARTIST)+" album:"+metadata.get(XMPDM.ALBUM)+" track:no:"+metadata.get(XMPDM.TRACK_NUMBER)+" title:"+metadata.get(Metadata.TITLE));
-		 
+		    System.out.print("artist:"+metadata.get(XMPDM.ARTIST)+" album:"+metadata.get(XMPDM.ALBUM)+" track:no:"+metadata.get(XMPDM.TRACK_NUMBER)+" title:"+metadata.get(Metadata.TITLE));
+		 for (String genre:metadata.getValues(XMPDM.GENRE)){
+			 System.out.print(" genre "+genre);
+		 }
+		 for (String style:metadata.getValues("style")){
+			 System.out.print(" style "+style);
+		 }
+		 System.out.println("****");
 		    return metadata;
 //		    for (int i = 0; i < metadata.names().length; i++) {
 //		        String item = metadata.names()[i];

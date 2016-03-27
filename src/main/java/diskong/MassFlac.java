@@ -20,9 +20,8 @@ import org.xml.sax.SAXException;
 
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
-
+import diskong.parser.NioDirectoryParser;
 import diskong.parser.fileutils.FilePath;
-import diskong.parser.fileutils.NioDirectoryParser;
 
 //
 /**
@@ -78,15 +77,28 @@ public class MassFlac {
 				System.out.println("fin parcours répertoire, infos album:");
 				System.out.println(album.toString() + album.getTracks().size() + " pistes");
 				System.out.println("Connecting to database:" + SearchAPI.DISCOGS);
-				DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
-				IAlbumVo alInfos= ds.searchRelease(album);
-				System.out.println(alInfos.getStyle()+ " "+alInfos.getGenre());
+				actionOnAlbum(album);
 			} catch (IOException | SAXException | TikaException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 
+	}
+
+	private void actionOnAlbum(IAlbumVo album) {
+		boolean isOK = isAllOK(album);
+		DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
+		IAlbumVo alInfos= ds.searchRelease(album);
+		System.out.println(alInfos.getStyle()+ " "+alInfos.getGenre());
+	}
+
+	private boolean isAllOK(IAlbumVo iAlbum) {
+//		AlbumVo album = (AlbumVo)iAlbum;
+//		for (String neededTag : neededTags){
+//			album.getTracks().
+//		}
+		return false;
 	}
 
 }

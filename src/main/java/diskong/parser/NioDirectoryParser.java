@@ -1,4 +1,4 @@
-package diskong.parser.fileutils;
+package diskong.parser;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import diskong.MassFlac;
-import diskong.parser.DirectoryParser;
+import diskong.parser.fileutils.FilePath;
 
 public class NioDirectoryParser implements DirectoryParser {
 
@@ -33,9 +33,14 @@ public class NioDirectoryParser implements DirectoryParser {
 	public static void main(String[] args) throws MalformedURLException, URISyntaxException {
 		NioDirectoryParser dp = new NioDirectoryParser();
 
-		URI uri = new File(args[0]).toURI();//
+		URI uri = null;
+		if (args.length>=0){
+			uri = new File("/mnt/media1/music/Air").toURI();
+		}else{
+		 uri = new File(args[0]).toURI();//
+		}
 		// testURL(new File(args[0]));
-		Path dir = FileSystems.getDefault().getPath(args[0]);
+		//Path dir = FileSystems.getDefault().getPath(args[0]);
 		long startTime = System.currentTimeMillis();
 
 		dp.parse(uri);
