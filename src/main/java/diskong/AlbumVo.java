@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 
 import diskong.parser.fileutils.FilePath;
 
@@ -14,6 +16,9 @@ public class AlbumVo implements IAlbumVo {
 	private String artist;
 	private String genre;
 	private String style;
+	
+	private List<String> styles;
+	private List<String> genres;
 
 	public void add(Metadata metadata) throws WrongTrackAlbumException, WrongTrackArtistException {
 		
@@ -105,7 +110,9 @@ public class AlbumVo implements IAlbumVo {
 
 	@Override
 	public String getStyle() {
-		// TODO Auto-generated method stub
+		if (styles!=null){
+			return styles.get(0);
+		}
 		return null;
 	}
 
@@ -117,8 +124,46 @@ public class AlbumVo implements IAlbumVo {
 
 	@Override
 	public String getGenre() {
-		// TODO Auto-generated method stub
+		if (genres!=null){
+			return genres.get(0);
+		}
 		return null;
 	}
+	@Override
+	public void setStyles(JSONArray jsonArray) {
+		styles = new ArrayList<String>();
+		for (int i=0; i<jsonArray.length(); i++) {
+			try {
+				styles.add( jsonArray.getString(i) );
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+		@Override
+		public void setGenres(JSONArray jsonArray) {
+			genres = new ArrayList<String>();
+			for (int i=0; i<jsonArray.length(); i++) {
+				try {
+					genres.add( jsonArray.getString(i) );
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		@Override
+		public List<String> getStyles() {
+			// TODO Auto-generated method stub
+			return styles;
+		}
+		@Override
+		public List<String> getGenres() {
+			// TODO Auto-generated method stub
+			return genres;
+		}
 
 }

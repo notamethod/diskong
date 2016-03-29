@@ -137,7 +137,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 	}
 
 	public IAlbumVo searchRelease(IAlbumVo album) {
-		IAlbumVo albumInfo = new SimpleAlbumVO();
+		IAlbumVo albumInfo = new AlbumVo();
 		String query = null;
 		if (album == null || StringUtils.isBlank(album.getTitle())) {
 			log.error("insufficient data for search query..." + album);
@@ -152,8 +152,9 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 		JSONObject jsonObject = search(query);
 		try {
 			JSONObject result = jsonObject.getJSONArray("results").getJSONObject(0);
-			albumInfo.setStyle(result.getString("style"));
-			albumInfo.setGenre(result.getString("genre"));
+			//TODO: multi genre
+			albumInfo.setStyles(result.getJSONArray("style"));
+			albumInfo.setGenres(result.getJSONArray("genre"));
 
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

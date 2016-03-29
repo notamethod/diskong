@@ -2,6 +2,8 @@ package diskong;
 
 import java.util.List;
 
+import org.codehaus.jettison.json.JSONArray;
+
 public class SimpleAlbumVO implements IAlbumVo {
 
 	private String title;
@@ -50,6 +52,30 @@ public class SimpleAlbumVO implements IAlbumVo {
 
 	@Override
 	public List<TrackInfo> getTracks() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setStyles(JSONArray jsonArray) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setGenres(JSONArray jsonArray) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<String> getStyles() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getGenres() {
 		// TODO Auto-generated method stub
 		return null;
 	}

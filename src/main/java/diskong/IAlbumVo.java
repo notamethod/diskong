@@ -2,6 +2,8 @@ package diskong;
 
 import java.util.List;
 
+import org.codehaus.jettison.json.JSONArray;
+
 public interface IAlbumVo {
 
 	String getTitle();
@@ -21,5 +23,13 @@ public interface IAlbumVo {
 	void setStyle(String style);
 	
 	 List<TrackInfo> getTracks();
+
+	void setStyles(JSONArray jsonArray);
+
+	void setGenres(JSONArray jsonArray);
+	
+	List<String> getStyles();
+
+	List<String> getGenres();
 
 }
