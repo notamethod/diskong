@@ -24,7 +24,7 @@ import diskong.parser.fileutils.FilePath;
 
 public class NioDirectoryParser implements DirectoryParser {
 
-	final static Logger LOG = LoggerFactory.getLogger(MassFlac.class);
+	final static Logger LOG = LoggerFactory.getLogger(NioDirectoryParser.class);
 
 	static int cpt = 0;
 
@@ -34,13 +34,13 @@ public class NioDirectoryParser implements DirectoryParser {
 		NioDirectoryParser dp = new NioDirectoryParser();
 
 		URI uri = null;
-		if (args.length>=0){
+		if (args.length >= 0) {
 			uri = new File("/mnt/media1/music/Air").toURI();
-		}else{
-		 uri = new File(args[0]).toURI();//
+		} else {
+			uri = new File(args[0]).toURI();//
 		}
 		// testURL(new File(args[0]));
-		//Path dir = FileSystems.getDefault().getPath(args[0]);
+		// Path dir = FileSystems.getDefault().getPath(args[0]);
 		long startTime = System.currentTimeMillis();
 
 		dp.parse(uri);
@@ -57,7 +57,7 @@ public class NioDirectoryParser implements DirectoryParser {
 		LOG.debug("parsing..." + dirName);
 		parsePath(dirPath);
 		long endTime = System.currentTimeMillis();
-		System.out.println(cpt + " files parsed in " + (endTime - startTime) + " ms");
+		LOG.info(cpt + " files parsed in " + (endTime - startTime) + " ms");
 		return map;
 	}
 
@@ -67,7 +67,7 @@ public class NioDirectoryParser implements DirectoryParser {
 
 		parsePath(dirPath);
 		long endTime = System.currentTimeMillis();
-		System.out.println(cpt + " files parsed in " + (endTime - startTime) + " ms");
+		LOG.info(cpt + " files parsed in " + (endTime - startTime) + " ms");
 		return map;
 	}
 
@@ -89,9 +89,10 @@ public class NioDirectoryParser implements DirectoryParser {
 				}
 			});
 			for (Path path : stream) {
-				System.out.println("parsedir" + path.getFileName());
+				LOG.debug("parsedir" + path.getFileName());
+
 				if (Files.isDirectory(path)) {
-					
+
 					parsePath(path);
 
 				} else {

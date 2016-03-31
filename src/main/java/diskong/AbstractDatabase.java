@@ -13,8 +13,9 @@ public abstract class AbstractDatabase {
 	/**
 	 * Search for an unique album release
 	 * @param album
+	 * @throws ReleaseNotFoundException 
 	 */
-	public IAlbumVo searchRelease(IAlbumVo album) {
+	public IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException {
 		String query=null;
 		if (album==null ||  StringUtils.isBlank(album.getTitle())){
 			log.error("insufficient data for search query..."+album);

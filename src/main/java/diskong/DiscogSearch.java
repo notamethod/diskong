@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.api.json.JSONJAXBContext.JSONNotation;
 import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
@@ -38,7 +40,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 	private static final String URL_PROFILE = "users/";
 	private static final String URL_SEARCH = "database/search?";
 
-	final static Logger logger = LoggerFactory.getLogger(DiscogSearch.class);
+	final static Logger LOG = LoggerFactory.getLogger(DiscogSearch.class);
 	private Client client;
 
 	public DiscogSearch() {
@@ -48,7 +50,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 	}
 
 	public static void main(String[] args) {
-		logger.info("Entering application.");
+		LOG.info("Entering application.");
 		DiscogSearch app = new DiscogSearch();
 
 		app.getProfile("croger42");
@@ -76,10 +78,10 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 			StringBuilder builder = new StringBuilder();
 			builder.append(jsonObject.getString("username")).append(jsonObject.getString("resource_url"));
 			statuses.add(builder.toString());
-			System.out.println(builder.toString());
+			LOG.debug(builder.toString());
 			// }
 		} catch (JSONException ex) {
-			logger.error(DiscogSearch.class.getName(), ex);
+			LOG.error(DiscogSearch.class.getName(), ex);
 		}
 	}
 
@@ -102,11 +104,11 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 			StringBuilder builder = new StringBuilder();
 			builder.append(jsonObject.getString("username")).append(jsonObject.getString("resource_url"));
 			statuses.add(builder.toString());
-			System.out.println(builder.toString());
-			System.out.println(jsonObject.toString());
+			LOG.debug(builder.toString());
+			LOG.debug(jsonObject.toString());
 			// }
 		} catch (JSONException ex) {
-			logger.error(DiscogSearch.class.getName(), ex);
+			LOG.error(DiscogSearch.class.getName(), ex);
 		}
 	}
 
@@ -128,15 +130,15 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 			// builder.append(jsonObject.getString("username")).append(jsonObject.getString("resource_url"));
 			// statuses.add(builder.toString());
 
-			System.out.println(jsonObject.toString());
+			LOG.info(jsonObject.toString());
 
 		} catch (Exception ex) {
-			logger.error(DiscogSearch.class.getName(), ex);
+			LOG.error(DiscogSearch.class.getName(), ex);
 		}
 		return jsonObject;
 	}
 
-	public IAlbumVo searchRelease(IAlbumVo album) {
+	public IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException {
 		IAlbumVo albumInfo = new AlbumVo();
 		String query = null;
 		if (album == null || StringUtils.isBlank(album.getTitle())) {
@@ -151,7 +153,11 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 		}
 		JSONObject jsonObject = search(query);
 		try {
-			JSONObject result = jsonObject.getJSONArray("results").getJSONObject(0);
+			JSONArray results = jsonObject.getJSONArray("results");
+			if (results.length()==0)
+				throw new ReleaseNotFoundException(album.getTitle());
+			JSONObject result = results.getJSONObject(0);
+			
 			//TODO: multi genre
 			albumInfo.setStyles(result.getJSONArray("style"));
 			albumInfo.setGenres(result.getJSONArray("genre"));

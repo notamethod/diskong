@@ -2,6 +2,6 @@ package diskong;
 
 public interface DatabaseSearch {
 
-	IAlbumVo searchRelease(IAlbumVo album);
+	IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException;
 
 }

@@ -16,20 +16,26 @@ import org.apache.tika.metadata.XMPDM;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import diskong.MassFlac;
 import diskong.parser.fileutils.FilePath;
 
 /**
  * Parser for audio files using apache Tika
+ * 
  * @author christophe
  *
  */
 public class AudioParser {
 
+	final static Logger LOG = LoggerFactory.getLogger(AudioParser.class);
+
 	public static void main(String[] args) {
-		String fic="/mnt/media1/music/Collective Soul/Dosage/02. Heavy.flac";
-		
+		String fic = "/mnt/media1/music/Collective Soul/Dosage/02. Heavy.flac";
+
 		AudioParser ap = new AudioParser();
 		try {
 			ap.parse(new File(fic));
@@ -47,57 +53,58 @@ public class AudioParser {
 			e.printStackTrace();
 		}
 	}
-	
-	public void parse(File f) throws IOException, SAXException, TikaException{
 
-	    Metadata metadata = new Metadata();
-	    BodyContentHandler ch = new BodyContentHandler();
-	    AutoDetectParser parser = new AutoDetectParser();
-	    
-	    String mimeType = new Tika().detect(f);
-	    metadata.set(Metadata.CONTENT_TYPE, mimeType);
-	    FileInputStream is = new FileInputStream(f);
-	    parser.parse(is, ch, metadata, new ParseContext());
-	    is.close();
+	public void parse(File f) throws IOException, SAXException, TikaException {
 
-	    for (int i = 0; i < metadata.names().length; i++) {
-	    
-	        String item = metadata.names()[i];
-	        System.out.println(item + " -- " + metadata.get(item));
-	    }
+		Metadata metadata = new Metadata();
+		BodyContentHandler ch = new BodyContentHandler();
+		AutoDetectParser parser = new AutoDetectParser();
 
-	    System.out.println(ch.toString());
-	  }
-	
-	public Metadata parse(FilePath fPath) throws IOException, SAXException, TikaException{
+		String mimeType = new Tika().detect(f);
+		metadata.set(Metadata.CONTENT_TYPE, mimeType);
+		FileInputStream is = new FileInputStream(f);
+		parser.parse(is, ch, metadata, new ParseContext());
+		is.close();
 
-		    Metadata metadata = new Metadata();
-		    BodyContentHandler ch = new BodyContentHandler();
-		    AutoDetectParser parser = new AutoDetectParser();
-		    
-		    String mimeType = new Tika().detect(fPath.getFile());
-		    metadata.set(Metadata.CONTENT_TYPE, mimeType);
-		    InputStream is = Files.newInputStream(fPath.getPath(), StandardOpenOption.READ);
-			
-		    parser.parse(is, ch, metadata, new ParseContext());
-		    is.close();
+		for (int i = 0; i < metadata.names().length; i++) {
 
-		    System.out.print("artist:"+metadata.get(XMPDM.ARTIST)+" album:"+metadata.get(XMPDM.ALBUM)+" track:no:"+metadata.get(XMPDM.TRACK_NUMBER)+" title:"+metadata.get(Metadata.TITLE));
-		 for (String genre:metadata.getValues(XMPDM.GENRE)){
-			 System.out.print(" genre "+genre);
-		 }
-		 for (String style:metadata.getValues("style")){
-			 System.out.print(" style "+style);
-		 }
-		 System.out.println("****");
-		    return metadata;
-//		    for (int i = 0; i < metadata.names().length; i++) {
-//		        String item = metadata.names()[i];
-//		        //System.out.println(item + " -- " + metadata.get(item));
-//		      
-//		    }
+			String item = metadata.names()[i];
+			System.out.println(item + " -- " + metadata.get(item));
+		}
 
-		    //System.out.println(ch.toString());
-		  }
-	
+		System.out.println(ch.toString());
+	}
+
+	public Metadata parse(FilePath fPath) throws IOException, SAXException, TikaException {
+
+		Metadata metadata = new Metadata();
+		BodyContentHandler ch = new BodyContentHandler();
+		AutoDetectParser parser = new AutoDetectParser();
+
+		String mimeType = new Tika().detect(fPath.getFile());
+		metadata.set(Metadata.CONTENT_TYPE, mimeType);
+		InputStream is = Files.newInputStream(fPath.getPath(), StandardOpenOption.READ);
+
+		parser.parse(is, ch, metadata, new ParseContext());
+		is.close();
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("artist:" + metadata.get(XMPDM.ARTIST) + " album:" + metadata.get(XMPDM.ALBUM) + " track:no:"
+					+ metadata.get(XMPDM.TRACK_NUMBER) + " title:" + metadata.get(Metadata.TITLE));
+			for (String genre : metadata.getValues(XMPDM.GENRE)) {
+				LOG.debug(" genre " + genre);
+			}
+			for (String style : metadata.getValues("style")) {
+				LOG.debug(" style " + style);
+			}
+		}
+		return metadata;
+		// for (int i = 0; i < metadata.names().length; i++) {
+		// String item = metadata.names()[i];
+		// //System.out.println(item + " -- " + metadata.get(item));
+		//
+		// }
+
+		// System.out.println(ch.toString());
+	}
+
 }

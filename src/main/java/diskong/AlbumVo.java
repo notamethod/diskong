@@ -7,10 +7,14 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import diskong.parser.fileutils.FilePath;
 
 public class AlbumVo implements IAlbumVo {
+	final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
+	
 	private List<TrackInfo> tracks = new ArrayList<TrackInfo>();
 	private String title;
 	private String artist;
@@ -19,6 +23,8 @@ public class AlbumVo implements IAlbumVo {
 	
 	private List<String> styles;
 	private List<String> genres;
+
+	private TagState tagState;
 
 	public void add(Metadata metadata) throws WrongTrackAlbumException, WrongTrackArtistException {
 		
@@ -52,14 +58,14 @@ public class AlbumVo implements IAlbumVo {
 			tracks.add(new TrackInfo(fPath, metadata));
 
 		} else {
-			System.err.println("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
+			LOG.debug("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "AlbumVo [tracks=" + tracks + ", title=" + title + ", artist=" + artist + ", genre=" + genre + ", style="
-				+ style + "]";
+		return "AlbumVo [title=" + title + ", artist=" + artist + ", genre=" + genre + ", style="
+				+ style + ", tracks=" + tracks + "]";
 	}
 
 	public List<TrackInfo> getTracks() {
@@ -164,6 +170,17 @@ public class AlbumVo implements IAlbumVo {
 		public List<String> getGenres() {
 			// TODO Auto-generated method stub
 			return genres;
+		}
+		public TagState getState() {
+			if (tagState==null)
+				return  TagState.UNKNOWN;
+			return tagState;
+			
+		}
+		
+		public void setState(TagState state) {
+			tagState=state;
+			
 		}
 
 }
