@@ -6,10 +6,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.tika.exception.TikaException;
@@ -21,6 +27,7 @@ import org.xml.sax.SAXException;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
 import diskong.parser.MetaUtils;
+import diskong.parser.MyCallable;
 import diskong.parser.NioDirectoryParser;
 import diskong.parser.fileutils.FilePath;
 
@@ -37,13 +44,13 @@ public class MassFlac {
 
 	public static void main(String[] args) throws URISyntaxException {
 		MassFlac mf = new MassFlac();
-	
+
 		if (args == null || args.length < 1) {
 			// mf.massTag(new
 			// File("/mnt/media1/music/Weezer/test"));//mnt/media1/music/Amen/Death
 			// Before Musick"));
 
-			mf.massTag(new File("/mnt/media1/music/R.E.M/"));
+			mf.massTag(new File("/mnt/media1/music/Soundtrack/"));
 		} else {
 			mf.massTag(new File(args[0]));
 			// String path=args[0];
@@ -60,7 +67,9 @@ public class MassFlac {
 
 	private void traiterDir(Map<Path, List<FilePath>> map) {
 		for (Entry<Path, List<FilePath>> entry : map.entrySet()) {
+			long startTime = System.currentTimeMillis();
 
+		
 			LOG.debug("iteration");
 			diskong.parser.AudioParser ap = new AudioParser();
 			AlbumVo album = AlbumFactory.getAlbum();
@@ -70,22 +79,39 @@ public class MassFlac {
 
 				album.setState(TagState.TOTAG);
 				LOG.info("**************START******************************");
+				ExecutorService executor = Executors.newFixedThreadPool(10);
+				List<Future<TrackInfo>> list = new ArrayList<Future<TrackInfo>>();
 				for (FilePath fPath : entry.getValue()) {
 					LOG.debug(fPath.getFile().getAbsolutePath());
-					try {
-						album.add(fPath, ap.parse(fPath)); // (metafile)
-					} catch (WrongTrackAlbumException e) {
-						// put track in right album
-						AlbumFactory.orderingTrack(e.getTrack());
-					}
-					// Content-Type=audio/x-flac
-					catch (WrongTrackArtistException e) {
-						// TODO Auto-generated catch block
-						LOG.error("wrong artist, various artists not implemented...skipping...");
-						album.setState(TagState.VARIOUS);
-						break;
-					}
+					 Callable<TrackInfo> worker = new MyCallable(fPath);
+				      Future<TrackInfo> submit = executor.submit(worker);
+				      list.add(submit);
 				}
+				
+				for (Future<TrackInfo> future : list) {
+				      try {
+				    	  album.add(future.get()); // (metafile)
+				      } catch (InterruptedException e) {
+				        e.printStackTrace();
+				      } catch (ExecutionException e) {
+				        e.printStackTrace();
+				      } catch (WrongTrackAlbumException e) {
+							// put track in right album
+							AlbumFactory.orderingTrack(e.getTrack());
+						}
+						// Content-Type=audio/x-flac
+//						catch (WrongTrackArtistException e) {
+//							// TODO Auto-generated catch block
+//							LOG.error("wrong artist, various artists not implemented...skipping...");
+//							album.setState(TagState.VARIOUS);
+//							break;
+//						}
+				    }
+				    System.out.println("xx");
+				    executor.shutdown();
+					
+					
+				
 				if (album.getTracks().isEmpty())
 					album.setState(TagState.NOTRACKS);
 				else
@@ -97,10 +123,13 @@ public class MassFlac {
 					actionOnAlbum(album, alInfos);
 				}
 
-			} catch (IOException | SAXException | TikaException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		
+			long endTime = System.currentTimeMillis();
+			LOG.info(" files metaparsed in " + (endTime - startTime) + " ms");
 		}
 
 	}
@@ -140,15 +169,15 @@ public class MassFlac {
 				album.setExactMatch(false);
 				album.setTitle(title);
 				return searchAlbum(album);
-			}else{
-				 title = regexx(album.getTitle(), "\\((.+)\\)");
-				 if (title != null && !title.equals("") && title != album.getTitle()) {
-						album.setExactMatch(false);
-						album.setTitle(title);
-						return searchAlbum(album);
-				 }
+			} else {
+				title = regexx(album.getTitle(), "\\((.+)\\)");
+				if (title != null && !title.equals("") && title != album.getTitle()) {
+					album.setExactMatch(false);
+					album.setTitle(title);
+					return searchAlbum(album);
+				}
 			}
-			
+
 			return null;
 		}
 		return alInfos;
@@ -169,12 +198,13 @@ public class MassFlac {
 			LOG.warn("NO DATA");
 			return;
 		}
-		if (!album.isExactMatch()){
+		if (!album.isExactMatch()) {
 			Scanner sc = new Scanner(System.in);
-			System.out.println("Not exact match :release found: "+alInfos.getTitle()+", "+alInfos.getArtist()+" for album "+album.getTitle()+", "+album.getArtist());
+			System.out.println("Not exact match :release found: " + alInfos.getTitle() + ", " + alInfos.getArtist()
+					+ " for album " + album.getTitle() + ", " + album.getArtist());
 			System.out.println("retag with this ? (O/N)");
 			String str = sc.nextLine();
-			if (!str.equals("O")){
+			if (!str.equals("O")) {
 				return;
 			}
 		}

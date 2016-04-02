@@ -191,5 +191,9 @@ public class AlbumVo implements IAlbumVo {
 			tagState=state;
 			
 		}
+		public void add(TrackInfo trackInfo) throws WrongTrackAlbumException, WrongTrackArtistException {
+			add(trackInfo.getfPath(), trackInfo.getMetadata());
+			
+		}
 
 }
