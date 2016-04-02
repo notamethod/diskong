@@ -3,20 +3,16 @@ package diskong;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +37,13 @@ public class MassFlac {
 
 	public static void main(String[] args) throws URISyntaxException {
 		MassFlac mf = new MassFlac();
+	
 		if (args == null || args.length < 1) {
 			// mf.massTag(new
 			// File("/mnt/media1/music/Weezer/test"));//mnt/media1/music/Amen/Death
 			// Before Musick"));
 
-			mf.massTag(new File("/mnt/media1/music/Soundtrack"));
+			mf.massTag(new File("/mnt/media1/music/R.E.M/"));
 		} else {
 			mf.massTag(new File(args[0]));
 			// String path=args[0];
@@ -63,6 +60,7 @@ public class MassFlac {
 
 	private void traiterDir(Map<Path, List<FilePath>> map) {
 		for (Entry<Path, List<FilePath>> entry : map.entrySet()) {
+
 			LOG.debug("iteration");
 			diskong.parser.AudioParser ap = new AudioParser();
 			AlbumVo album = AlbumFactory.getAlbum();
@@ -73,7 +71,7 @@ public class MassFlac {
 				album.setState(TagState.TOTAG);
 				LOG.info("**************START******************************");
 				for (FilePath fPath : entry.getValue()) {
-
+					LOG.debug(fPath.getFile().getAbsolutePath());
 					try {
 						album.add(fPath, ap.parse(fPath)); // (metafile)
 					} catch (WrongTrackAlbumException e) {
@@ -84,16 +82,21 @@ public class MassFlac {
 					catch (WrongTrackArtistException e) {
 						// TODO Auto-generated catch block
 						LOG.error("wrong artist, various artists not implemented...skipping...");
-						album.setState(TagState.SKIP);
+						album.setState(TagState.VARIOUS);
 						break;
 					}
 				}
 				if (album.getTracks().isEmpty())
 					album.setState(TagState.NOTRACKS);
-				LOG.info("fin parcours répertoire, infos album:" + album.toString() + album.getTracks().size()
-						+ " pistes " + album.getState());
+				else
+					LOG.info("fin parcours répertoire, infos album:" + album.toString() + album.getTracks().size()
+							+ " pistes " + album.getState());
 
-				actionOnAlbum(album);
+				if (checkAction(album)) {
+					IAlbumVo alInfos = searchAlbum(album);
+					actionOnAlbum(album, alInfos);
+				}
+
 			} catch (IOException | SAXException | TikaException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -105,9 +108,8 @@ public class MassFlac {
 	/**
 	 * @param album
 	 */
-	private void actionOnAlbum(AlbumVo album) {
+	private boolean checkAction(AlbumVo album) {
 
-		int tagged = 0;
 		boolean forceRetag = false;
 		// if (forceRetag){
 		// return ;
@@ -117,25 +119,75 @@ public class MassFlac {
 			LOG.warn(
 					"album " + album.getTitle() + " not parsed: state:" + album.getState() + " all tags found:" + isOK);
 
+			return false;
+		}
+		return true;
+	}
+
+	private IAlbumVo searchAlbum(AlbumVo album) {
+
+		int tagged = 0;
+		IAlbumVo alInfos = null;
+		LOG.info("Connecting to database:" + SearchAPI.DISCOGS);
+		DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
+		try {
+			alInfos = ds.searchRelease(album);
+			LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
+
+		} catch (ReleaseNotFoundException e) {
+			String title = regexx(album.getTitle(), "cd\\d*\\s");
+			if (title != null && !title.equals("") && title != album.getTitle()) {
+				album.setExactMatch(false);
+				album.setTitle(title);
+				return searchAlbum(album);
+			}else{
+				 title = regexx(album.getTitle(), "\\((.+)\\)");
+				 if (title != null && !title.equals("") && title != album.getTitle()) {
+						album.setExactMatch(false);
+						album.setTitle(title);
+						return searchAlbum(album);
+				 }
+			}
+			
+			return null;
+		}
+		return alInfos;
+
+	}
+
+	private String regexx(String title, String regex) {
+		return title.replaceAll(regex, "");
+	}
+
+	/**
+	 * @param album
+	 */
+	private void actionOnAlbum(AlbumVo album, IAlbumVo alInfos) {
+
+		int tagged = 0;
+		if (alInfos == null) {
+			LOG.warn("NO DATA");
 			return;
 		}
-		LOG.info("Connecting to database:" + SearchAPI.DISCOGS);
-		try {
-
-			DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
-			IAlbumVo alInfos = ds.searchRelease(album);
-			LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
-			LOG.debug("iteration");
-			for (TrackInfo track : album.getTracks()) {
-				MetaUtils.setGenre(alInfos, track.getMetadata());
-				MetaUtils.setStyle(alInfos, track.getMetadata());
-				if (retag(track) == 0)
-					tagged++;
+		if (!album.isExactMatch()){
+			Scanner sc = new Scanner(System.in);
+			System.out.println("Not exact match :release found: "+alInfos.getTitle()+", "+alInfos.getArtist()+" for album "+album.getTitle()+", "+album.getArtist());
+			System.out.println("retag with this ? (O/N)");
+			String str = sc.nextLine();
+			if (!str.equals("O")){
+				return;
 			}
-		} catch (ReleaseNotFoundException e) {
-			// TODO Auto-generated catch block
-			LOG.error("ReleaseNotFound", e);
 		}
+
+		LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
+		LOG.debug("iteration");
+		for (TrackInfo track : album.getTracks()) {
+			MetaUtils.setGenre(alInfos, track.getMetadata());
+			MetaUtils.setStyle(alInfos, track.getMetadata());
+			if (retag(track) == 0)
+				tagged++;
+		}
+
 		LOG.info("*** TAGGED TRACK ***" + tagged);
 	}
 
@@ -168,7 +220,7 @@ public class MassFlac {
 
 	private int retag(TrackInfo track) {
 
-		int exitCode=0;
+		int exitCode = 0;
 		Arguments args = new Arguments();
 		args.add(ArgAction.REMOVE_TAG, MetaUtils.STYLE);
 		args.add(ArgAction.REMOVE_TAG, XMPDM.GENRE);
@@ -188,10 +240,10 @@ public class MassFlac {
 		ProcessBuilder pb = new ProcessBuilder(args.getList());
 		try {
 			Process p = pb.start();
-			if (!p.waitFor(30, TimeUnit.SECONDS)){
-				exitCode=88;
-			}else{
-			exitCode=p.exitValue();
+			if (!p.waitFor(30, TimeUnit.SECONDS)) {
+				exitCode = 88;
+			} else {
+				exitCode = p.exitValue();
 			}
 			if (exitCode != 0) {
 				BufferedReader output = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -204,11 +256,11 @@ public class MassFlac {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			exitCode=99;
+			exitCode = 99;
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			exitCode=99;
+			exitCode = 99;
 		}
 
 		// Map<String, String> env = pb.environment();

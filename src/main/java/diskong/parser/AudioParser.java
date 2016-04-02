@@ -69,10 +69,10 @@ public class AudioParser {
 		for (int i = 0; i < metadata.names().length; i++) {
 
 			String item = metadata.names()[i];
-			System.out.println(item + " -- " + metadata.get(item));
+			LOG.debug(item + " -- " + metadata.get(item));
 		}
 
-		System.out.println(ch.toString());
+		LOG.debug(ch.toString());
 	}
 
 	public Metadata parse(FilePath fPath) throws IOException, SAXException, TikaException {

@@ -14,6 +14,7 @@ import diskong.parser.fileutils.FilePath;
 
 public class AlbumVo implements IAlbumVo {
 	final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
+	final static String VARIOUS="Various";
 	
 	private List<TrackInfo> tracks = new ArrayList<TrackInfo>();
 	private String title;
@@ -23,6 +24,13 @@ public class AlbumVo implements IAlbumVo {
 	
 	private List<String> styles;
 	private List<String> genres;
+	private boolean exactMatch=true;
+	public boolean isExactMatch() {
+		return exactMatch;
+	}
+	public void setExactMatch(boolean exactMatch) {
+		this.exactMatch = exactMatch;
+	}
 
 	private TagState tagState;
 
@@ -43,7 +51,8 @@ public class AlbumVo implements IAlbumVo {
 				artist = metadata.get(XMPDM.ARTIST);
 			} else if (!artist.equals(metadata.get(XMPDM.ARTIST))) {
 				// wrong artist or various ?
-				throw new WrongTrackArtistException(metadata);
+				artist=VARIOUS;
+				//throw new WrongTrackArtistException(metadata);
 			}
 			if (genre == null) {
 				genre = metadata.get(XMPDM.GENRE);
@@ -116,7 +125,7 @@ public class AlbumVo implements IAlbumVo {
 
 	@Override
 	public String getStyle() {
-		if (styles!=null){
+		if (styles!=null && !styles.isEmpty()){
 			return styles.get(0);
 		}
 		return null;
