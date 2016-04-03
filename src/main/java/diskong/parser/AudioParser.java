@@ -31,6 +31,15 @@ import diskong.parser.fileutils.FilePath;
  */
 public class AudioParser {
 
+	private Tika tika;
+	AutoDetectParser autoParser;
+
+	public AudioParser() {
+		super();
+		this.tika = new Tika();
+		this.autoParser= new AutoDetectParser();
+	}
+
 	final static Logger LOG = LoggerFactory.getLogger(AudioParser.class);
 
 	public static void main(String[] args) {
@@ -58,12 +67,12 @@ public class AudioParser {
 
 		Metadata metadata = new Metadata();
 		BodyContentHandler ch = new BodyContentHandler();
-		AutoDetectParser parser = new AutoDetectParser();
+		//AutoDetectParser parser = new AutoDetectParser();
 
-		String mimeType = new Tika().detect(f);
+		String mimeType = tika.detect(f);
 		metadata.set(Metadata.CONTENT_TYPE, mimeType);
 		FileInputStream is = new FileInputStream(f);
-		parser.parse(is, ch, metadata, new ParseContext());
+		autoParser.parse(is, ch, metadata, new ParseContext());
 		is.close();
 
 		for (int i = 0; i < metadata.names().length; i++) {
