@@ -1,4 +1,4 @@
-package diskong.ihm;
+package ui;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -11,13 +11,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import diskong.old.DiscogClient;
+import diskong.api.DatabaseSearch;
+import diskong.api.DatabaseSearchFactory;
+import diskong.api.SearchAPI;
+
 
 public class SearchFrame extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField query;
-	private DiscogClient app;
+	private DatabaseSearch app;
 
 	/**
 	 * Launch the application.
@@ -55,15 +58,19 @@ public class SearchFrame extends JFrame {
 		contentPane.add(query);
 		query.setColumns(10);
 		
+		
+		app = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
+		
+		
 		JButton btnNewButton = new JButton("New button");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				app.search(query.getText());
+				//TODOapp.search(query.getText());
 			}
 		});
 		btnNewButton.setBounds(469, 102, 
 				106, 28);
 		contentPane.add(btnNewButton);
-		app = new DiscogClient();
+		//app = new DiscogClient();
 	}
 }

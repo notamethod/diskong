@@ -18,6 +18,9 @@ import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
+import diskong.api.AbstractDatabase;
+import diskong.api.DatabaseSearch;
+
 /**
  * Hello world!
  * 

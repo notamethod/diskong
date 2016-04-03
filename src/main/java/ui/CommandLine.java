@@ -1,4 +1,4 @@
-package diskong.ihm;
+package ui;
 
 public class CommandLine {
 

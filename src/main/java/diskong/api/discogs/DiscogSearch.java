@@ -1,9 +1,7 @@
-package diskong;
+package diskong.api.discogs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
@@ -21,11 +19,12 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.ClientFilter;
-import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.api.json.JSONJAXBContext.JSONNotation;
-import com.sun.jersey.oauth.client.OAuthClientFilter;
-import com.sun.jersey.oauth.signature.OAuthParameters;
-import com.sun.jersey.oauth.signature.OAuthSecrets;
+
+import diskong.AlbumVo;
+import diskong.IAlbumVo;
+import diskong.ReleaseNotFoundException;
+import diskong.api.AbstractDatabase;
+import diskong.api.DatabaseSearch;
 
 /**
  * Hello world!
@@ -142,7 +141,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 		IAlbumVo albumInfo = new AlbumVo();
 		String query = null;
 		if (album == null || StringUtils.isBlank(album.getTitle())) {
-			log.error("insufficient data for search query..." + album);
+			LOG.error("insufficient data for search query..." + album);
 			return null;
 		}
 		try {

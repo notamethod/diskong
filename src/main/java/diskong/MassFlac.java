@@ -18,12 +18,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.XMPDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
+import diskong.api.DatabaseSearch;
+import diskong.api.DatabaseSearchFactory;
+import diskong.api.SearchAPI;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
 import diskong.parser.MetaUtils;

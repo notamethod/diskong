@@ -1,6 +1,8 @@
-package diskong;
+package diskong.api;
 
-public class DatabaseSearchFactory {
+import diskong.api.discogs.DiscogSearch;
+
+public class DatabaseSearchFactory { 
 	
 	Enum SearchEngines;
 

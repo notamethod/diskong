@@ -1,4 +1,4 @@
-package diskong;
+package diskong.api.discogs;
 
 import java.util.ArrayList;
 import java.util.HashMap;

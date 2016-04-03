@@ -1,4 +1,4 @@
-package diskong;
+package diskong.api;
 
 public class SearchEngine {
 

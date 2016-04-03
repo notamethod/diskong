@@ -1,7 +1,7 @@
 /**
  * 
  */
-package diskong;
+package diskong.api;
 
 /**
  * @author christophe
