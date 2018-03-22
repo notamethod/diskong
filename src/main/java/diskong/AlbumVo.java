@@ -10,13 +10,14 @@ import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import diskong.parser.MetaUtils;
 import diskong.parser.fileutils.FilePath;
 
 public class AlbumVo implements IAlbumVo {
 	final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
 	final static String VARIOUS="Various";
 	
-	private List<TrackInfo> tracks = new ArrayList<TrackInfo>();
+	private List<TrackInfo> tracks = new ArrayList<>();
 	private String title;
 	private String artist;
 	private String genre;
@@ -24,6 +25,7 @@ public class AlbumVo implements IAlbumVo {
 	
 	private List<String> styles;
 	private List<String> genres;
+	private List<String> images;
 	private boolean exactMatch=true;
 	public boolean isExactMatch() {
 		return exactMatch;
@@ -56,13 +58,17 @@ public class AlbumVo implements IAlbumVo {
 			}
 			if (genre == null) {
 				genre = metadata.get(XMPDM.GENRE);
+				genres= new ArrayList<>();
+				genres.add(genre);
 			} else if (!genre.equals(metadata.get(XMPDM.GENRE))) {
-				//TODO
+				genres.add(metadata.get(XMPDM.GENRE));
 			}
 			if (style == null) {
 				style = metadata.get("style");
-			} else if (!style.equals(metadata.get(XMPDM.GENRE))) {
-				//TODO
+				styles= new ArrayList<>();
+				styles.add(style);
+			} else if (!style.equals(metadata.get(MetaUtils.STYLE))) {
+				styles.add(metadata.get(MetaUtils.STYLE));
 			}
 			tracks.add(new TrackInfo(fPath, metadata));
 
@@ -73,8 +79,8 @@ public class AlbumVo implements IAlbumVo {
 
 	@Override
 	public String toString() {
-		return "AlbumVo [title=" + title + ", artist=" + artist + ", genre=" + genre + ", style="
-				+ style + ", tracks=" + tracks + "]";
+		return "AlbumVo [title=" + title + ", artist=" + artist + ", genre=" + genres.toString() + ", style="
+				+ styles.toString()/* + ", tracks=" + tracks + "]"*/;
 	}
 
 	public List<TrackInfo> getTracks() {
@@ -133,7 +139,8 @@ public class AlbumVo implements IAlbumVo {
 
 	@Override
 	public void setStyle(String style) {
-		// TODO Auto-generated method stub
+		styles = new ArrayList<>();
+		styles.add(style);
 		
 	}
 
@@ -146,7 +153,7 @@ public class AlbumVo implements IAlbumVo {
 	}
 	@Override
 	public void setStyles(JSONArray jsonArray) {
-		styles = new ArrayList<String>();
+		styles = new ArrayList<>();
 		for (int i=0; i<jsonArray.length(); i++) {
 			try {
 				styles.add( jsonArray.getString(i) );
@@ -159,7 +166,7 @@ public class AlbumVo implements IAlbumVo {
 	}
 		@Override
 		public void setGenres(JSONArray jsonArray) {
-			genres = new ArrayList<String>();
+			genres = new ArrayList<>();
 			for (int i=0; i<jsonArray.length(); i++) {
 				try {
 					genres.add( jsonArray.getString(i) );
@@ -170,6 +177,20 @@ public class AlbumVo implements IAlbumVo {
 			}
 			
 		}
+
+	@Override
+	public void setImages(JSONArray jsonArray) {
+		images = new ArrayList<>();
+		for (int i=0; i<jsonArray.length(); i++) {
+			try {
+				images.add( jsonArray.getString(i) );
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
 		@Override
 		public List<String> getStyles() {
 			// TODO Auto-generated method stub
@@ -180,7 +201,13 @@ public class AlbumVo implements IAlbumVo {
 			// TODO Auto-generated method stub
 			return genres;
 		}
-		public TagState getState() {
+
+    @Override
+    public List<String> getImages() {
+        return images;
+    }
+
+    public TagState getState() {
 			if (tagState==null)
 				return  TagState.UNKNOWN;
 			return tagState;

@@ -1,4 +1,4 @@
-package diskong.old;
+package diskong.api.discogs.todo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,9 +24,9 @@ import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
-import diskong.AbstractDatabase;
-import diskong.DatabaseSearch;
 import diskong.IAlbumVo;
+import diskong.api.AbstractDatabase;
+import diskong.api.DatabaseSearch;
 
 /**
  * Hello world!
@@ -100,7 +100,7 @@ public class DiscogClient extends AbstractDatabase implements DatabaseSearch {
 		// Add the filter to the resource
 		resource.addFilter(oauthFilter);
 		String response = resource.get(String.class);
-		Map<String, String> mapParams = new HashMap<String, String>();
+		Map<String, String> mapParams = new HashMap<>();
 		for (String reqParm : response.split("&")) {
 			String[] val = reqParm.split("=");
 			mapParams.put(val[0], val[1]);
@@ -159,7 +159,7 @@ public class DiscogClient extends AbstractDatabase implements DatabaseSearch {
 		addOauthFilters(resource);
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
@@ -184,7 +184,7 @@ public class DiscogClient extends AbstractDatabase implements DatabaseSearch {
 		addOauthFilters(resource);
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
@@ -210,7 +210,7 @@ public class DiscogClient extends AbstractDatabase implements DatabaseSearch {
 		addOauthFilters(resource);
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {

@@ -8,7 +8,7 @@ import org.apache.tika.metadata.Property;
 public class Arguments {
 
 	StringBuffer buf = new StringBuffer();
-	List<String> liste = new ArrayList<String>();
+	List<String> liste = new ArrayList<>();
 	
 	public void add(ArgAction actionTag, Property prop) {
 		// TODO Auto-generated method stub

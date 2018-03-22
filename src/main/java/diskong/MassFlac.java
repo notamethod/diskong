@@ -42,16 +42,18 @@ import diskong.parser.fileutils.FilePath;
 public class MassFlac {
 
 	final static Logger LOG = LoggerFactory.getLogger(MassFlac.class);
+	private static final String UNKNOWN = "Unknown";
+	private int checkTagged;
+	private int taggedTrack;;
+	static int NBCHECK = 200;
+	boolean IsSimulate=true;
 
 	public static void main(String[] args) throws URISyntaxException {
 		MassFlac mf = new MassFlac();
 
 		if (args == null || args.length < 1) {
-			// mf.massTag(new
-			// File("/mnt/media1/music/Weezer/test"));//mnt/media1/music/Amen/Death
-			// Before Musick"));
-
-			mf.massTag(new File("/mnt/media1/music/Soundtrack/"));
+			 mf.massTag(new
+			 File("/media/syno/music/Weezer/test"));
 		} else {
 			mf.massTag(new File(args[0]));
 			// String path=args[0];
@@ -61,17 +63,25 @@ public class MassFlac {
 	}
 
 	public void massTag(File file) {
+		checkTagged = 0;
+		taggedTrack = 0;
 		DirectoryParser dirParser = new NioDirectoryParser();
 		Map<Path, List<FilePath>> map = dirParser.parse(file.getAbsolutePath());
 		traiterDir(map);
+		System.out.println("END...tagged tracks:" + taggedTrack);
 	}
 
 	private void traiterDir(Map<Path, List<FilePath>> map) {
 		for (Entry<Path, List<FilePath>> entry : map.entrySet()) {
 			long startTime = System.currentTimeMillis();
-
-		
-			LOG.debug("iteration");
+			if (checkTagged >= NBCHECK) {
+				if (contineParse()) {
+					checkTagged = 0;
+				} else {
+					break;
+				}
+			}
+			//FIXME:check parser creation
 			diskong.parser.AudioParser ap = new AudioParser();
 			AlbumVo album = AlbumFactory.getAlbum();
 			try {
@@ -79,60 +89,67 @@ public class MassFlac {
 				LOG.debug("iteration");
 
 				album.setState(TagState.TOTAG);
-				LOG.info("**************START******************************");
+				LOG.debug("**************START******************************");
 				ExecutorService executor = Executors.newFixedThreadPool(10);
-				List<Future<TrackInfo>> list = new ArrayList<Future<TrackInfo>>();
+				List<Future<TrackInfo>> list = new ArrayList<>();
 				for (FilePath fPath : entry.getValue()) {
 					LOG.debug(fPath.getFile().getAbsolutePath());
-					 Callable<TrackInfo> worker = new MyCallable(fPath);
-				      Future<TrackInfo> submit = executor.submit(worker);
-				      list.add(submit);
+					Callable<TrackInfo> worker = new MyCallable(fPath);
+					Future<TrackInfo> submit = executor.submit(worker);
+					list.add(submit);
 				}
-				
+
 				for (Future<TrackInfo> future : list) {
-				      try {
-				    	  album.add(future.get()); // (metafile)
-				      } catch (InterruptedException e) {
-				        e.printStackTrace();
-				      } catch (ExecutionException e) {
-				        e.printStackTrace();
-				      } catch (WrongTrackAlbumException e) {
-							// put track in right album
-							AlbumFactory.orderingTrack(e.getTrack());
-						}
-						// Content-Type=audio/x-flac
-//						catch (WrongTrackArtistException e) {
-//							// TODO Auto-generated catch block
-//							LOG.error("wrong artist, various artists not implemented...skipping...");
-//							album.setState(TagState.VARIOUS);
-//							break;
-//						}
-				    }
-				    System.out.println("xx");
-				    executor.shutdown();
-					
-					
-				
+					try {
+						TrackInfo tinf = future.get();
+						album.add(tinf); // (metafile)
+					} catch (InterruptedException |ExecutionException e) {
+						e.printStackTrace();
+					} catch (WrongTrackAlbumException e) {
+						// put track in right album
+						AlbumFactory.orderingTrack(e.getTrack());
+					}
+		
+				}
+				executor.shutdown();
+
 				if (album.getTracks().isEmpty())
 					album.setState(TagState.NOTRACKS);
 				else
-					LOG.info("fin parcours répertoire, infos album:" + album.toString() + album.getTracks().size()
-							+ " pistes " + album.getState());
+					LOG.info("Album parsed:" + album.toString() + album.getTracks().size());
 
 				if (checkAction(album)) {
 					IAlbumVo alInfos = searchAlbum(album);
-					actionOnAlbum(album, alInfos);
+					checkTagged += actionOnAlbum(album, alInfos);
+					taggedTrack += checkTagged;
 				}
+
+//				1 <
+//						{"pagination": {"per_page": 50, "items": 1, "page": 1, "urls": {}, "pages": 1}, "results": [{"style": ["Alternative Rock", "Power Pop"], "thumb": "https://img.discogs.com/h--kMjRx67LHlr9H2DCiaGhQ6zc=/fit-in/150x150/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-6167017-1412736726-5831.jpeg.jpg", "format": ["CD", "Album"], "country": "US", "barcode": ["602537990726"], "uri": "/Weezer-Everything-Will-Be-Alright-In-The-End/master/741903", "community": {"have": 2744, "want": 712}, "label": ["Republic Records", "Republic Records", "Republic Records", "The Village Recorder", "South Beach Studios", "Sterling Sound"], "cover_image": "https://img.discogs.com/gpekxrOlT4AVW9-ykuOKsNQwpEQ=/fit-in/500x500/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-6167017-1412736726-5831.jpeg.jpg", "catno": "B0021619-02", "year": "2014", "genre": ["Rock"], "title": "Weezer - Everything Will Be Alright In The End", "resource_url": "https://api.discogs.com/masters/741903", "type": "master", "id": 741903}]}
+//				22:58:47.641 [main] DEBUG diskong.api.discogs.DiscogSearch - {"pagination":{"per_page":50,"items":1,"page":1,"urls":{},"pages":1},"results":[{"style":["Alternative Rock","Power Pop"],"thumb":"https:\/\/img.discogs.com\/h--kMjRx67LHlr9H2DCiaGhQ6zc=\/fit-in\/150x150\/filters:strip_icc():format(jpeg):mode_rgb():quality(40)\/discogs-images\/R-6167017-1412736726-5831.jpeg.jpg","format":["CD","Album"],"country":"US","barcode":["602537990726"],"uri":"\/Weezer-Everything-Will-Be-Alright-In-The-End\/master\/741903","community":{"have":2744,"want":712},"label":["Republic Records","Republic Records","Republic Records","The Village Recorder","South Beach Studios","Sterling Sound"],"cover_image":"https:\/\/img.discogs.com\/gpekxrOlT4AVW9-ykuOKsNQwpEQ=\/fit-in\/500x500\/filters:strip_icc():format(jpeg):mode_rgb():quality(90)\/discogs-images\/R-6167017-1412736726-5831.jpeg.jpg","catno":"B0021619-02","year":"2014","genre":["Rock"],"title":"Weezer - Everything Will Be Alright In The End","resource_url":"https:\/\/api.discogs.com\/masters\/741903","type":"master","id":741903}]}
+//				22:58:47.649 [main] DEBUG diskong.MassFlac - Alternative Rock Rock
+
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
+
 			long endTime = System.currentTimeMillis();
-			LOG.info(" files metaparsed in " + (endTime - startTime) + " ms");
+			LOG.debug(" files metaparsed in " + (endTime - startTime) + " ms");
 		}
 
+	}
+
+	private boolean contineParse() {
+		Scanner sc = new Scanner(System.in);
+		System.out.println(NBCHECK + " or more tracks tagged ");
+		System.out.println("continue ? (O/N)");
+		String str = sc.nextLine();
+		if (!str.equals("O")) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -145,12 +162,19 @@ public class MassFlac {
 		// return ;
 		// }
 		boolean isOK = isAllOK(album);
+		if (album.getState().equals(TagState.TOTAG) && !forceRetag && isOK) {
+			LOG.debug(
+					"album " + album.getTitle() + " not parsed: state:" + album.getState() + " all tags found:" + isOK);
+
+			return false;
+		}
 		if (!album.getState().equals(TagState.TOTAG) || (!forceRetag && isOK)) {
 			LOG.warn(
 					"album " + album.getTitle() + " not parsed: state:" + album.getState() + " all tags found:" + isOK);
 
 			return false;
 		}
+
 		return true;
 	}
 
@@ -162,10 +186,19 @@ public class MassFlac {
 		DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
 		try {
 			alInfos = ds.searchRelease(album);
+			if (alInfos.getStyles().isEmpty())
+				alInfos.setStyle(UNKNOWN);
 			LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
 
 		} catch (ReleaseNotFoundException e) {
-			String title = regexx(album.getTitle(), "cd\\d*\\s");
+			String artist = regexx(album.getArtist(), "(\\((.+)\\))|(!)|(&)");
+			if (artist != null && !artist.equals("") && artist != album.getArtist()) {
+				album.setExactMatch(false);
+				album.setArtist(artist);
+				return searchAlbum(album);
+			}
+
+			String title = regexx(album.getTitle(), "(cd\\d*\\s)|(!)|(&)|(:)|(,)|(Disc\\s\\d*)");
 			if (title != null && !title.equals("") && title != album.getTitle()) {
 				album.setExactMatch(false);
 				album.setTitle(title);
@@ -178,6 +211,12 @@ public class MassFlac {
 					return searchAlbum(album);
 				}
 			}
+			if (artist != null && artist.equals("Various")){
+				album.setExactMatch(false);
+				album.setArtist(null);
+				return searchAlbum(album);
+			}
+			
 
 			return null;
 		}
@@ -185,33 +224,34 @@ public class MassFlac {
 
 	}
 
-	private String regexx(String title, String regex) {
-		return title.replaceAll(regex, "");
+	private String regexx(String string, String regex) {
+		if (string==null)
+			return null;
+		return string.replaceAll(regex, "").trim();
 	}
 
 	/**
 	 * @param album
 	 */
-	private void actionOnAlbum(AlbumVo album, IAlbumVo alInfos) {
+	private int actionOnAlbum(AlbumVo album, IAlbumVo alInfos) {
 
 		int tagged = 0;
 		if (alInfos == null) {
 			LOG.warn("NO DATA");
-			return;
+			return 0;
 		}
 		if (!album.isExactMatch()) {
 			Scanner sc = new Scanner(System.in);
-			System.out.println("Not exact match :release found: " + alInfos.getTitle() + ", " + alInfos.getArtist()
-					+ " for album " + album.getTitle() + ", " + album.getArtist());
+			System.out.println("Not exact match for "+album.getTitle()+"/"+album.getArtist()+" - release found: " + alInfos.getTitle() + ", " + alInfos.getArtist());
 			System.out.println("retag with this ? (O/N)");
 			String str = sc.nextLine();
 			if (!str.equals("O")) {
-				return;
+				return 0;
 			}
 		}
 
 		LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
-		LOG.debug("iteration");
+		LOG.debug("iteration inutile");
 		for (TrackInfo track : album.getTracks()) {
 			MetaUtils.setGenre(alInfos, track.getMetadata());
 			MetaUtils.setStyle(alInfos, track.getMetadata());
@@ -220,6 +260,7 @@ public class MassFlac {
 		}
 
 		LOG.info("*** TAGGED TRACK ***" + tagged);
+		return tagged;
 	}
 
 	private boolean isAllOK(IAlbumVo iAlbum) {
@@ -251,6 +292,8 @@ public class MassFlac {
 
 	private int retag(TrackInfo track) {
 
+		if (IsSimulate)
+			return 0;
 		int exitCode = 0;
 		Arguments args = new Arguments();
 		args.add(ArgAction.REMOVE_TAG, MetaUtils.STYLE);

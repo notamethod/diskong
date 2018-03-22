@@ -16,7 +16,7 @@ public class MetaUtils {
 	public static final Property STYLE = Property.externalText("style");
 
 	public static List<String> getGenre(Metadata metadata) {
-		List<String> genres = new ArrayList<String>();
+		List<String> genres = new ArrayList<>();
 		for (String genre : metadata.getValues(XMPDM.GENRE)) {
 			genres.add(genre);
 		}
@@ -25,7 +25,7 @@ public class MetaUtils {
 	}
 
 	public static List<String> getStyle(Metadata metadata) {
-		List<String> styles = new ArrayList<String>();
+		List<String> styles = new ArrayList<>();
 		for (String style : metadata.getValues("style")) {
 			styles.add(style);
 		}

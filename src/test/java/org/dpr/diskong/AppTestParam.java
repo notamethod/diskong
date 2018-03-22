@@ -6,7 +6,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import diskong.old.DiscogClient;
+import diskong.api.discogs.todo.DiscogClient;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

@@ -19,8 +19,8 @@ public class NioDirectoryParser {
 		
 		dp.parse(dir);
 		long endTime = System.currentTimeMillis();
-		System.out.println("nb fichiers "+cpt);
-	    System.out.println("temps " + (endTime-startTime)/1000);
+		System.out.println("file count "+cpt);
+	    System.out.println("duration " + (endTime-startTime)/1000);
 	}
 
 	private void parse(Path dir) {

@@ -34,6 +34,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
 	// base URL for the API calls
 	private static final String URL_API = "https://api.discogs.com/";
+    private static final String URL_API_IMG = "https://api.discogs.com/";
 	// private static final String URL_API = "http://localhost:8080/";
 	private static final String URL_IDENTITY = "oauth/identity";
 	private static final String URL_PROFILE = "users/";
@@ -52,9 +53,9 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 		LOG.info("Entering application.");
 		DiscogSearch app = new DiscogSearch();
 
-		app.getProfile("croger42");
+		//app.getProfile("croger42");
 
-		// app.search("type=all&artist=babybird");
+		 app.search("type=all&artist=babybird");
 	}
 
 	public void getUserID() {
@@ -69,7 +70,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 		auth.addAuthentificationFilters(resource);
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
@@ -95,7 +96,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 		auth.addAuthentificationFilters(resource);
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
@@ -120,7 +121,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 		auth.addAuthentificationFilters(resource);
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 		// for (int i = 0; i < jsonArray.length(); i++) {
 		JSONObject jsonObject = null;
 		try {
@@ -129,7 +130,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 			// builder.append(jsonObject.getString("username")).append(jsonObject.getString("resource_url"));
 			// statuses.add(builder.toString());
 
-			LOG.info(jsonObject.toString());
+			LOG.debug(jsonObject.toString());
 
 		} catch (Exception ex) {
 			LOG.error(DiscogSearch.class.getName(), ex);
@@ -147,19 +148,23 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 		try {
 			query = getReleaseQuery(album);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("invalid query" + query, e);
 		}
 		JSONObject jsonObject = search(query);
 		try {
 			JSONArray results = jsonObject.getJSONArray("results");
-			if (results.length()==0)
+			if (results.length() == 0)
 				throw new ReleaseNotFoundException(album.getTitle());
 			JSONObject result = results.getJSONObject(0);
-			
-			//TODO: multi genre
+
+			// TODO: multi genre
+			albumInfo.setTitle(result.getString("title"));
+			try{
+			albumInfo.setArtist(result.getString("artist"));
+			}catch(JSONException j){}
 			albumInfo.setStyles(result.getJSONArray("style"));
 			albumInfo.setGenres(result.getJSONArray("genre"));
+            albumInfo.setImages(result.getJSONArray("image"));
 
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -179,7 +184,9 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("type=master");
-		sb.append("&artist=").append(album.getArtist());
+		if (album.getArtist() != null) {
+			sb.append("&artist=").append(album.getArtist());
+		}
 		sb.append("&title=").append(album.getTitle());
 
 		return URIUtil.encodeQuery(sb.toString());

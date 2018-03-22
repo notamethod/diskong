@@ -13,6 +13,7 @@ public class Result {
 private List<String> style = new ArrayList<String>();
 private String thumb;
 private List<String> format = new ArrayList<String>();
+    private List<String> image = new ArrayList<String>();
 private String country;
 private List<String> barcode = new ArrayList<String>();
 private String uri;
@@ -133,6 +134,12 @@ this.type = type;
 public Integer getId() {
 return id;
 }
+    public List<String> getImage() {
+        return image;
+    }
+    public void setImage(List<String> image) {
+        this.image = image;
+    }
 
 public void setId(Integer id) {
 this.id = id;

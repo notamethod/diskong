@@ -28,7 +28,7 @@ public class NioDirectoryParser implements DirectoryParser {
 
 	static int cpt = 0;
 
-	Map<Path, List<FilePath>> map = new HashMap<Path, List<FilePath>>();
+	Map<Path, List<FilePath>> map = new HashMap<>();
 
 	public static void main(String[] args) throws MalformedURLException, URISyntaxException {
 		NioDirectoryParser dp = new NioDirectoryParser();
@@ -125,7 +125,7 @@ public class NioDirectoryParser implements DirectoryParser {
 	private void traiterFichier(Path path) {
 		List<FilePath> l = map.get(path.getParent());
 		if (null == map.get(path.getParent())) {
-			l = new ArrayList<FilePath>();
+			l = new ArrayList<>();
 			map.put(path.getParent(), l);
 		}
 		l.add(new FilePath(new File(path.toUri()), path));

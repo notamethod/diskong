@@ -130,7 +130,7 @@ public class OAuthentification extends AbstractDatabase implements DatabaseSearc
 
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
@@ -156,7 +156,7 @@ public class OAuthentification extends AbstractDatabase implements DatabaseSearc
 
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
@@ -183,7 +183,7 @@ public class OAuthentification extends AbstractDatabase implements DatabaseSearc
 
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {

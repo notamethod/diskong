@@ -93,7 +93,7 @@ public class DiscogsOAuth  {
 		// Add the filter to the resource
 		resource.addFilter(oauthFilter);
 		String response = resource.get(String.class);
-		Map<String, String> mapParams = new HashMap<String, String>();
+		Map<String, String> mapParams = new HashMap<>();
 		for (String reqParm : response.split("&")) {
 			String[] val = reqParm.split("=");
 			mapParams.put(val[0], val[1]);

@@ -32,4 +32,7 @@ public interface IAlbumVo {
 
 	List<String> getGenres();
 
+
+	List<String> getImages();
+	void setImages(JSONArray jsonArray);
 }

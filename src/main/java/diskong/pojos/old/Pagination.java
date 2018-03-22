@@ -13,7 +13,7 @@ private Integer pages;
 private Integer items;
 private Integer per_page;
 private Urls urls;
-private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+private Map<String, Object> additionalProperties = new HashMap<>();
 //
 //public Integer getPage() {
 //return page;

@@ -1,4 +1,4 @@
-package diskong.old;
+package diskong.api.discogs.todo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,11 +7,11 @@ import java.util.logging.Logger;
 
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
@@ -19,22 +19,23 @@ import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
-import diskong.AbstractDatabase;
-import diskong.DatabaseSearch;
 import diskong.IAlbumVo;
+import diskong.api.AbstractDatabase;
+import diskong.api.DatabaseSearch;
+import diskong.pojos.Release;
+import diskong.pojos.Result;
 
 /**
  * Hello world!
  * 
  */
-public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch{
+public class DiscogClientJackson extends AbstractDatabase implements DatabaseSearch {
 
 	// base URL for the API calls
 	private static final String URL_API = "http://api.discogs.com/";
 	private static final String URL_IDENTITY = "oauth/identity";
 	private static final String URL_PROFILE = "users/";
 	private static final String URL_SEARCH = "database/search?q=";
-	
 
 	private static final String CONSUMER_KEY = "FFtWwazbcskFPzduEFOK";
 	private static final String CONSUMER_SECRET = "GOfYoDjZVsACWagKncvDJcjToXwoILJf";
@@ -50,23 +51,22 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 	// oauth_token_secret=vLBzEKasidOAroTRsfslCVkIGpSxMbPCymhoVhsb&oauth_token=
 	private Client client;
 
-	public DiscogClientMoxy() {
+	public DiscogClientJackson() {
 		// Create a Jersey client
 		client = Client.create();
 		client.addFilter(new LoggingFilter());
 	}
 
 	public static void main(String[] args) throws Exception {
-		DiscogClientMoxy app = new DiscogClientMoxy();
-		//app.getUserID();
-		//app.getProfile("croger42");
-		app.getRequestToken();
+		DiscogClientJackson app = new DiscogClientJackson();
+		// app.getUserID();
+		// app.getProfile("croger42");
 		app.search("type=all&artist=babybird");
 	}
 
 	public void getRequestToken() {
 		client.removeAllFilters();
-		//WebTarget ss;
+		// WebTarget ss;
 		// Create a resource to be used to make Twitter API calls
 		WebResource resource = client.resource(REQUEST_TOKEN_URL);
 
@@ -116,7 +116,7 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
@@ -127,7 +127,7 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 			System.out.println(builder.toString());
 			// }
 		} catch (JSONException ex) {
-			Logger.getLogger(DiscogClientMoxy.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(DiscogClientJackson.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -142,7 +142,7 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
@@ -154,7 +154,7 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 			System.out.println(jsonObject.toString());
 			// }
 		} catch (JSONException ex) {
-			Logger.getLogger(DiscogClientMoxy.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(DiscogClientJackson.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -162,41 +162,36 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 		client.removeAllFilters();
 
 		// Create a resource to be used to make Twitter API calls
-		WebResource resource = client.resource(URL_API);
+		WebResource resource = client.resource(URL_API + URL_SEARCH + query);
 
 		// Add the filter to the resource
 		resource.addFilter(getOauthFilter());
-		String encQuery = null;
-		try {
-			encQuery = URIUtil.encodeQuery(URL_SEARCH + query);
-		} catch (URIException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        List<Object> customers = resource.path(encQuery).accept("application/json").get(new GenericType<List<Object>>(){});
-		 
+
 		// Parse the JSON array
 		// JSONArray jsonArray = resource.get(JSONArray.class);
-		List<String> statuses = new ArrayList<String>();
+		List<String> statuses = new ArrayList<>();
 
+		ObjectMapper mapper = new ObjectMapper();
 		try {
 			// for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = resource.get(JSONObject.class);
-			StringBuilder builder = new StringBuilder();
-//			builder.append(jsonObject.getString("username")).append(jsonObject.getString("resource_url"));
-//			statuses.add(builder.toString());
-			System.out.println(builder.toString());
-			System.out.println(jsonObject.toString());
-	       // List<Customer> customers = resource.path("/findCustomersByCity/Any%20Town").accept("application/json").get(new GenericType<List<Customer>>(){});
-	        
-//			Release rel = target
-//			        .request()
-//			        .post(Entity.entity(new MyObject("Duke", 18), MediaType.APPLICATION_JSON), MyObject.class);
-			// }
+			//System.out.println(jsonObject.toString());
+			Release r = mapper.readValue(jsonObject.toString(), Release.class);
+			System.out.println(r.getPagination().getPages());
+			System.out.println(r.getPagination().getItems());
+			List<Result> list = r.getResults();
+			for (Result res : list) 
+			{
+				System.out.println(res.getTitle());
+				System.out.println(res.getType());
+				System.out.println(res.getId());
+			}
+
 		} catch (Exception ex) {
-			Logger.getLogger(DiscogClientMoxy.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(DiscogClientJackson.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
+
 	private ClientFilter getOauthFilter() {
 		// Set the OAuth parameters
 		OAuthSecrets secrets = new OAuthSecrets().consumerSecret(CONSUMER_SECRET)
@@ -208,17 +203,20 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 
 	}
 
-
 	@Override
 	protected String getReleaseQuery(IAlbumVo album) throws URIException {
-		StringBuilder sb=new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		sb.append("type=all");
 		sb.append("&artist=").append(album.getArtist());
 		sb.append("&album=").append(album.getTitle());
-			
+
 		return URIUtil.encodeQuery(sb.toString());
 
 	}
 
+	public String get(String string, String iD) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

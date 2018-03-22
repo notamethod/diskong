@@ -80,4 +80,14 @@ public class SimpleAlbumVO implements IAlbumVo {
 		return null;
 	}
 
+	@Override
+	public List<String> getImages() {
+		return null;
+	}
+
+	@Override
+	public void setImages(JSONArray jsonArray) {
+
+	}
+
 }

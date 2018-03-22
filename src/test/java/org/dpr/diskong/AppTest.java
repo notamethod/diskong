@@ -1,6 +1,6 @@
 package org.dpr.diskong;
 
-import diskong.old.DiscogClient;
+import diskong.api.discogs.todo.DiscogClient;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
