@@ -5,7 +5,7 @@ public enum ArgAction {
 
 	 private final String name;       
 	 
-	 private ArgAction(String s) {
+	 ArgAction(String s) {
 	        name = s;
 	    }
 	 

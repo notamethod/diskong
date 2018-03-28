@@ -30,25 +30,6 @@ public class NioDirectoryParser implements DirectoryParser {
 
 	Map<Path, List<FilePath>> map = new HashMap<>();
 
-	public static void main(String[] args) throws MalformedURLException, URISyntaxException {
-		NioDirectoryParser dp = new NioDirectoryParser();
-
-		URI uri = null;
-		if (args.length >= 0) {
-			uri = new File("/mnt/media1/music/Air").toURI();
-		} else {
-			uri = new File(args[0]).toURI();//
-		}
-		// testURL(new File(args[0]));
-		// Path dir = FileSystems.getDefault().getPath(args[0]);
-		long startTime = System.currentTimeMillis();
-
-		dp.parse(uri);
-		long endTime = System.currentTimeMillis();
-		System.out.println("nb fichiers " + cpt);
-		System.out.println("temps " + (endTime - startTime) / 1000);
-
-	}
 
 	public Map<Path, List<FilePath>> parse(String dirName) {
 		Path dirPath = FileSystems.getDefault().getPath(dirName);
@@ -80,13 +61,10 @@ public class NioDirectoryParser implements DirectoryParser {
 			stream = Files.newDirectoryStream(dir, new DirectoryStream.Filter<Path>() {
 
 				@Override
-				public boolean accept(Path entry) throws IOException {
+				public boolean accept(Path entry) {
 
-					if ("@eaDir".equals(entry.getFileName().toString())) {
-						return false;
-					}
-					return true;
-				}
+                    return !"@eaDir".equals(entry.getFileName().toString());
+                }
 			});
 			for (Path path : stream) {
 				LOG.debug("parsedir" + path.getFileName());

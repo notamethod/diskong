@@ -22,6 +22,24 @@ public class AlbumVo implements IAlbumVo {
 	private String artist;
 	private String genre;
 	private String style;
+
+    @Override
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    @Override
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
+    }
+
+    private String coverImageUrl;
+
+    public String getFolderImagePath() {
+        return folderImagePath;
+    }
+
+    private String folderImagePath;
 	
 	private List<String> styles;
 	private List<String> genres;
@@ -36,11 +54,11 @@ public class AlbumVo implements IAlbumVo {
 
 	private TagState tagState;
 
-	public void add(Metadata metadata) throws WrongTrackAlbumException, WrongTrackArtistException {
+	public void add(Metadata metadata) {
 		
 	}
 	// add track to album
-	public void add(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException, WrongTrackArtistException {
+	public void add(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException {
 		// check if all tracks in folder belong to same album
 		if (metadata.get(Metadata.CONTENT_TYPE).contains("flac")) {
 			if (title == null) {
@@ -72,7 +90,11 @@ public class AlbumVo implements IAlbumVo {
 			}
 			tracks.add(new TrackInfo(fPath, metadata));
 
-		} else {
+		} else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") && (fPath.getFile().getName().toLowerCase().contains("folder") ||fPath.getFile().getName().toLowerCase().contains("cover"))){
+			LOG.debug("cover image found " + fPath.getFile().getName());
+			folderImagePath = fPath.getFile().getName();
+		}
+		else {
 			LOG.debug("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
 		}
 	}

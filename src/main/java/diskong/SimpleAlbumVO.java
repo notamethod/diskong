@@ -10,6 +10,8 @@ public class SimpleAlbumVO implements IAlbumVo {
 	private String artist;
 	private String genre;
 	private String style;
+	private String coverImageUrl;
+
 	public String getGenre() {
 		return genre;
 	}
@@ -48,6 +50,16 @@ public class SimpleAlbumVO implements IAlbumVo {
 	public void setArtist(String artist) {
 		this.artist=artist;
 
+	}
+
+	@Override
+	public String getCoverImageUrl() {
+		return coverImageUrl;
+	}
+
+	@Override
+	public void setCoverImageUrl(String coverImageUrl) {
+		this.coverImageUrl=coverImageUrl;
 	}
 
 	@Override

@@ -26,9 +26,7 @@ public class MetaUtils {
 
 	public static List<String> getStyle(Metadata metadata) {
 		List<String> styles = new ArrayList<>();
-		for (String style : metadata.getValues("style")) {
-			styles.add(style);
-		}
+		Collections.addAll(styles, metadata.getValues("style"));
 		return styles;
 	}
 

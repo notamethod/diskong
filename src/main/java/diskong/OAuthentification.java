@@ -55,7 +55,7 @@ public class OAuthentification extends AbstractDatabase implements DatabaseSearc
 		client.addFilter(new LoggingFilter());
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		OAuthentification app = new OAuthentification();
 		//app.getUserID();
 		//app.getProfile("croger42");

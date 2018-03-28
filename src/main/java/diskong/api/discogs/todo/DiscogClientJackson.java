@@ -57,7 +57,7 @@ public class DiscogClientJackson extends AbstractDatabase implements DatabaseSea
 		client.addFilter(new LoggingFilter());
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		DiscogClientJackson app = new DiscogClientJackson();
 		// app.getUserID();
 		// app.getProfile("croger42");

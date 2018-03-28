@@ -56,7 +56,7 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 		client.addFilter(new LoggingFilter());
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		DiscogClientMoxy app = new DiscogClientMoxy();
 		//app.getUserID();
 		//app.getProfile("croger42");

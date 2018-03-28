@@ -9,7 +9,7 @@ import diskong.pojos2.Artist;
 
 public class ArtistDao {
 
-	public Artist getByID(String ID) throws JsonParseException, JsonMappingException, IOException{
+	public Artist getByID(String ID) {
 		
 //		DiscogClientJackson discogCli = new DiscogClientJackson();
 //		

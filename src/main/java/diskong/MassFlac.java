@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ import diskong.api.SearchAPI;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
 import diskong.parser.MetaUtils;
-import diskong.parser.MyCallable;
+import diskong.parser.CallTrackInfo;
 import diskong.parser.NioDirectoryParser;
 import diskong.parser.fileutils.FilePath;
 
@@ -44,16 +43,16 @@ public class MassFlac {
 	final static Logger LOG = LoggerFactory.getLogger(MassFlac.class);
 	private static final String UNKNOWN = "Unknown";
 	private int checkTagged;
-	private int taggedTrack;;
+	private int taggedTrack;
 	static int NBCHECK = 200;
 	boolean IsSimulate=true;
 
-	public static void main(String[] args) throws URISyntaxException {
+	public static void main(String[] args) {
 		MassFlac mf = new MassFlac();
 
 		if (args == null || args.length < 1) {
 			 mf.massTag(new
-			 File("/media/syno/music/Weezer/test"));
+			 File("/media/syno/music/R.E.M" /**"/media/syno/music/Weezer/test"**/));
 		} else {
 			mf.massTag(new File(args[0]));
 			// String path=args[0];
@@ -74,6 +73,8 @@ public class MassFlac {
 	private void traiterDir(Map<Path, List<FilePath>> map) {
 		for (Entry<Path, List<FilePath>> entry : map.entrySet()) {
 			long startTime = System.currentTimeMillis();
+
+			//continue or stop asked every NBCHECK parsed files
 			if (checkTagged >= NBCHECK) {
 				if (contineParse()) {
 					checkTagged = 0;
@@ -94,7 +95,7 @@ public class MassFlac {
 				List<Future<TrackInfo>> list = new ArrayList<>();
 				for (FilePath fPath : entry.getValue()) {
 					LOG.debug(fPath.getFile().getAbsolutePath());
-					Callable<TrackInfo> worker = new MyCallable(fPath);
+					Callable<TrackInfo> worker = new CallTrackInfo(fPath);
 					Future<TrackInfo> submit = executor.submit(worker);
 					list.add(submit);
 				}
@@ -117,7 +118,7 @@ public class MassFlac {
 					album.setState(TagState.NOTRACKS);
 				else
 					LOG.info("Album parsed:" + album.toString() + album.getTracks().size());
-
+				Statistics.getInstance().addStats(album);
 				if (checkAction(album)) {
 					IAlbumVo alInfos = searchAlbum(album);
 					checkTagged += actionOnAlbum(album, alInfos);
@@ -146,10 +147,7 @@ public class MassFlac {
 		System.out.println(NBCHECK + " or more tracks tagged ");
 		System.out.println("continue ? (O/N)");
 		String str = sc.nextLine();
-		if (!str.equals("O")) {
-			return false;
-		}
-		return true;
+		return str.equals("O");
 	}
 
 	/**
@@ -179,6 +177,7 @@ public class MassFlac {
 	}
 
 	private IAlbumVo searchAlbum(AlbumVo album) {
+
 
 		int tagged = 0;
 		IAlbumVo alInfos = null;

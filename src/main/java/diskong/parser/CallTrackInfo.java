@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
 import diskong.TrackInfo;
 import diskong.parser.fileutils.FilePath;
 
-public class MyCallable implements Callable<TrackInfo> {
-	final static Logger LOG = LoggerFactory.getLogger(MyCallable.class);
+public class CallTrackInfo implements Callable<TrackInfo> {
+	final static Logger LOG = LoggerFactory.getLogger(CallTrackInfo.class);
 	private FilePath fPath;
 
-	public MyCallable(FilePath fPath) {
+	public CallTrackInfo(FilePath fPath) {
 		this.fPath = fPath;
 	}
 
@@ -39,7 +39,7 @@ public class MyCallable implements Callable<TrackInfo> {
 		is.close();
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("artist:" + metadata.get(XMPDM.ARTIST) + " album:" + metadata.get(XMPDM.ALBUM) + " track:no:"
-					+ metadata.get(XMPDM.TRACK_NUMBER) + " title:" + metadata.get(Metadata.TITLE));
+					+ metadata.get(XMPDM.TRACK_NUMBER) + " title:" + metadata.get(Metadata.TITLE) +  " length:" + metadata.get(XMPDM.DURATION));
 			for (String genre : metadata.getValues(XMPDM.GENRE)) {
 				LOG.debug(" genre " + genre);
 			}

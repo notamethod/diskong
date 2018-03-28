@@ -14,6 +14,10 @@ public interface IAlbumVo {
 
 	void setArtist(String artist);
 
+	String getCoverImageUrl();
+
+	void setCoverImageUrl(String image);
+
 	void setGenre(String genre);
 
 	String getStyle();

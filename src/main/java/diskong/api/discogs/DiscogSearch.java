@@ -161,6 +161,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 			albumInfo.setTitle(result.getString("title"));
 			try{
 			albumInfo.setArtist(result.getString("artist"));
+			albumInfo.setCoverImageUrl(result.getString("cover_image"));
 			}catch(JSONException j){}
 			albumInfo.setStyles(result.getJSONArray("style"));
 			albumInfo.setGenres(result.getJSONArray("genre"));
