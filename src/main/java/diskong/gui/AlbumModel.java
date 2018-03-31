@@ -3,6 +3,7 @@ package diskong.gui;
 import diskong.AlbumVo;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AlbumModel extends AbstractTableModel{
@@ -11,11 +12,17 @@ public class AlbumModel extends AbstractTableModel{
 
     public AlbumModel() {
         super();
+        //albums= new ArrayList<>();
     }
 
-    String[] colName=new String[]{"a","b","c"};
+    String[] colName=new String[]{"Title","Artist","c"};
     public AlbumModel(List<AlbumVo> albums) {
         this.albums = albums;
+    }
+
+    public void setAlbums(List<AlbumVo> albums) {
+        this.albums = albums;
+        fireTableDataChanged();
     }
 
     @Override
@@ -34,7 +41,24 @@ public class AlbumModel extends AbstractTableModel{
     }
 
     @Override
-    public Object getValueAt(int i, int i1) {
-        return null;
+    public Object getValueAt(int row, int column) {
+        AlbumVo album  = null;
+        album= albums.get(row);
+
+        switch (column) {
+
+            case 0:
+                return album.getTitle();
+            case 1:
+                return album.getArtist();
+            case 2:
+                return album.getStyle();
+            case 3:
+
+            default :
+
+                return "";
+        }
+
     }
 }
