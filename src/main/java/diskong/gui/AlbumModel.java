@@ -2,7 +2,11 @@ package diskong.gui;
 
 import diskong.AlbumVo;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.awt.*;
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +19,7 @@ public class AlbumModel extends AbstractTableModel{
         //albums= new ArrayList<>();
     }
 
-    String[] colName=new String[]{"Title","Artist","c"};
+    String[] colName=new String[]{"Title","Artist","style", "image"};
     public AlbumModel(List<AlbumVo> albums) {
         this.albums = albums;
     }
@@ -32,12 +36,24 @@ public class AlbumModel extends AbstractTableModel{
 
     @Override
     public int getRowCount() {
+        if (albums==null)
+            return 0;
         return albums.size();
     }
 
     @Override
     public int getColumnCount() {
         return colName.length;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int column) {
+        switch (column) {
+            case 3:
+                return ImageIcon.class;
+            default:
+                return super.getColumnClass(column);
+        }
     }
 
     @Override
@@ -54,7 +70,17 @@ public class AlbumModel extends AbstractTableModel{
             case 2:
                 return album.getStyle();
             case 3:
+                if (album.getFolderImagePath()!=null){
+                    ImageIcon imgi;
+                    try {
+                        imgi = new ImageIcon(new File(album.getFolderImagePath()).toURI().toURL());
 
+                        return new ImageIcon(imgi.getImage().getScaledInstance(40, 40, Image.SCALE_DEFAULT));
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return "no image";
             default :
 
                 return "";

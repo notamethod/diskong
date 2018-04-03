@@ -92,7 +92,7 @@ public class AlbumVo implements IAlbumVo {
 
 		} else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") && (fPath.getFile().getName().toLowerCase().contains("folder") ||fPath.getFile().getName().toLowerCase().contains("cover"))){
 			LOG.debug("cover image found " + fPath.getFile().getName());
-			folderImagePath = fPath.getFile().getName();
+			folderImagePath = fPath.getFile().getAbsolutePath();
 		}
 		else {
 			LOG.debug("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
