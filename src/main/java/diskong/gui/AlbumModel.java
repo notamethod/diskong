@@ -1,6 +1,7 @@
 package diskong.gui;
 
 import diskong.AlbumVo;
+import diskong.IAlbumVo;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -86,5 +87,9 @@ public class AlbumModel extends AbstractTableModel{
                 return "";
         }
 
+    }
+
+    public AlbumVo getRow(int row){
+        return albums.get(row);
     }
 }

@@ -1,11 +1,9 @@
 package diskong.services;
 
-import com.googlecode.mp4parser.authoring.Track;
 import diskong.*;
 import diskong.gui.AlbumModel;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
-import diskong.parser.MetaUtils;
 import diskong.parser.fileutils.FilePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +20,12 @@ public class AudioService {
     static int NBCHECK = 200;
     AlbumService albumService = new AlbumService();
 
+
     public List<AlbumVo> traiterDir(Map<Path, List<FilePath>> map, AlbumModel model) {
         List<AlbumVo> albums = new ArrayList<>();
         int checkTagged = 0;
         int taggedTrack = 0;
+        diskong.parser.AudioParser ap = new AudioParser();
         for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
             long startTime = System.currentTimeMillis();
 
@@ -38,44 +38,60 @@ public class AudioService {
                 }
             }
             //FIXME:check parser creation
-            diskong.parser.AudioParser ap = new AudioParser();
-            AlbumVo album = AlbumFactory.getAlbum();
-            albums.add(album);
-            try {
-                // parsedir
-                LOG.debug("iteration");
+            AlbumVo avo =  parseDirectory(entry);
+            albums.add(avo);
+            model.setAlbums(albums);
 
-                album.setState(TagState.TOTAG);
-                LOG.debug("**************START******************************");
-                ExecutorService executor = Executors.newFixedThreadPool(10);
-                List<Future<TrackInfo>> list = new ArrayList<>();
-                for (FilePath fPath : entry.getValue()) {
-                    LOG.debug(fPath.getFile().getAbsolutePath());
-                    Callable<TrackInfo> worker = new CallTrackInfo(fPath);
-                    Future<TrackInfo> submit = executor.submit(worker);
-                    list.add(submit);
+
+            long endTime = System.currentTimeMillis();
+            LOG.debug(" files metaparsed in " + (endTime - startTime) + " ms");
+            if (Thread.interrupted()) {
+                System.out.println("xxxxxxxxxxxxxxxxxx");
+            }
+
+        }
+        return albums;
+    }
+
+    public AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry) {
+
+        AlbumVo album = AlbumFactory.getAlbum();
+
+        try {
+            // parsedir
+            LOG.debug("iteration");
+
+            album.setState(TagState.TOTAG);
+            LOG.debug("**************START******************************");
+            ExecutorService executor = Executors.newFixedThreadPool(10);
+            List<Future<TrackInfo>> list = new ArrayList<>();
+            for (FilePath fPath : entry.getValue()) {
+                LOG.debug(fPath.getFile().getAbsolutePath());
+                Callable<TrackInfo> worker = new CallTrackInfo(fPath);
+                Future<TrackInfo> submit = executor.submit(worker);
+                list.add(submit);
+            }
+
+            for (Future<TrackInfo> future : list) {
+                try {
+                    TrackInfo tinf = future.get();
+                    album.add(tinf); // (metafile)
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                } catch (WrongTrackAlbumException e) {
+                    // put track in right album
+                    AlbumFactory.orderingTrack(e.getTrack());
                 }
 
-                for (Future<TrackInfo> future : list) {
-                    try {
-                        TrackInfo tinf = future.get();
-                        album.add(tinf); // (metafile)
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    } catch (WrongTrackAlbumException e) {
-                        // put track in right album
-                        AlbumFactory.orderingTrack(e.getTrack());
-                    }
+            }
+            executor.shutdown();
 
-                }
-                executor.shutdown();
-
-                if (album.getTracks().isEmpty())
-                    album.setState(TagState.NOTRACKS);
-                else
-                    LOG.info("Album parsed:" + album.toString() + album.getTracks().size());
-                model.setAlbums(albums);
-                Statistics.getInstance().addStats(album);
+            if (album.getTracks().isEmpty())
+                album.setState(TagState.NOTRACKS);
+            else
+                LOG.info("Album parsed:" + album.toString() + album.getTracks().size());
+            //model.setAlbums(albums);
+            Statistics.getInstance().addStats(album);
 //                if (checkAction(album)) {
 //                    IAlbumVo alInfos = albumService.searchAlbum(album);
 //                    checkTagged += albumService.actionOnAlbum(album, alInfos);
@@ -88,16 +104,11 @@ public class AudioService {
 //				22:58:47.649 [main] DEBUG diskong.MassFlac - Alternative Rock Rock
 
 
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            long endTime = System.currentTimeMillis();
-            LOG.debug(" files metaparsed in " + (endTime - startTime) + " ms");
-
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        return albums;
+        return album;
     }
 
     private boolean contineParse() {

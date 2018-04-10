@@ -22,7 +22,7 @@ public class AlbumService {
 
 
 
-     IAlbumVo searchAlbum(AlbumVo album) {
+     public IAlbumVo searchAlbum(AlbumVo album) {
 
 
         int tagged = 0;

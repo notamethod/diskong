@@ -32,7 +32,6 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
             <version>1.17.1</version>
-
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -103,7 +102,7 @@
             <version>1.0.13</version>
         </dependency>
         <dependency>
-            <groupId>org.dpr</groupId>
+            <groupId>com.github.so-kes</groupId>
             <artifactId>swingtools</artifactId>
             <version>1.0</version>
         </dependency>

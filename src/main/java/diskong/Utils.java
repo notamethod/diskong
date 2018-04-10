@@ -15,9 +15,9 @@ public class Utils {
      * @param target
      * @throws IOException
      */
-    public void downloadFile(String url, Path target) throws IOException {
+    public static void downloadFile(String url, Path target) throws IOException {
 
-        URL website = new URL("http://www.website.com/information.asp");
+        URL website = new URL(url);
         try (InputStream in = website.openStream()) {
             Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
         }
