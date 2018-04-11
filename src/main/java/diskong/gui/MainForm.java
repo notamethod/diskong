@@ -33,8 +33,8 @@ public class MainForm {
     AlbumService albumService = new AlbumService();
     Map<Path, List<FilePath>> map;
     List<AlbumVo> albums = new ArrayList<>();
-    MonSwingWorker worker;
-    // RetrieveAlbumsTasks worker;
+    //MonSwingWorker worker;
+    RetrieveAlbumsTasks worker;
     private JButton analyseAlbumButton;
     private JPanel Panel1;
     private JTable table1;
@@ -57,7 +57,7 @@ public class MainForm {
                     public void run() {
                         /* Démarrage de l'interface graphique et du SwingWorker. */
 
-                        worker = new MonSwingWorker(model, 2);
+                        worker = new RetrieveAlbumsTasks(model, 2);
                         worker.execute();
                     }
                 });
@@ -98,6 +98,7 @@ public class MainForm {
 
                             try {
                                 Utils.downloadFile(a2.getCoverImageUrl(), target.resolve("folder.jpg"));
+                                JOptionPane.showMessageDialog(null, "image recovered");
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -197,6 +198,11 @@ public class MainForm {
             int taggedTrack = 0;
             diskong.parser.AudioParser ap = new AudioParser();
             for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
+                if(this.isCancelled()){
+                    progressBar1.setMaximum(map.size());
+                    JOptionPane.showMessageDialog(null, "Analyse stopped");
+                    return albums;
+                }
                 long startTime = System.currentTimeMillis();
 
                 //continue or stop asked every NBCHECK parsed files
