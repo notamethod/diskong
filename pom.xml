@@ -6,7 +6,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>Diskong</name>
     <properties>
-        <tika.version>1.12</tika.version>
+        <tika.version>1.17</tika.version>
     </properties>
     <dependencies>
         <dependency>
@@ -58,6 +58,13 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
             <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gagravarr</groupId>
+
+            <version>0.9-SNAPSHOT</version>
+
+            <artifactId>vorbis-java-core</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>

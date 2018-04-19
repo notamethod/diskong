@@ -19,15 +19,23 @@ public class AlbumService {
     final static Logger LOG = LoggerFactory.getLogger(AlbumService.class);
     private static final String UNKNOWN = "Unknown";
     boolean IsSimulate=true;
+    private SearchAPI searchAPI;
 
+    public SearchAPI getSearchAPI() {
+        return searchAPI;
+    }
 
+    public void setSearchAPI(SearchAPI searchAPI) {
+        this.searchAPI = searchAPI;
+    }
 
-     public IAlbumVo searchAlbum(AlbumVo album) {
+    public IAlbumVo searchAlbum(AlbumVo album) {
 
 
         int tagged = 0;
         IAlbumVo alInfos = null;
         LOG.info("Connecting to database:" + SearchAPI.DISCOGS);
+        this.searchAPI = SearchAPI.DISCOGS;
         DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
         try {
             alInfos = ds.searchRelease(album);

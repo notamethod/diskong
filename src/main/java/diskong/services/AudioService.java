@@ -5,6 +5,8 @@ import diskong.gui.AlbumModel;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
 import diskong.parser.fileutils.FilePath;
+import org.apache.tika.Tika;
+import org.apache.tika.parser.AutoDetectParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +58,7 @@ public class AudioService {
     public AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry) {
 
         AlbumVo album = AlbumFactory.getAlbum();
+        AutoDetectParser autoParser=new AutoDetectParser();
 
         try {
             // parsedir
@@ -67,7 +70,7 @@ public class AudioService {
             List<Future<TrackInfo>> list = new ArrayList<>();
             for (FilePath fPath : entry.getValue()) {
                 LOG.debug(fPath.getFile().getAbsolutePath());
-                Callable<TrackInfo> worker = new CallTrackInfo(fPath);
+                Callable<TrackInfo> worker = new CallTrackInfo(fPath, autoParser);
                 Future<TrackInfo> submit = executor.submit(worker);
                 list.add(submit);
             }

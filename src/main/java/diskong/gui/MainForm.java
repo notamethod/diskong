@@ -81,6 +81,7 @@ public class MainForm {
                 if (table1.getSelectedRow()>-1){
                     AlbumVo aa =  model.getRow(table1.getSelectedRow());
                     IAlbumVo a2 = albumService.searchAlbum(aa);
+                    JOptionPane.showMessageDialog(null,aa.getTitle() +" found using API: "+albumService.getSearchAPI());
                     System.out.println(a2.getCoverImageUrl());
                 }
 
@@ -111,6 +112,12 @@ public class MainForm {
 
 
     public static void main(String[] args) {
+        MainForm mf = new MainForm();
+        mf.init();
+    }
+
+    public void init(){
+
         for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
             if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
                 try {
@@ -127,6 +134,7 @@ public class MainForm {
 
         frame.pack();
         frame.setVisible(true);
+
     }
 
     private void createUIComponents() {
