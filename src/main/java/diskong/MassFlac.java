@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import diskong.api.ApiConfigurationException;
 import org.apache.tika.metadata.XMPDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,7 +177,7 @@ public class MassFlac {
 		return true;
 	}
 
-	private IAlbumVo searchAlbum(AlbumVo album) {
+	private IAlbumVo searchAlbum(AlbumVo album) throws ApiConfigurationException {
 
 
 		int tagged = 0;

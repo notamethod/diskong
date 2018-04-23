@@ -3,6 +3,7 @@ package diskong.gui;
 import diskong.AlbumVo;
 import diskong.IAlbumVo;
 import diskong.Utils;
+import diskong.api.ApiConfigurationException;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
 import diskong.parser.NioDirectoryParser;
@@ -80,7 +81,12 @@ public class MainForm {
             public void actionPerformed(ActionEvent actionEvent) {
                 if (table1.getSelectedRow()>-1){
                     AlbumVo aa =  model.getRow(table1.getSelectedRow());
-                    IAlbumVo a2 = albumService.searchAlbum(aa);
+                    IAlbumVo a2 = null;
+                    try {
+                        a2 = albumService.searchAlbum(aa);
+                    } catch (ApiConfigurationException e) {
+                        e.printStackTrace();
+                    }
                     JOptionPane.showMessageDialog(null,aa.getTitle() +" found using API: "+albumService.getSearchAPI());
                     System.out.println(a2.getCoverImageUrl());
                 }
@@ -93,7 +99,12 @@ public class MainForm {
                 if (table1.getSelectedRow()>-1){
                     AlbumVo album =  model.getRow(table1.getSelectedRow());
                     if (album.getFolderImagePath()==null || album.getFolderImagePath().isEmpty()) {
-                        IAlbumVo a2 = albumService.searchAlbum(album);
+                        IAlbumVo a2 = null;
+                        try {
+                            a2 = albumService.searchAlbum(album);
+                        } catch (ApiConfigurationException e) {
+                            e.printStackTrace();
+                        }
                         if (a2.getCoverImageUrl() != null){
                             Path target = album.getTracks().get(0).getfPath().getPath().getParent();
 

@@ -7,6 +7,7 @@ import diskong.AlbumVo;
 import diskong.IAlbumVo;
 import diskong.ReleaseNotFoundException;
 import diskong.api.AbstractDatabase;
+import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
@@ -17,6 +18,9 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +45,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ApiConfigurationException {
         LOG.info("Entering application.");
         DiscogSearch app = new DiscogSearch();
 
@@ -50,7 +54,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         app.search("type=all&artist=babybird");
     }
 
-    public void getUserID() {
+    public void getUserID() throws ApiConfigurationException {
         client.removeAllFilters();
 
         // Create a resource to be used to make Twitter API calls
@@ -77,7 +81,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         }
     }
 
-    public void getProfile(String userName) {
+    public void getProfile(String userName) throws ApiConfigurationException {
         client.removeAllFilters();
 
         // Create a resource to be used to make Twitter API calls
@@ -104,7 +108,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         }
     }
 
-    public JSONObject search(String query) {
+    public JSONObject search(String query) throws ApiConfigurationException {
         client.removeAllFilters();
         // Create a resource to be used to make Twitter API calls
         WebResource resource = client.resource(URL_API + URL_SEARCH + query);
@@ -130,7 +134,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         return jsonObject;
     }
 
-    public IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException {
+    public IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException, ApiConfigurationException {
         IAlbumVo albumInfo = new AlbumVo();
         String query = null;
         if (album == null || StringUtils.isBlank(album.getTitle())) {
@@ -189,6 +193,19 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
         return URIUtil.encodeQuery(sb.toString());
 
+    }
+
+    @Override
+    public boolean isAPIAvailable() {
+        boolean available=true;
+
+            File file = new File(System.getProperty("user.home")+"/.shipkong/authapis.ini");
+       if (!file.exists()){
+                log.error("no configuration file found");
+                available = false;
+            }
+
+        return available;
     }
 
     public class UserAgentFilter extends ClientFilter {

@@ -214,6 +214,11 @@ public class DiscogClientJackson extends AbstractDatabase implements DatabaseSea
 
 	}
 
+	@Override
+	public boolean isAPIAvailable() {
+		return false;
+	}
+
 	public String get(String string, String iD) {
 		// TODO Auto-generated method stub
 		return null;

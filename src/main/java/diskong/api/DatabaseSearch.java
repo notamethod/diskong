@@ -5,6 +5,6 @@ import diskong.ReleaseNotFoundException;
 
 public interface DatabaseSearch {
 
-	IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException;
+	IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException, ApiConfigurationException;
 
 }

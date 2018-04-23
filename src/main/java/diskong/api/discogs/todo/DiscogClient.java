@@ -266,6 +266,11 @@ public class DiscogClient extends AbstractDatabase implements DatabaseSearch {
 
 	}
 
+	@Override
+	public boolean isAPIAvailable() {
+		return false;
+	}
+
 	public class UserAgentFilter extends ClientFilter {
 		private final String header;
 		private final String value;

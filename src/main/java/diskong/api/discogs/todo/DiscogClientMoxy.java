@@ -220,5 +220,10 @@ public class DiscogClientMoxy extends AbstractDatabase implements DatabaseSearch
 
 	}
 
+	@Override
+	public boolean isAPIAvailable() {
+		return false;
+	}
+
 
 }

@@ -23,6 +23,7 @@ import diskong.api.DatabaseSearch;
 
 /**
  * Hello world!
+ * to stash
  * 
  */
 public class OAuthentification extends AbstractDatabase implements DatabaseSearch{
@@ -224,6 +225,11 @@ public class OAuthentification extends AbstractDatabase implements DatabaseSearc
 			
 		return URIUtil.encodeQuery(sb.toString());
 
+	}
+
+	@Override
+	public boolean isAPIAvailable() {
+		return false;
 	}
 
 

@@ -10,7 +10,7 @@ import diskong.ReleaseNotFoundException;
 
 public abstract class AbstractDatabase {
 	
-	final static Logger log = LoggerFactory.getLogger(AbstractDatabase.class);
+	protected final static Logger log = LoggerFactory.getLogger(AbstractDatabase.class);
 
 
 	/**
@@ -18,7 +18,7 @@ public abstract class AbstractDatabase {
 	 * @param album
 	 * @throws ReleaseNotFoundException 
 	 */
-	public IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException {
+	public IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException, ApiConfigurationException {
 		String query=null;
 		if (album==null ||  StringUtils.isBlank(album.getTitle())){
 			log.error("insufficient data for search query..."+album);
@@ -37,5 +37,6 @@ public abstract class AbstractDatabase {
 	//protected  abstract void search(String query);
 
 	protected  abstract String getReleaseQuery(IAlbumVo album) throws Exception;
-	
+
+	public abstract boolean isAPIAvailable();
 }

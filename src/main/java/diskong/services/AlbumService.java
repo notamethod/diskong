@@ -1,6 +1,7 @@
 package diskong.services;
 
 import diskong.*;
+import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
 import diskong.api.DatabaseSearchFactory;
 import diskong.api.SearchAPI;
@@ -29,7 +30,7 @@ public class AlbumService {
         this.searchAPI = searchAPI;
     }
 
-    public IAlbumVo searchAlbum(AlbumVo album) {
+    public IAlbumVo searchAlbum(AlbumVo album) throws ApiConfigurationException {
 
 
         int tagged = 0;
