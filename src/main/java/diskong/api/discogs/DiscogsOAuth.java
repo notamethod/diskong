@@ -1,15 +1,10 @@
 package diskong.api.discogs;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 import diskong.api.ApiConfigurationException;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,20 +30,18 @@ public class DiscogsOAuth  {
 	private static final String URL_API = "https://api.discogs.com/";
 
 
-	private static final String CONSUMER_KEY = "DISCOGS_CONSUMER_KEY";
-	private static final String CONSUMER_SECRET = "DISCOGS_CONSUMER_SECRET";
+	private static final String PROP_CONSUMER_KEY = "DISCOGS_CONSUMER_KEY";
+	private static final String PROP_CONSUMER_SECRET = "DISCOGS_CONSUMER_SECRET";
+	private static final String PROP_ACCESS_OAUTH_TOKEN = "DISCOGS_ACCESS_OAUTH_TOKEN";
+	private static final String PROP_ACCESS_OAUTH_TOKEN_SECRET = "DISCOGS_ACCESS_OAUTH_TOKEN_SECRET";
 	private static final String REQUEST_TOKEN_URL = URL_API + "oauth/request_token";
 	private static final String Authorize_URL = "https://www.discogs.com/oauth/authorize";
 	private static final String ACCESS_TOKEN_URL = "https://api.discogs.com/oauth/access_token";
 	private static final String REQUEST_OAUTH_TOKEN = "DISCOGS_REQUEST_OAUTH_TOKEN";
 	private static final String REQUEST_OAUTH_TOKEN_SECRET = "DISCOGS_REQUEST_OAUTH_TOKEN_SECRET";
 	private static final String PIN = "DISCOGS_PIN";
-	private static final String ACCESS_OAUTH_TOKEN = "DISCOGS_ACCESS_OAUTH_TOKEN";
-	private static final String ACCESS_OAUTH_TOKEN_SECRET = "DISCOGS_ACCESS_OAUTH_TOKEN_SECRET";
-//	// oauth_token_secret=byLxdKQdmAmrGojZKiYZBKSeHmwrgdrSTQrSTRSQ&oauth_token=OAUszICFIcekTTMaQAzarDRfwLTGPmUroXRQICwL
-//	oauth_token_secret=&oauth_token=&oauth_callback_confirmed=true
-//			retour:oauth_token_secret=aKrtKqSlLCkjQsgFAIWflijiTKSKQwmPgYIdMYdl&oauth_token=rhTaolHuQCieyGZeJlgEccdtcxjBjUsvsUigSlSh&oauth_callback_confirmed=true
-//			https://www.discogs.com/oauth/authorize?oauth_token=rhTaolHuQCieyGZeJlgEccdtcxjBjUsvsUigSlSh
+
+
 	
 	final static Logger logger = LoggerFactory.getLogger(DiscogsOAuth.class);
 	Properties authProperties = new Properties();
@@ -89,8 +82,8 @@ public class DiscogsOAuth  {
 		// Create a resource
 		WebResource resource = client.resource(REQUEST_TOKEN_URL);
 
-		OAuthSecrets secrets = new OAuthSecrets().consumerSecret(authProperties.getProperty(CONSUMER_SECRET));
-		OAuthParameters params = new OAuthParameters().consumerKey(authProperties.getProperty(CONSUMER_KEY)).signatureMethod("PLAINTEXT")
+		OAuthSecrets secrets = new OAuthSecrets().consumerSecret(authProperties.getProperty(PROP_CONSUMER_SECRET));
+		OAuthParameters params = new OAuthParameters().consumerKey(authProperties.getProperty(PROP_CONSUMER_KEY)).signatureMethod("PLAINTEXT")
 				.version("1.0a").callback("oob");
 		// Create the OAuth client filter
 		OAuthClientFilter oauthFilter = new OAuthClientFilter(client.getProviders(), params, secrets);
@@ -129,10 +122,10 @@ public class DiscogsOAuth  {
 
 	public WebResource addAuthentificationFilters(WebResource resource) {
 		// Set the OAuth parameters
-		OAuthSecrets secrets = new OAuthSecrets().consumerSecret(authProperties.getProperty(CONSUMER_SECRET))
-				.tokenSecret(authProperties.getProperty(ACCESS_OAUTH_TOKEN_SECRET));
-		OAuthParameters params = new OAuthParameters().consumerKey(authProperties.getProperty(CONSUMER_KEY)).signatureMethod("HMAC-SHA1")
-				.version("1.0").token(authProperties.getProperty(ACCESS_OAUTH_TOKEN));
+		OAuthSecrets secrets = new OAuthSecrets().consumerSecret(authProperties.getProperty(PROP_CONSUMER_SECRET))
+				.tokenSecret(authProperties.getProperty(PROP_ACCESS_OAUTH_TOKEN_SECRET));
+		OAuthParameters params = new OAuthParameters().consumerKey(authProperties.getProperty(PROP_CONSUMER_KEY)).signatureMethod("HMAC-SHA1")
+				.version("1.0").token(authProperties.getProperty(PROP_ACCESS_OAUTH_TOKEN));
 		// Create the OAuth client filter
 		resource.addFilter(new LoggingFilter(System.out));
 		resource.addFilter(new UserAgentFilter(HttpHeaders.USER_AGENT, "<<diskong-user-agent>>"));

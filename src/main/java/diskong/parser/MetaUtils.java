@@ -1,6 +1,7 @@
 package diskong.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.Property;
 import org.apache.tika.metadata.XMPDM;
 
-import diskong.AlbumVo;
 import diskong.IAlbumVo;
 
 public class MetaUtils {
@@ -17,9 +17,7 @@ public class MetaUtils {
 
 	public static List<String> getGenre(Metadata metadata) {
 		List<String> genres = new ArrayList<>();
-		for (String genre : metadata.getValues(XMPDM.GENRE)) {
-			genres.add(genre);
-		}
+		genres.addAll(Arrays.asList(metadata.getValues(XMPDM.GENRE)));
 		return genres;
 
 	}

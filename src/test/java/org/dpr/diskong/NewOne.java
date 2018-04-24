@@ -1,10 +1,5 @@
 package org.dpr.diskong;
 
-import diskong.parser.NioDirectoryParser;
-
-import java.io.File;
-import java.net.URI;
-
 public class NewOne {
 
 

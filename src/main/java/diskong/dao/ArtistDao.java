@@ -1,17 +1,12 @@
 package diskong.dao;
 
-import java.io.IOException;
-
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-
 import diskong.pojos2.Artist;
 
 public class ArtistDao {
 
 	public Artist getByID(String ID) {
 		
-//		DiscogClientJackson discogCli = new DiscogClientJackson();
+//		DiscogClientxJackson discogCli = new DiscogClientxJackson();
 //		
 //		String jsString=discogCli.get("Release.ByID", ID);
 //		

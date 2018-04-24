@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class AlbumService {
     final static Logger LOG = LoggerFactory.getLogger(AlbumService.class);
     private static final String UNKNOWN = "Unknown";
-    boolean IsSimulate=true;
+    boolean IsSimulate = true;
     private SearchAPI searchAPI;
 
     public SearchAPI getSearchAPI() {
@@ -46,26 +46,26 @@ public class AlbumService {
 
         } catch (ReleaseNotFoundException e) {
             String artist = TrackUtils.regexx(album.getArtist(), "(\\((.+)\\))|(!)|(&)");
-            if (artist != null && !artist.equals("") && artist != album.getArtist()) {
+            if (artist != null && !artist.equals("") && !artist.equals(album.getArtist())) {
                 album.setExactMatch(false);
                 album.setArtist(artist);
                 return searchAlbum(album);
             }
 
             String title = TrackUtils.regexx(album.getTitle(), "(cd\\d*\\s)|(!)|(&)|(:)|(,)|(Disc\\s\\d*)");
-            if (title != null && !title.equals("") && title != album.getTitle()) {
+            if (title != null && !title.equals("") && !title.equals(album.getTitle())) {
                 album.setExactMatch(false);
                 album.setTitle(title);
                 return searchAlbum(album);
             } else {
                 title = TrackUtils.regexx(album.getTitle(), "\\((.+)\\)");
-                if (title != null && !title.equals("") && title != album.getTitle()) {
+                if (title != null && !title.equals("") && !title.equals(album.getTitle())) {
                     album.setExactMatch(false);
                     album.setTitle(title);
                     return searchAlbum(album);
                 }
             }
-            if (artist != null && artist.equals("Various")){
+            if (artist != null && artist.equals("Various")) {
                 album.setExactMatch(false);
                 album.setArtist(null);
                 return searchAlbum(album);
@@ -81,7 +81,7 @@ public class AlbumService {
     /**
      * @param album
      */
-     int actionOnAlbum(AlbumVo album, IAlbumVo alInfos) {
+    int actionOnAlbum(AlbumVo album, IAlbumVo alInfos) {
 
         int tagged = 0;
         if (alInfos == null) {
@@ -90,7 +90,7 @@ public class AlbumService {
         }
         if (!album.isExactMatch()) {
             Scanner sc = new Scanner(System.in);
-            System.out.println("Not exact match for "+album.getTitle()+"/"+album.getArtist()+" - release found: " + alInfos.getTitle() + ", " + alInfos.getArtist());
+            System.out.println("Not exact match for " + album.getTitle() + "/" + album.getArtist() + " - release found: " + alInfos.getTitle() + ", " + alInfos.getArtist());
             System.out.println("retag with this ? (O/N)");
             String str = sc.nextLine();
             if (!str.equals("O")) {

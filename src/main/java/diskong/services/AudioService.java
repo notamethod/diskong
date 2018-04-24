@@ -5,7 +5,6 @@ import diskong.gui.AlbumModel;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
 import diskong.parser.fileutils.FilePath;
-import org.apache.tika.Tika;
 import org.apache.tika.parser.AutoDetectParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

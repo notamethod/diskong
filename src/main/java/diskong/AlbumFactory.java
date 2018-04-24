@@ -10,7 +10,7 @@ public class AlbumFactory {
 	}
 
 	public static void orderingTrack(Metadata metadata) {
-		System.err.println("rangement non géré");
+		System.err.println("not implemented");
 		
 	}
 

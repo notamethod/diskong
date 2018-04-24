@@ -1,16 +1,15 @@
 package diskong.gui;
 
 import diskong.AlbumVo;
-import diskong.IAlbumVo;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class AlbumModel extends AbstractTableModel{
 
     List<AlbumVo> albums;
