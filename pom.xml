@@ -3,7 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dpr</groupId>
     <artifactId>diskong</artifactId>
+    <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
+    <modules>
+        <module>kong-core</module>
+        <module>discogs-client</module>
+        <module>Shipkong</module>
+
+    </modules>
     <name>Diskong</name>
     <properties>
         <tika.version>1.17</tika.version>
