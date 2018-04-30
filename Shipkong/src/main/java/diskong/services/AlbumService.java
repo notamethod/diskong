@@ -1,5 +1,6 @@
 package diskong.services;
 
+import diskong.*;
 import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
 import diskong.api.DatabaseSearchFactory;
