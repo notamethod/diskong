@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/discogs-client/discogs-client.iml" filepath="$PROJECT_DIR$/discogs-client/discogs-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/diskong.iml" filepath="$PROJECT_DIR$/diskong.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kong-core/kong-core.iml" filepath="$PROJECT_DIR$/kong-core/kong-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Shipkong/shipkong.iml" filepath="$PROJECT_DIR$/Shipkong/shipkong.iml" />
+    </modules>
+  </component>
+</project>

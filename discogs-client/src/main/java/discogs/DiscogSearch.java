@@ -29,8 +29,8 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
     final static Logger LOG = LoggerFactory.getLogger(DiscogSearch.class);
     // base URL for the API calls
-    private static final String URL_API = "https://diskong.api.discogs.com/";
-    private static final String URL_API_IMG = "https://diskong.api.discogs.com/";
+    private static final String URL_API = "https://api.discogs.com/";
+    private static final String URL_API_IMG = "https://api.discogs.com/";
     // private static final String URL_API = "http://localhost:8080/";
     private static final String URL_IDENTITY = "oauth/identity";
     private static final String URL_PROFILE = "users/";

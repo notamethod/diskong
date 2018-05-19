@@ -27,7 +27,7 @@ import com.sun.jersey.oauth.signature.OAuthSecrets;
 public class DiscogsOAuth  {
 
 	// base URL for the API calls
-	private static final String URL_API = "https://diskong.api.discogs.com/";
+	private static final String URL_API = "https://api.discogs.com/";
 
 
 	private static final String PROP_CONSUMER_KEY = "DISCOGS_CONSUMER_KEY";
@@ -36,7 +36,7 @@ public class DiscogsOAuth  {
 	private static final String PROP_ACCESS_OAUTH_TOKEN_SECRET = "DISCOGS_ACCESS_OAUTH_TOKEN_SECRET";
 	private static final String REQUEST_TOKEN_URL = URL_API + "oauth/request_token";
 	private static final String Authorize_URL = "https://www.discogs.com/oauth/authorize";
-	private static final String ACCESS_TOKEN_URL = "https://diskong.api.discogs.com/oauth/access_token";
+	private static final String ACCESS_TOKEN_URL = "https://api.discogs.com/oauth/access_token";
 	private static final String REQUEST_OAUTH_TOKEN = "DISCOGS_REQUEST_OAUTH_TOKEN";
 	private static final String REQUEST_OAUTH_TOKEN_SECRET = "DISCOGS_REQUEST_OAUTH_TOKEN_SECRET";
 	private static final String PIN = "DISCOGS_PIN";
