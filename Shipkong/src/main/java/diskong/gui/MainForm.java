@@ -15,6 +15,7 @@ import org.dpr.swingtools.components.JDropText;
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -40,7 +41,7 @@ public class MainForm {
     private JPanel Panel1;
     private JTable table1;
     private JButton analyzeDirButton;
-    private JButton button3;
+    private JButton getImageButton;
     private JLabel nbFiles;
     private JProgressBar progressBar1;
     private JScrollPane scrollPane1;
@@ -79,33 +80,38 @@ public class MainForm {
         analyseAlbumButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (table1.getSelectedRow()>-1){
-                    AlbumVo aa =  model.getRow(table1.getSelectedRow());
+                if (table1.getSelectedRow() > -1) {
+                    AlbumVo aa = model.getRow(table1.getSelectedRow());
                     IAlbumVo a2 = null;
                     try {
                         a2 = albumService.searchAlbum(aa);
                     } catch (ApiConfigurationException e) {
                         e.printStackTrace();
                     }
-                    JOptionPane.showMessageDialog(null,aa.getTitle() +" found using API: "+albumService.getSearchAPI());
-                    System.out.println(a2.getCoverImageUrl());
+                    if (a2 != null)
+                        JOptionPane.showMessageDialog(null, aa.getTitle() + " found using API: " + albumService.getSearchAPI());
+                    else
+                    JOptionPane.showMessageDialog(null,
+                            aa.getTitle() +
+                                    "  not found using API: " + albumService.getSearchAPI(), "error", JOptionPane.ERROR_MESSAGE);
+
                 }
 
             }
         });
-        button3.addActionListener(new ActionListener() {
+        getImageButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (table1.getSelectedRow()>-1){
-                    AlbumVo album =  model.getRow(table1.getSelectedRow());
-                    if (album.getFolderImagePath()==null || album.getFolderImagePath().isEmpty()) {
+                if (table1.getSelectedRow() > -1) {
+                    AlbumVo album = model.getRow(table1.getSelectedRow());
+                    if (album.getFolderImagePath() == null || album.getFolderImagePath().isEmpty()) {
                         IAlbumVo a2 = null;
                         try {
                             a2 = albumService.searchAlbum(album);
                         } catch (ApiConfigurationException e) {
                             e.printStackTrace();
                         }
-                        if (a2.getCoverImageUrl() != null){
+                        if (a2.getCoverImageUrl() != null) {
                             Path target = album.getTracks().get(0).getfPath().getPath().getParent();
 
                             try {
@@ -127,7 +133,7 @@ public class MainForm {
         mf.init();
     }
 
-    public void init(){
+    public void init() {
 
         for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
             if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
@@ -217,7 +223,7 @@ public class MainForm {
             int taggedTrack = 0;
             diskong.parser.AudioParser ap = new AudioParser();
             for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
-                if(this.isCancelled()){
+                if (this.isCancelled()) {
                     progressBar1.setMaximum(map.size());
                     JOptionPane.showMessageDialog(null, "Analyse stopped");
                     return albums;

@@ -1,8 +1,9 @@
-package diskong;
+package diskong.tag.metatag;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import diskong.tag.metatag.ArgAction;
 import org.apache.tika.metadata.Property;
 
 public class Arguments {

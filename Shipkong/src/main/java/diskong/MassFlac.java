@@ -18,6 +18,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import diskong.api.ApiConfigurationException;
+import diskong.tag.metatag.ArgAction;
+import diskong.tag.metatag.Arguments;
 import org.apache.tika.metadata.XMPDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

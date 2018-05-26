@@ -1,7 +1,7 @@
-package diskong;
+package diskong.rip;
 
 public enum ArgAction {
-	REMOVE_TAG("--remove-tag="), SET_TAG("--set-tag="); 
+	CDDB("-a cddb"), CLEAN("-a clean"), EMBEDIMAGE("-B"), DEFAULT("-a default,getalbumart");
 
 	 private final String name;       
 	 

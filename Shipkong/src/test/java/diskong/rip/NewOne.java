@@ -1,8 +1,24 @@
-package org.dpr.diskong;
+package diskong.rip;
+
+
+import org.junit.Test;
+
+import java.net.URISyntaxException;
 
 public class NewOne {
 
 
+    @Test
+    public void test_abcde_conf_loaded() {
+        AbcdeHandler ah = null;
+        try {
+            ah = new AbcdeHandler();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        System.out.println(ah.ripProperties.getProperty("PROPTEST1"));
+
+    }
 //    public static void main(String[] args) {
 //        NioDirectoryParser dp = new NioDirectoryParser();
 //
