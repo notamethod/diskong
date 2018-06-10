@@ -1,7 +1,7 @@
 package diskong.rip;
 
 public enum ArgAction {
-	CDDB("-a cddb"), CLEAN("-a clean"), EMBEDIMAGE("-B"), DEFAULT("-a default,getalbumart");
+	CDDB("-a cddb"), CLEAN("-a clean"), EMBEDIMAGE("-B"), DEFAULT("-a default,getalbumart"), GETIMAGE("getalbumart");
 
 	 private final String name;       
 	 

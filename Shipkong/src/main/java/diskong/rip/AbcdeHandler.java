@@ -19,9 +19,12 @@ public class AbcdeHandler {
     public final String OUTPUT_FORMAT = "OUTPUTFORMAT";
     public final String WAVOUTPUTDIR = "WAVOUTPUTDIR";
     public final String DEFAULT_OUTPUT_FORMAT = "'${ARTISTFILE}-${ALBUMFILE}/${TRACKNUM}.${TRACKFILE}'";
+    final String TITLE_SEPARATOR = "----";
     final String COMMAND_NAME = "abcde";
     Properties ripProperties = new Properties();
     String configurationFileName;
+    private String artist;
+    private String album;
 
     public AbcdeHandler() throws URISyntaxException {
         InputStream is = null;
@@ -53,7 +56,7 @@ public class AbcdeHandler {
     }
 
     public String process(Map<String, String> params, List<String> actionList) throws RipperException {
-        String actionResult="";
+        String actionResult = "";
         try {
             configure(params);
         } catch (IOException e) {
@@ -64,7 +67,9 @@ public class AbcdeHandler {
         List<String> liste = new ArrayList<>();
         liste.add(COMMAND_NAME);
         liste.add("-c" + configurationFileName);
-        liste.addAll(actionList);
+
+        String actions = "-a " + String.join(",", actionList);
+        liste.add(actions);
         System.out.println(liste.toString());
         ProcessBuilder pb = new ProcessBuilder(liste);
         try {
@@ -83,24 +88,28 @@ public class AbcdeHandler {
                 builder.append(System.getProperty("line.separator"));
             }
             String result = builder.toString();
-//            System.out.println("result: " + result);
-            actionResult= parseInfo(result, actionList);
+            actionResult = parseInfo(result, actionList);
             if (exitCode != 0) {
                 BufferedReader output = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                parseError(output, exitCode);
+                throw new RipperException(parseError(output, exitCode), result, exitCode);
             }
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             exitCode = 99;
+            throw new RipperException("exit code is " + exitCode);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             exitCode = 99;
-        }finally {
-            if (exitCode!=0)
-                throw new RipperException("exit code is "+exitCode);
+            throw new RipperException("exit code is " + exitCode);
+        } finally {
+            if (exitCode == 88){
+
+            }
+            //OK
+
         }
 
 
@@ -111,16 +120,14 @@ public class AbcdeHandler {
         String line;
         StringBuilder sb = new StringBuilder();
         BufferedReader reader = new BufferedReader(new StringReader(result));
-        boolean firstLine = false;
+        String firstLine = null;
         while ((line = reader.readLine()) != null) {
-            if (line.startsWith("#"))
-                if (line.startsWith("#1"))
-                    firstLine = true;
-                else
-                    firstLine = false;
-            if (firstLine && !line.startsWith("#1"))
+            if (null == firstLine)
+                firstLine = getTitle(line);
+
+            if (null != firstLine && !firstLine.equals(line))
                 sb.append(line).append(System.getProperty("line.separator"));
-            if (firstLine && line.startsWith("#1"))
+            if (null != firstLine && firstLine.equals(line))
                 sb.append(parseHeader(line)).append(System.getProperty("line.separator"));
 
 
@@ -128,11 +135,28 @@ public class AbcdeHandler {
         return sb.toString();
     }
 
+    private String getTitle(String line) {
+        if (line.startsWith("#"))
+            if (line.startsWith("#1"))
+                return line;
+        if (line.startsWith(TITLE_SEPARATOR))
+            return line;
+        return null;
+
+    }
+
     private String parseHeader(String line) {
         String trimedString = line.replaceAll("----", "");
-        String[] strArray = trimedString.split(" ");
-        for (int i=0; i<4;i++) {
-            trimedString = trimedString.replaceAll(strArray[i], "");
+//        String[] strArray = trimedString.split(" ");
+//        for (int i = 0; i < 4; i++) {
+//            trimedString = trimedString.replaceAll(strArray[i], "");
+//        }
+        if (null!=trimedString){
+            String[] split = trimedString.split("/");
+            if (split.length==2){
+                artist=split[0].trim();
+                album = split[1].trim();
+            }
         }
         return trimedString;
     }
@@ -154,7 +178,7 @@ public class AbcdeHandler {
         }
     }
 
-    private void parseError(BufferedReader output, int exitCode) throws RipperException {
+    private String parseError(BufferedReader output, int exitCode) throws RipperException {
         String ligne;
         try {
             String message = "";
@@ -168,12 +192,23 @@ public class AbcdeHandler {
 
                 sb.append(System.getProperty("line.separator"));
                 sb.append(ligne);
-                throw new RipperException(message + sb.toString());
+
             }
+            return message + sb.toString();
         } catch (IOException e) {
             throw new RipperException("Error executing process", e);
 
         }
 
     }
+
+    public String getCoverImage() {
+        String dir = ripProperties.getProperty(OUTPUT_DIR);
+        File f = new File(dir, artist.replaceAll(" ", "_")+"-"+album.replaceAll(" ", "_"));
+        File image = new File(f, "cover.jpg");
+        return image.getAbsolutePath();
+    }
+   // /tmp/Dinosaur Jr.-I Bet on Sky/cover.jpg
+   //  /tmp/Dinosaur_Jr.-I_Bet_on_Sky
+    //sudo apt-get install libmusicbrainz-discid-perl libwebservice-musicbrainz-perl
 }

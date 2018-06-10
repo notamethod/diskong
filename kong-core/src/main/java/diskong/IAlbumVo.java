@@ -39,4 +39,8 @@ public interface IAlbumVo {
 
 	List<String> getImages();
 	void setImages(JSONArray jsonArray);
+
+	public boolean isExactMatch();
+	public void setExactMatch(boolean exactMatch);
+
 }

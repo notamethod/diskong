@@ -18,12 +18,28 @@ public class Arguments {
 		liste.add(buf.toString());
 		
 	}
+
+	public void add(ArgAction actionTag, String prop) {
+		// TODO Auto-generated method stub
+		StringBuffer buf = new StringBuffer();
+		buf.append(actionTag.getString()).append(prop.contains(":")?prop.split(":")[1]:prop);//.append(" ");
+		liste.add(buf.toString());
+
+	}
 	public void add(ArgAction actionTag, Property prop, String value) {
 		StringBuffer buf = new StringBuffer();
 		
 		buf.append(actionTag.getString()).append(prop.getName().contains(":")?prop.getName().split(":")[1]:prop.getName()).append("=").append(value);
 		liste.add(buf.toString());
 		
+	}
+
+	public void add(ArgAction actionTag, String key, String value) {
+		StringBuffer buf = new StringBuffer();
+
+		buf.append(actionTag.getString()).append(key.contains(":")?key.split(":")[1]:key).append("=").append(value);
+		liste.add(buf.toString());
+
 	}
 	public String flatten() {
 		// TODO Auto-generated method stub

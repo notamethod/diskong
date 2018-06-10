@@ -3,8 +3,11 @@ package diskong.gui;
 import diskong.rip.AbcdeHandler;
 import diskong.rip.ArgAction;
 import diskong.rip.RipperException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -27,12 +30,14 @@ public class RipForm {
     private JTextField tempFolder;
     private JTextField outputFormat;
     private JCheckBox albumArtCheckBox;
+    private JLabel jCoverImage;
+    private JButton button2;
     private String outputDir;
 
 
     public RipForm() {
 
-
+        final  Logger LOG = LoggerFactory.getLogger(RipForm.class);
         final Map<String, String> params = new HashMap<>();
 
         try {
@@ -50,18 +55,28 @@ public class RipForm {
 
                 List<String> liste = new ArrayList<>();
 
-                liste.add("-a clean,cddb");
+                liste.add("clean,cddb");
+                if (albumArtCheckBox.isSelected()) {
+                    liste.add(ArgAction.GETIMAGE.getString());
+                }
                 try {
 
                     textArea1.setText(ah.process(params, liste));
+                    ImageIcon imageIcon = new ImageIcon(ah.getCoverImage()); // load the image to a imageIcon
+
+                    Image newimg = imageIcon.getImage();
+
+                    newimg  = newimg.getScaledInstance(120, 120,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+                      imageIcon = new ImageIcon(newimg);  // transform it back
+                    jCoverImage.setIcon(imageIcon);
                 } catch (RipperException e) {
+                    LOG.error("process error", e);
                     JOptionPane.showMessageDialog(null,
-                            e.getMessage(), "information", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
+                            e.getMessageCode(), "information", JOptionPane.ERROR_MESSAGE);
                 } catch (Exception e) {
+                    LOG.error("process error", e);
                     JOptionPane.showMessageDialog(null,
                             e.getMessage(), "information", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
                 }
             }
         });
@@ -85,7 +100,7 @@ public class RipForm {
                 List<String> liste = new ArrayList<>();
 
                 liste.add(ah.FORMAT_PREFIX + comboBox2.getSelectedItem());
-                if (albumArtCheckBox.isSelected()){
+                if (albumArtCheckBox.isSelected()) {
                     liste.add(ArgAction.DEFAULT.getString());
                 }
 

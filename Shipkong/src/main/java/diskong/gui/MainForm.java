@@ -10,12 +10,14 @@ import diskong.parser.NioDirectoryParser;
 import diskong.parser.fileutils.FilePath;
 import diskong.services.AlbumService;
 import diskong.services.AudioService;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
+import org.apache.tika.metadata.XMPDM;
 import org.dpr.swingtools.components.JDropText;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -24,6 +26,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
@@ -47,6 +50,9 @@ public class MainForm {
     private JScrollPane scrollPane1;
     private JDropText pathField;
     private JButton stopButton;
+    private JButton retagButton;
+    private IAlbumVo originalInfo;
+    private IAlbumVo correctedInfo;
 
 
     public MainForm() {
@@ -81,20 +87,22 @@ public class MainForm {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (table1.getSelectedRow() > -1) {
-                    AlbumVo aa = model.getRow(table1.getSelectedRow());
+                    IAlbumVo album = model.getRow(table1.getSelectedRow());
                     IAlbumVo a2 = null;
                     try {
-                        a2 = albumService.searchAlbum(aa);
+                        a2 = albumService.searchAlbum(album);
                     } catch (ApiConfigurationException e) {
                         e.printStackTrace();
                     }
                     if (a2 != null)
-                        JOptionPane.showMessageDialog(null, aa.getTitle() + " found using API: " + albumService.getSearchAPI());
-                    else
-                    JOptionPane.showMessageDialog(null,
-                            aa.getTitle() +
-                                    "  not found using API: " + albumService.getSearchAPI(), "error", JOptionPane.ERROR_MESSAGE);
+                        //found: ok
+                        JOptionPane.showMessageDialog(null, album.getTitle() + " found using API: " + albumService.getSearchAPI());
+                    else {
+                        a2= manualSearch(album);
 
+                    }
+                    originalInfo = album;
+                    correctedInfo = a2;
                 }
 
             }
@@ -125,112 +133,167 @@ public class MainForm {
                 }
             }
         });
+        retagButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+               Metadata data =  checkRetagNeeded(originalInfo, correctedInfo);
+                albumService.setSimulate(false);
+                 albumService.retagAlbum(data, originalInfo);
+            }
+        });
     }
-
 
     public static void main(String[] args) {
         MainForm mf = new MainForm();
         mf.init();
     }
 
-    public void init() {
-
-        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-            if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
+    private Metadata checkRetagNeeded(IAlbumVo source, IAlbumVo dest) {
+        Metadata data =null;
+        if (dest != null) {
+             data =  new Metadata();
+            if ((dest.getTitle() != null) && !Objects.equals(dest.getTitle(), source.getTitle())) {
+                data.set(XMPDM.ALBUM, dest.getTitle());
+            }
+            if ((dest.getArtist() != null) && !Objects.equals(dest.getArtist(), source.getArtist())) {
+                data.set(XMPDM.ARTIST, dest.getArtist());
+            }
+//TODO /masters/{master_id}
+        }
+        //TODO must return null if metadata empty
+        return data;
+    }
+        /**
+         * Do a manual with title and artist/
+         *
+         * @param album contains artist and title previously not found
+         */
+        private IAlbumVo manualSearch (IAlbumVo album){
+            IAlbumVo a2 = null;
+            //manual search
+            ManualSearchDialog ms = new ManualSearchDialog(album.getArtist(), album.getTitle());
+            ms.setVisible(true);
+            AlbumVo albumToSearch = ms.getAlbumInfos();
+            if (albumToSearch != null) {
                 try {
-                    setLookAndFeel(info.getClassName());
-                } catch (Exception e) {
+                    a2 = albumService.searchAlbum(albumToSearch);
+                } catch (ApiConfigurationException e) {
                     e.printStackTrace();
                 }
-                break;
+                if (a2 != null) {
+                    //found: ok
+                    JOptionPane.showMessageDialog(null, album.getTitle() + " found using API: " + albumService.getSearchAPI());
+                    System.out.println(a2.toString());
+                    a2.setArtist(albumToSearch.getArtist());
+                    a2.setTitle(albumToSearch.getTitle());
+                    return a2;
+                } else
+                    return manualSearch(album);
+
+
+            }
+            return null;
+
+        }
+
+        public void init () {
+
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
+                    try {
+                        setLookAndFeel(info.getClassName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+            JFrame frame = new JFrame("MainForm");
+            frame.setContentPane(new MainForm().Panel1);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            frame.pack();
+            frame.setVisible(true);
+
+        }
+
+        private void createUIComponents () {
+            table1 = new JTable(model);
+            table1.setRowHeight(48);
+        }
+
+        private void parseDir (File file){
+            DirectoryParser dirParser = new NioDirectoryParser();
+            map = dirParser.parse(file.getAbsolutePath());
+            if (!map.isEmpty())
+                analyzeDirButton.setEnabled(true);
+            nbFiles.setText(String.valueOf(map.size()));
+            progressBar1.setMaximum(map.size());
+        }
+
+        class MonSwingWorker extends SwingWorker {
+
+            public MonSwingWorker() {
+
+            }
+
+            public MonSwingWorker(AlbumModel model, int i) {
+            }
+
+            @Override
+            public Integer doInBackground() {
+
+                File f = new File(pathField.getText());
+                parseDir(f);
+                if (tListener != null)
+                    table1.getModel().removeTableModelListener(tListener);
+                table1.setModel(model);
+                tListener = e -> progressBar1.setValue(table1.getModel().getRowCount());
+                table1.getModel().addTableModelListener(tListener);
+
+                albums = service.traiterDir(map, model);
+
+                //model.setAlbums(albums);
+
+                return 0;
+            }
+
+
+            @Override
+            protected void done() {
+
             }
         }
-        JFrame frame = new JFrame("MainForm");
-        frame.setContentPane(new MainForm().Panel1);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.pack();
-        frame.setVisible(true);
+        class RetrieveAlbumsTasks extends
+                SwingWorker<List<AlbumVo>, AlbumVo> {
+            RetrieveAlbumsTasks(TableModel model, int numbersToFind) {
+                //initialize
+            }
 
-    }
+            @Override
+            public List<AlbumVo> doInBackground() {
+                albums.clear();
+                File f = new File(pathField.getText());
+                parseDir(f);
+                if (tListener != null)
+                    table1.getModel().removeTableModelListener(tListener);
+                table1.setModel(model);
+                tListener = e -> progressBar1.setValue(table1.getModel().getRowCount());
+                table1.getModel().addTableModelListener(tListener);
 
-    private void createUIComponents() {
-        table1 = new JTable(model);
-        table1.setRowHeight(48);
-    }
+                int checkTagged = 0;
+                int taggedTrack = 0;
+                diskong.parser.AudioParser ap = new AudioParser();
+                for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
+                    if (this.isCancelled()) {
+                        progressBar1.setMaximum(map.size());
+                        JOptionPane.showMessageDialog(null, "Analyse stopped");
+                        return albums;
+                    }
+                    long startTime = System.currentTimeMillis();
 
-    private void parseDir(File file) {
-        DirectoryParser dirParser = new NioDirectoryParser();
-        map = dirParser.parse(file.getAbsolutePath());
-        if (!map.isEmpty())
-            analyzeDirButton.setEnabled(true);
-        nbFiles.setText(String.valueOf(map.size()));
-        progressBar1.setMaximum(map.size());
-    }
-
-    class MonSwingWorker extends SwingWorker {
-
-        public MonSwingWorker() {
-
-        }
-
-        public MonSwingWorker(AlbumModel model, int i) {
-        }
-
-        @Override
-        public Integer doInBackground() {
-
-            File f = new File(pathField.getText());
-            parseDir(f);
-            if (tListener != null)
-                table1.getModel().removeTableModelListener(tListener);
-            table1.setModel(model);
-            tListener = e -> progressBar1.setValue(table1.getModel().getRowCount());
-            table1.getModel().addTableModelListener(tListener);
-
-            albums = service.traiterDir(map, model);
-
-            //model.setAlbums(albums);
-
-            return 0;
-        }
-
-
-        @Override
-        protected void done() {
-
-        }
-    }
-
-    class RetrieveAlbumsTasks extends
-            SwingWorker<List<AlbumVo>, AlbumVo> {
-        RetrieveAlbumsTasks(TableModel model, int numbersToFind) {
-            //initialize
-        }
-
-        @Override
-        public List<AlbumVo> doInBackground() {
-            albums.clear();
-            File f = new File(pathField.getText());
-            parseDir(f);
-            if (tListener != null)
-                table1.getModel().removeTableModelListener(tListener);
-            table1.setModel(model);
-            tListener = e -> progressBar1.setValue(table1.getModel().getRowCount());
-            table1.getModel().addTableModelListener(tListener);
-
-            int checkTagged = 0;
-            int taggedTrack = 0;
-            diskong.parser.AudioParser ap = new AudioParser();
-            for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
-                if (this.isCancelled()) {
-                    progressBar1.setMaximum(map.size());
-                    JOptionPane.showMessageDialog(null, "Analyse stopped");
-                    return albums;
-                }
-                long startTime = System.currentTimeMillis();
-
-                //continue or stop asked every NBCHECK parsed files
+                    //continue or stop asked every NBCHECK parsed files
 //                if (checkTagged >= NBCHECK) {
 //                    if (contineParse()) {
 //                        checkTagged = 0;
@@ -238,11 +301,11 @@ public class MainForm {
 //                        return albums;
 //                    }
 //                }
-                //FIXME:check parser creation
-                AlbumVo avo = service.parseDirectory(entry);
-                //albums.add(avo);
-                //model.setAlbums(albums);
-                publish(avo);
+                    //FIXME:check parser creation
+                    AlbumVo avo = service.parseDirectory(entry);
+                    //albums.add(avo);
+                    //model.setAlbums(albums);
+                    publish(avo);
 
 
 //                while (!enough && !isCancelled()) {
@@ -250,18 +313,18 @@ public class MainForm {
 //                    publish(number);
 //                    setProgress(100 * numbers.size() / numbersToFind);
 //                }
+                }
+                return albums;
+
             }
-            return albums;
 
-        }
-
-        @Override
-        protected void process(List<AlbumVo> chunks) {
-            albums.addAll(chunks);
-            model.setAlbums(albums);
+            @Override
+            protected void process(List<AlbumVo> chunks) {
+                albums.addAll(chunks);
+                model.setAlbums(albums);
 //            for (AlbumVo avo : chunks) {
 //                textArea.append(number + "\n");
 //            }
+            }
         }
     }
-}

@@ -8,6 +8,7 @@ import diskong.api.SearchAPI;
 import diskong.parser.MetaUtils;
 import diskong.tag.metatag.ArgAction;
 import diskong.tag.metatag.Arguments;
+import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,12 @@ import java.util.concurrent.TimeUnit;
 public class AlbumService {
     final static Logger LOG = LoggerFactory.getLogger(AlbumService.class);
     private static final String UNKNOWN = "Unknown";
-    boolean IsSimulate = true;
+    boolean isSimulate = true;
+
+    public void setSimulate(boolean simulate) {
+        isSimulate = simulate;
+    }
+
     private SearchAPI searchAPI;
 
     public SearchAPI getSearchAPI() {
@@ -32,7 +38,7 @@ public class AlbumService {
         this.searchAPI = searchAPI;
     }
 
-    public IAlbumVo searchAlbum(AlbumVo album) throws ApiConfigurationException {
+    public IAlbumVo searchAlbum(IAlbumVo album) throws ApiConfigurationException {
 
 
         int tagged = 0;
@@ -113,9 +119,10 @@ public class AlbumService {
         return tagged;
     }
 
+
     private int retag(TrackInfo track) {
 
-        if (IsSimulate)
+        if (isSimulate)
             return 0;
         int exitCode = 0;
         Arguments args = new Arguments();
@@ -126,7 +133,6 @@ public class AlbumService {
         // Nobody.flac
         for (String genre : MetaUtils.getGenre(track.getMetadata())) {
             args.add(ArgAction.SET_TAG, XMPDM.GENRE, genre);
-
         }
         for (String style : MetaUtils.getStyle(track.getMetadata())) {
             args.add(ArgAction.SET_TAG, MetaUtils.STYLE, style);
@@ -175,5 +181,102 @@ public class AlbumService {
         //
 
         return exitCode;
+    }
+
+    private int retag2(Metadata metadata, TrackInfo track) {
+
+        if (isSimulate)
+            return 0;
+        int exitCode = 0;
+        Arguments args = new Arguments();
+
+        // metaflac --remove-tag=genre --set-tag=GENRE=Rruick
+        // --set-tag=GENRE=Rack /mnt/media1/music/Weezer/test/01.\ Ain’t\ Got\
+        // Nobody.flac
+        for (String name : metadata.names()){
+         // ?   if (metadata.isMultiValued(name)){
+            args.add(ArgAction.REMOVE_TAG,name);
+                for (String value : metadata.getValues(name)) {
+
+                    args.add(ArgAction.SET_TAG, name, value);
+                }
+     //       }
+        }
+
+//        for (String value : metadata.getValues(XMPDM.ARTIST)) {
+//
+//            args.add(ArgAction.SET_TAG, XMPDM.ARTIST, value);
+//        }
+//
+//        for (String value : metadata.getValues(XMPDM.ALBUM)) {
+//
+//            args.add(ArgAction.SET_TAG, XMPDM.ALBUM, value);
+//        }
+        args.getList().add(0, "metaflac");
+        args.getList().add(track.getfPath().getFile().getAbsolutePath());
+        ProcessBuilder pb = new ProcessBuilder(args.getList());
+        try {
+            Process p = pb.start();
+            if (!p.waitFor(30, TimeUnit.SECONDS)) {
+                exitCode = 88;
+            } else {
+                exitCode = p.exitValue();
+            }
+            if (exitCode != 0) {
+                BufferedReader output = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                String ligne;
+                while ((ligne = output.readLine()) != null) {
+                    System.out.println(ligne);
+                }
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            exitCode = 99;
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            exitCode = 99;
+        }
+
+        // Map<String, String> env = pb.environment();
+        // env.put("VAR1", "myValue");
+        // env.remove("OTHERVAR");
+        // env.put("VAR2", env.get("VAR1") + "suffix");
+        // pb.directory("myDir");
+
+        // metaflac --show-tag=style /mnt/media1/music/Amen/Death\ Before\
+        // Musick/01.\ Liberation\ For....flac
+        // metaflac --set-tag=GENRE=Rock /mnt/media1/music/Weezer/Everything\
+        // Will\ Be\ Alright\ in\ the\ End/01.\ Ain’t\ Got\ Nobody.flac
+        // $ metaflac --show-tag=genre /mnt/media1/music/Weezer/Everything\
+        // Will\ Be\ Alright\ in\ the\ End/01.\ Ain’t\ Got\ Nobody.flac
+        //
+
+        return exitCode;
+    }
+
+    /**
+     *  retag all tracks with metada infos.
+     * @param data
+     * @param album
+     * @return number of tagged tracks
+     */
+    public int retagAlbum(Metadata data, IAlbumVo album) {
+        int tagged = 0;
+        if (data == null) {
+            LOG.warn("NO DATA");
+            return 0;
+        }
+
+        for (TrackInfo track : album.getTracks()) {
+
+            if (retag2(data, track) == 0)
+                tagged++;
+        }
+
+        LOG.info("*** TAGGED TRACK ***" + tagged);
+        return tagged;
     }
 }
