@@ -1,9 +1,14 @@
 package diskong.gui;
 
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import diskong.AlbumVo;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
+import java.util.ResourceBundle;
 
 public class ManualSearchDialog extends JDialog {
     private JPanel contentPane;
@@ -68,4 +73,5 @@ public class ManualSearchDialog extends JDialog {
 
         return avo;
     }
+
 }

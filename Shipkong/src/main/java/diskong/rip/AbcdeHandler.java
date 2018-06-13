@@ -12,6 +12,13 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class AbcdeHandler {
+    public String getArtist() {
+        return artist;
+    }
+
+    public String getAlbum() {
+        return album;
+    }
 
     final static Logger logger = LoggerFactory.getLogger(AbcdeHandler.class);
     public final String OUTPUT_DIR = "OUTPUTDIR";
@@ -55,13 +62,9 @@ public class AbcdeHandler {
         return ripProperties;
     }
 
-    public String process(Map<String, String> params, List<String> actionList) throws RipperException {
+    public String process(List<String> actionList) throws RipperException {
         String actionResult = "";
-        try {
-            configure(params);
-        } catch (IOException e) {
-            throw new RipperException("configuration error", e);
-        }
+
         int exitCode = 0;
 
         List<String> liste = new ArrayList<>();
@@ -161,7 +164,7 @@ public class AbcdeHandler {
         return trimedString;
     }
 
-    private void configure(Map<String, String> params) throws IOException {
+    public void configure(Map<String, String> params) throws IOException {
         boolean isEdited = false;
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String value = ripProperties.getProperty(entry.getKey());
