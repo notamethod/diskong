@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package diskong.api;
+package diskong.rip;
 
-import java.io.IOException;
-
-public class ApiConfigurationException extends Exception {
-    public ApiConfigurationException(String s, Throwable throwable) {
-        super(s, throwable);
+public class analyseException extends Exception {
+    public analyseException(String str) {
+        super(str);
     }
 }

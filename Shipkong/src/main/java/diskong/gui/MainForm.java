@@ -25,6 +25,7 @@ import diskong.Utils;
 import diskong.api.ApiConfigurationException;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
+import diskong.parser.MetaUtils;
 import diskong.parser.NioDirectoryParser;
 import diskong.parser.fileutils.FilePath;
 import diskong.services.AlbumService;
@@ -158,7 +159,16 @@ public class MainForm {
         retagButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                RetagSelectionDialog dialog = new RetagSelectionDialog();
+                dialog.pack();
+                dialog.setVisible(true);
+               Map<String, Boolean> map =  dialog.getretagElements();
                 Metadata data = checkRetagNeeded(originalInfo, correctedInfo);
+                if (map.get("style")!=null) {
+                    MetaUtils.setStyle(correctedInfo, data);
+                    MetaUtils.setGenre(correctedInfo, data);
+                }
+
                 albumService.setSimulate(false);
                 albumService.retagAlbum(data, originalInfo);
             }
@@ -198,6 +208,7 @@ public class MainForm {
             if ((dest.getArtist() != null) && !Objects.equals(dest.getArtist(), source.getArtist())) {
                 data.set(XMPDM.ARTIST, dest.getArtist());
             }
+
 //TODO /masters/{master_id}
         }
         //TODO must return null if metadata empty
@@ -334,14 +345,6 @@ public class MainForm {
                 }
                 long startTime = System.currentTimeMillis();
 
-                //continue or stop asked every NBCHECK parsed files
-//                if (checkTagged >= NBCHECK) {
-//                    if (contineParse()) {
-//                        checkTagged = 0;
-//                    } else {
-//                        return albums;
-//                    }
-//                }
                 //FIXME:check parser creation
                 AlbumVo avo = service.parseDirectory(entry);
                 //albums.add(avo);

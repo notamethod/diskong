@@ -17,6 +17,7 @@
 package diskong.rip;
 
 
+import diskong.gui.TrackVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +79,8 @@ public class AbcdeHandler {
         return ripProperties;
     }
 
-    public String process(List<String> actionList) throws RipperException {
-        String actionResult = "";
+    public List<String> process(List<String> actionList) throws RipperException {
+        List<String> actionResult = null;
 
         int exitCode = 0;
 
@@ -88,7 +89,7 @@ public class AbcdeHandler {
         liste.add("-c" + configurationFileName);
 
         String actions = "-a " + String.join(",", actionList);
-        liste.add(actions);
+        liste.addAll(actionList);
         System.out.println(liste.toString());
         ProcessBuilder pb = new ProcessBuilder(liste);
         try {
@@ -128,30 +129,40 @@ public class AbcdeHandler {
 
             }
             //OK
-
         }
 
 
         return actionResult;
     }
 
-    private String parseInfo(String result, List<String> actionList) throws IOException {
+    public List<TrackVO> parseTrack(List<String> actionResult) throws analyseException {
+        List<TrackVO> tracks = new ArrayList<>();
+        for (String line:actionResult){
+            String[] splitted = line.split(":");
+            if(splitted.length>1) {
+                TrackVO track = new TrackVO(Integer.valueOf(splitted[0]), splitted[1], artist);
+                tracks.add(track);
+            }
+        }
+        if (tracks.isEmpty())
+            throw new analyseException("no tracks found");
+        return tracks;
+    }
+
+    private List<String> parseInfo(String result, List<String> actionList) throws IOException {
         String line;
-        StringBuilder sb = new StringBuilder();
+        List<String> sb = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new StringReader(result));
         String firstLine = null;
         while ((line = reader.readLine()) != null) {
             if (null == firstLine)
                 firstLine = getTitle(line);
-
             if (null != firstLine && !firstLine.equals(line))
-                sb.append(line).append(System.getProperty("line.separator"));
+                sb.add(line);//.append(System.getProperty("line.separator"));
             if (null != firstLine && firstLine.equals(line))
-                sb.append(parseHeader(line)).append(System.getProperty("line.separator"));
-
-
+                parseHeader(line);
         }
-        return sb.toString();
+        return sb;
     }
 
     private String getTitle(String line) {

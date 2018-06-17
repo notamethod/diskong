@@ -118,4 +118,14 @@ public class SimpleAlbumVO implements IAlbumVo{
 
 	}
 
+	@Override
+	public boolean isExactMatch() {
+		return false;
+	}
+
+	@Override
+	public void setExactMatch(boolean exactMatch) {
+
+	}
+
 }

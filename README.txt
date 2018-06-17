@@ -1,13 +1,4 @@
 
-Consumer Key	FFtWwazbcskFPzduEFOK
-Consumer Secret	GOfYoDjZVsACWagKncvDJcjToXwoILJf
-Request Token URL	http://api.discogs.com/oauth/request_token
-Authorize URL	http://www.discogs.com/oauth/authorize
-Access Token URL	http://api.discogs.com/oauth/access_token
-
-//pin NvYUcryoFw
-
-OtaZUJvZoStvbCaHrIjaWgXOLxIZABcUVaNYJkfp
 
 TODO:
 PArcours des r�eprtoires finaux

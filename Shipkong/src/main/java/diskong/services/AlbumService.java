@@ -67,6 +67,11 @@ public class AlbumService {
             if (alInfos.getStyles().isEmpty())
                 alInfos.setStyle(UNKNOWN);
             LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
+            if (null== alInfos.getArtist() || alInfos.getArtist().isEmpty())
+                alInfos.setArtist(album.getArtist());
+            if (null== alInfos.getArtist() || alInfos.getArtist().isEmpty() || !alInfos.getTitle().equals(album.getTitle()))
+                alInfos.setTitle(album.getTitle());
+
 
         } catch (ReleaseNotFoundException e) {
             String artist = TrackUtils.regexx(album.getArtist(), "(\\((.+)\\))|(!)|(&)");
@@ -211,6 +216,7 @@ public class AlbumService {
         // Nobody.flac
         for (String name : metadata.names()){
          // ?   if (metadata.isMultiValued(name)){
+            name.replaceAll("xmpDM:", "");
             args.add(ArgAction.REMOVE_TAG,name);
                 for (String value : metadata.getValues(name)) {
 
@@ -281,7 +287,7 @@ public class AlbumService {
      */
     public int retagAlbum(Metadata data, IAlbumVo album) {
         int tagged = 0;
-        if (data == null) {
+        if (data == null || data.size()<1) {
             LOG.warn("NO DATA");
             return 0;
         }

@@ -76,7 +76,7 @@ public class AlbumVo implements IAlbumVo {
 	// add track to album
 	public void add(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException {
 		// check if all tracks in folder belong to same album
-		if (metadata.get(Metadata.CONTENT_TYPE).contains("flac")) {
+		if (metadata.get(Metadata.CONTENT_TYPE).contains("flac") || metadata.get(Metadata.CONTENT_TYPE).contains("vorbis")) {
 			if (title == null) {
 				title = metadata.get(XMPDM.ALBUM);
 			} else if (!title.equals(metadata.get(XMPDM.ALBUM))) {

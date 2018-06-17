@@ -16,9 +16,6 @@
 
 package diskong.gui;
 
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import diskong.rip.AbcdeHandler;
 import diskong.rip.ArgAction;
 import diskong.rip.RipperException;
@@ -26,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,33 +32,31 @@ import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RipForm {
 
     final String[] formats = new String[]{"flac", "m4a", "mp3", "mpc", "ogg", "opus", "spx", "vorbis", "wav", "wv", "ape"};
     final Logger LOG = LoggerFactory.getLogger(RipForm.class);
     AbcdeHandler ah;
+    TableModelListener tListener;
+    TrackModel model ;
+    List<TrackVO> tracks = new ArrayList<>();
     private JPanel JPanel1;
     private JButton button1;
     private JTextArea textArea1;
-
     private JButton ripButton;
     private JComboBox comboBox2;
-
     private JTextField outputFormat;
     private JCheckBox albumArtCheckBox;
     private JLabel jCoverImage;
     private JButton button2;
     private JLabel jlTitle;
     private JLabel jlArtist;
-
+    private JScrollPane scrollPane1;
+    private JTable table1;
 
     public RipForm() {
-
-
 
 
         try {
@@ -118,7 +114,7 @@ public class RipForm {
             }
 
             public void componentShown(ComponentEvent e) {
-                rf.searchCD();
+             //   rf.searchCD();
             }
         });
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -135,13 +131,15 @@ public class RipForm {
 
         List<String> liste = new ArrayList<>();
 
-        liste.add("clean,cddb");
+        StringBuilder action = new StringBuilder("-a clean,cddb");
         if (albumArtCheckBox.isSelected()) {
-            liste.add(ArgAction.GETIMAGE.getString());
+            action.append(",").append(ArgAction.GETIMAGE.getString());
         }
+        liste.add(action.toString());
         try {
 
-            textArea1.setText(ah.process(liste));
+            List l = ah.parseTrack(ah.process(liste));
+            model.setElements(l);
             ImageIcon imageIcon = new ImageIcon(ah.getCoverImage()); // load the image to a imageIcon
 
             Image newimg = imageIcon.getImage();
@@ -164,6 +162,9 @@ public class RipForm {
     private void createUIComponents() {
 
         comboBox2 = new JComboBox(formats);
+         model = new TrackModel();
+        table1 = new JTable(model);
+
     }
 
 }
