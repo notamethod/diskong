@@ -31,7 +31,7 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import diskong.TrackInfo;
+import diskong.core.TrackInfo;
 import diskong.parser.fileutils.FilePath;
 
 public class CallTrackInfo implements Callable<TrackInfo> {

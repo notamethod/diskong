@@ -18,6 +18,8 @@ package diskong;
 
 import java.util.List;
 
+import diskong.core.IAlbumVo;
+import diskong.core.TrackInfo;
 import org.codehaus.jettison.json.JSONArray;
 
 public class SimpleAlbumVO implements IAlbumVo {

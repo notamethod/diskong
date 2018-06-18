@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package diskong.rip;
+package diskong.core;
 
-public class RipperException extends Throwable {
-    private String messageCode;
-    public RipperException(String s, Throwable throwable) {
-        super(s, throwable);
-    }
+import java.io.File;
+import java.nio.file.Path;
 
-    public RipperException(String s) {
-    super(s);
-    }
+public class FilePath {
+	private File file;
+	private Path path;
+	public FilePath(File file, Path path) {
+		super();
+		this.file = file;
+		this.path = path;
+	}
+	public File getFile() {
+		return file;
+	}
+	public void setFile(File file) {
+		this.file = file;
+	}
+	public Path getPath() {
+		return path;
+	}
+	public void setPath(Path path) {
+		this.path = path;
+	}
 
-    public String getMessageCode() {
-        return messageCode;
-    }
-
-    public RipperException(String error, String info, int exitCode) {
-        super(error + "\n" + info);
-        //TODO: i18n
-        messageCode = error;
-
-    }
 }

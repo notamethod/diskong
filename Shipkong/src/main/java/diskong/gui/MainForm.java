@@ -16,10 +16,12 @@
 
 package diskong.gui;
 
-import diskong.AlbumVo;
-import diskong.IAlbumVo;
+import diskong.core.AlbumVo;
+import diskong.core.IAlbumVo;
 import diskong.Utils;
 import diskong.api.ApiConfigurationException;
+import diskong.app.cdrip.GuiPreferences;
+import diskong.app.cdrip.RipForm;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
 import diskong.parser.MetaUtils;

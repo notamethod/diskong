@@ -16,13 +16,15 @@
 
 package diskong;
 
+import diskong.core.AlbumVo;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Statistics {
 
 
-    private List<AlbumVo> missingImages = new ArrayList<>();
+    private List<diskong.core.AlbumVo> missingImages = new ArrayList<>();
 
     /** Constructeur privé */
     private Statistics()

@@ -19,6 +19,10 @@ package diskong;
 import java.util.ArrayList;
 import java.util.List;
 
+import diskong.core.IAlbumVo;
+import diskong.core.TagState;
+import diskong.core.TrackInfo;
+import diskong.core.WrongTrackAlbumException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 import org.codehaus.jettison.json.JSONArray;
@@ -30,10 +34,10 @@ import diskong.parser.MetaUtils;
 import diskong.parser.fileutils.FilePath;
 
 public class AlbumVo implements IAlbumVo {
-	private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
+	private final static Logger LOG = LoggerFactory.getLogger(diskong.core.AlbumVo.class);
 	private final static String VARIOUS="Various";
 	
-	private List<TrackInfo> tracks = new ArrayList<>();
+	private List<diskong.core.TrackInfo> tracks = new ArrayList<>();
 	private String title;
 	private String artist;
 	private String genre;
@@ -68,7 +72,7 @@ public class AlbumVo implements IAlbumVo {
 		this.exactMatch = exactMatch;
 	}
 
-	private TagState tagState;
+	private diskong.core.TagState tagState;
 
 	public void add(Metadata metadata) {
 		
@@ -104,7 +108,7 @@ public class AlbumVo implements IAlbumVo {
 			} else if (!style.equals(metadata.get(MetaUtils.STYLE))) {
 				styles.add(metadata.get(MetaUtils.STYLE));
 			}
-			tracks.add(new TrackInfo(fPath, metadata));
+			tracks.add(new diskong.core.TrackInfo(fPath, metadata));
 
 		} else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") && (fPath.getFile().getName().toLowerCase().contains("folder") ||fPath.getFile().getName().toLowerCase().contains("cover"))){
 			LOG.debug("cover image found " + fPath.getFile().getName());
@@ -122,11 +126,11 @@ public class AlbumVo implements IAlbumVo {
 				+ styles.toString()/* + ", tracks=" + tracks + "]"*/;
 	}
 
-	public List<TrackInfo> getTracks() {
+	public List<diskong.core.TrackInfo> getTracks() {
 		return tracks;
 	}
 
-	public void setTracks(List<TrackInfo> tracks) {
+	public void setTracks(List<diskong.core.TrackInfo> tracks) {
 		this.tracks = tracks;
 	}
 
@@ -246,9 +250,9 @@ public class AlbumVo implements IAlbumVo {
         return images;
     }
 
-    public TagState getState() {
+    public diskong.core.TagState getState() {
 			if (tagState==null)
-				return  TagState.UNKNOWN;
+				return  diskong.core.TagState.UNKNOWN;
 			return tagState;
 			
 		}

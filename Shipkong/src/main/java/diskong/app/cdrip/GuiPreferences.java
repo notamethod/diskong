@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package diskong.gui;
-
-import diskong.rip.AbcdeHandler;
+package diskong.app.cdrip;
 
 import javax.swing.*;
 import java.awt.event.*;

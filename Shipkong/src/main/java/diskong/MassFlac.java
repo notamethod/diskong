@@ -31,6 +31,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import diskong.api.ApiConfigurationException;
+import diskong.core.*;
+import diskong.core.AlbumVo;
+import diskong.core.TagState;
+import diskong.core.TrackInfo;
 import diskong.tag.metatag.ArgAction;
 import diskong.tag.metatag.Arguments;
 import org.apache.tika.metadata.XMPDM;
@@ -100,25 +104,25 @@ class MassFlac {
 			}
 			//FIXME:check parser creation
 			diskong.parser.AudioParser ap = new AudioParser();
-			AlbumVo album = AlbumFactory.getAlbum();
+			diskong.core.AlbumVo album = AlbumFactory.getAlbum();
 			try {
 				// parsedir
 				LOG.debug("iteration");
 
-				album.setState(TagState.TOTAG);
+				album.setState(diskong.core.TagState.TOTAG);
 				LOG.debug("**************START******************************");
 				ExecutorService executor = Executors.newFixedThreadPool(10);
-				List<Future<TrackInfo>> list = new ArrayList<>();
+				List<Future<diskong.core.TrackInfo>> list = new ArrayList<>();
 				for (FilePath fPath : entry.getValue()) {
 					LOG.debug(fPath.getFile().getAbsolutePath());
-					Callable<TrackInfo> worker = new CallTrackInfo(fPath);
-					Future<TrackInfo> submit = executor.submit(worker);
+					Callable<diskong.core.TrackInfo> worker = new CallTrackInfo(fPath);
+					Future<diskong.core.TrackInfo> submit = executor.submit(worker);
 					list.add(submit);
 				}
 
-				for (Future<TrackInfo> future : list) {
+				for (Future<diskong.core.TrackInfo> future : list) {
 					try {
-						TrackInfo tinf = future.get();
+						diskong.core.TrackInfo tinf = future.get();
 						album.add(tinf); // (metafile)
 					} catch (InterruptedException |ExecutionException e) {
 						e.printStackTrace();
@@ -131,7 +135,7 @@ class MassFlac {
 				executor.shutdown();
 
 				if (album.getTracks().isEmpty())
-					album.setState(TagState.NOTRACKS);
+					album.setState(diskong.core.TagState.NOTRACKS);
 				else
 					LOG.info("Album parsed:" + album.toString() + album.getTracks().size());
 				Statistics.getInstance().addStats(album);
@@ -169,14 +173,14 @@ class MassFlac {
 	/**
 	 * @param album
 	 */
-	private boolean checkAction(AlbumVo album) {
+	private boolean checkAction(diskong.core.AlbumVo album) {
 
 		boolean forceRetag = false;
 		// if (forceRetag){
 		// return ;
 		// }
 		boolean isOK = isAllOK(album);
-		if (album.getState().equals(TagState.TOTAG) && !forceRetag && isOK) {
+		if (album.getState().equals(diskong.core.TagState.TOTAG) && !forceRetag && isOK) {
 			LOG.debug(
 					"album " + album.getTitle() + " not parsed: state:" + album.getState() + " all tags found:" + isOK);
 
@@ -192,7 +196,7 @@ class MassFlac {
 		return true;
 	}
 
-	private IAlbumVo searchAlbum(AlbumVo album) throws ApiConfigurationException {
+	private IAlbumVo searchAlbum(diskong.core.AlbumVo album) throws ApiConfigurationException {
 
 
 		int tagged = 0;
@@ -267,7 +271,7 @@ class MassFlac {
 
 		LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
 		LOG.debug("iteration inutile");
-		for (TrackInfo track : album.getTracks()) {
+		for (diskong.core.TrackInfo track : album.getTracks()) {
 			MetaUtils.setGenre(alInfos, track.getMetadata());
 			MetaUtils.setStyle(alInfos, track.getMetadata());
 			if (retag(track) == 0)
@@ -281,7 +285,7 @@ class MassFlac {
 	private boolean isAllOK(IAlbumVo iAlbum) {
 		String preferences = "genre_exists+style_exists";
 		LOG.debug("iteration");
-		for (TrackInfo track : iAlbum.getTracks()) {
+		for (diskong.core.TrackInfo track : iAlbum.getTracks()) {
 			if (MetaUtils.getGenre(track.getMetadata()).isEmpty()) {
 				return false;
 			}
@@ -292,7 +296,7 @@ class MassFlac {
 		return true;
 	}
 
-	private int retag(List<TrackInfo> tracks) {
+	private int retag(List<diskong.core.TrackInfo> tracks) {
 
 		// metaflac --show-tag=style /mnt/media1/music/Amen/Death\ Before\
 		// Musick/01.\ Liberation\ For....flac

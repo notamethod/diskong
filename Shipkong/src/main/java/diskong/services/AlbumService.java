@@ -16,11 +16,14 @@
 
 package diskong.services;
 
-import diskong.*;
 import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
 import diskong.api.DatabaseSearchFactory;
 import diskong.api.SearchAPI;
+import diskong.core.AlbumVo;
+import diskong.core.IAlbumVo;
+import diskong.core.ReleaseNotFoundException;
+import diskong.core.TrackInfo;
 import diskong.parser.MetaUtils;
 import diskong.tag.metatag.ArgAction;
 import diskong.tag.metatag.Arguments;
@@ -129,7 +132,7 @@ public class AlbumService {
 
         LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
         LOG.debug("iteration inutile");
-        for (TrackInfo track : album.getTracks()) {
+        for (diskong.core.TrackInfo track : album.getTracks()) {
             MetaUtils.setGenre(alInfos, track.getMetadata());
             MetaUtils.setStyle(alInfos, track.getMetadata());
             if (retag(track) == 0)
@@ -141,7 +144,7 @@ public class AlbumService {
     }
 
 
-    private int retag(TrackInfo track) {
+    private int retag(diskong.core.TrackInfo track) {
 
         if (isSimulate)
             return 0;
@@ -200,7 +203,7 @@ public class AlbumService {
         return exitCode;
     }
 
-    private int retag2(Metadata metadata, TrackInfo track) {
+    private int retag2(Metadata metadata, diskong.core.TrackInfo track) {
 
         if (isSimulate)
             return 0;

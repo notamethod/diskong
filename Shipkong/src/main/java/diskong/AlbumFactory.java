@@ -16,11 +16,12 @@
 
 package diskong;
 
+import diskong.core.AlbumVo;
 import org.apache.tika.metadata.Metadata;
 
 public class AlbumFactory {
 
-	public static AlbumVo getAlbum() {
+	public static diskong.core.AlbumVo getAlbum() {
 		// TODO Auto-generated method stub
 		return new AlbumVo();
 	}

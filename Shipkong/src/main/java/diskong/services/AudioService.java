@@ -17,6 +17,10 @@
 package diskong.services;
 
 import diskong.*;
+import diskong.core.AlbumVo;
+import diskong.core.TagState;
+import diskong.core.TrackInfo;
+import diskong.core.WrongTrackAlbumException;
 import diskong.gui.AlbumModel;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
@@ -38,8 +42,8 @@ public class AudioService {
     AlbumService albumService = new AlbumService();
 
 
-    public List<AlbumVo> traiterDir(Map<Path, List<FilePath>> map, AlbumModel model) {
-        List<AlbumVo> albums = new ArrayList<>();
+    public List<diskong.core.AlbumVo> traiterDir(Map<Path, List<FilePath>> map, AlbumModel model) {
+        List<diskong.core.AlbumVo> albums = new ArrayList<>();
         int checkTagged = 0;
         int taggedTrack = 0;
         diskong.parser.AudioParser ap = new AudioParser();
@@ -55,7 +59,7 @@ public class AudioService {
                 }
             }
             //FIXME:check parser creation
-            AlbumVo avo =  parseDirectory(entry);
+            diskong.core.AlbumVo avo =  parseDirectory(entry);
             albums.add(avo);
             model.setAlbums(albums);
 
@@ -70,27 +74,27 @@ public class AudioService {
         return albums;
     }
 
-    public AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry) {
+    public diskong.core.AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry) {
 
-        AlbumVo album = AlbumFactory.getAlbum();
+        diskong.core.AlbumVo album = AlbumFactory.getAlbum();
         AutoDetectParser autoParser=new AutoDetectParser();
 
         try {
             // parsedir
             LOG.debug("iteration");
 
-            album.setState(TagState.TOTAG);
+            album.setState(diskong.core.TagState.TOTAG);
             LOG.debug("**************START******************************");
             ExecutorService executor = Executors.newFixedThreadPool(10);
-            List<Future<TrackInfo>> list = new ArrayList<>();
+            List<Future<diskong.core.TrackInfo>> list = new ArrayList<>();
             for (FilePath fPath : entry.getValue()) {
                 LOG.debug(fPath.getFile().getAbsolutePath());
-                Callable<TrackInfo> worker = new CallTrackInfo(fPath, autoParser);
-                Future<TrackInfo> submit = executor.submit(worker);
+                Callable<diskong.core.TrackInfo> worker = new CallTrackInfo(fPath, autoParser);
+                Future<diskong.core.TrackInfo> submit = executor.submit(worker);
                 list.add(submit);
             }
 
-            for (Future<TrackInfo> future : list) {
+            for (Future<diskong.core.TrackInfo> future : list) {
                 try {
                     TrackInfo tinf = future.get();
                     album.add(tinf); // (metafile)
@@ -105,7 +109,7 @@ public class AudioService {
             executor.shutdown();
 
             if (album.getTracks().isEmpty())
-                album.setState(TagState.NOTRACKS);
+                album.setState(diskong.core.TagState.NOTRACKS);
             else
                 LOG.info("Album parsed:" + album.toString() + album.getTracks().size());
             //model.setAlbums(albums);
@@ -143,7 +147,7 @@ public class AudioService {
         // return ;
         // }
         boolean isOK = TrackUtils.isAllOK(album);
-        if (album.getState().equals(TagState.TOTAG) && !forceRetag && isOK) {
+        if (album.getState().equals(diskong.core.TagState.TOTAG) && !forceRetag && isOK) {
             LOG.debug(
                     "album " + album.getTitle() + " not parsed: state:" + album.getState() + " all tags found:" + isOK);
 

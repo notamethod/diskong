@@ -16,8 +16,8 @@
 
 package diskong.services;
 
-import diskong.IAlbumVo;
-import diskong.TrackInfo;
+import diskong.core.IAlbumVo;
+import diskong.core.TrackInfo;
 import diskong.parser.MetaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

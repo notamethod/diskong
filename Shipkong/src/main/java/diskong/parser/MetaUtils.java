@@ -25,7 +25,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.Property;
 import org.apache.tika.metadata.XMPDM;
 
-import diskong.IAlbumVo;
+import diskong.core.IAlbumVo;
 
 public class MetaUtils {
 

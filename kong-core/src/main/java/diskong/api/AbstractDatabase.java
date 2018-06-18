@@ -19,8 +19,8 @@ package diskong.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import diskong.IAlbumVo;
-import diskong.ReleaseNotFoundException;
+import diskong.core.IAlbumVo;
+import diskong.core.ReleaseNotFoundException;
 
 public abstract class AbstractDatabase {
 	

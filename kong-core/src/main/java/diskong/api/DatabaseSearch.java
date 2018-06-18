@@ -16,8 +16,8 @@
 
 package diskong.api;
 
-import diskong.IAlbumVo;
-import diskong.ReleaseNotFoundException;
+import diskong.core.IAlbumVo;
+import diskong.core.ReleaseNotFoundException;
 
 public interface DatabaseSearch {
 

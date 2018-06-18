@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package diskong;
+package diskong.core;
 
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONArray;
 
-public class SimpleAlbumVO implements IAlbumVo{
+public class SimpleAlbumVO implements IAlbumVo {
 
 	private String title;
 	private String artist;

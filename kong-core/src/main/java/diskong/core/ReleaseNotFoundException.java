@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package diskong.rip;
+package diskong.core;
 
-public enum ArgAction {
-	CDDB("-a cddb"), CLEAN("-a clean"), EMBEDIMAGE("-B"), DEFAULT("-a default,getalbumart"), GETIMAGE("getalbumart");
+public class ReleaseNotFoundException extends Exception {
 
-	 private final String name;       
-	 
-	 ArgAction(String s) {
-	        name = s;
-	    }
-	 
-	public String getString() {
-	
-		return name;
+	public ReleaseNotFoundException(String title) {
+		super(title);
 	}
 
-} 
+}

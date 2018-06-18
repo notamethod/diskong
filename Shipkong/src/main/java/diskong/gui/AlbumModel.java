@@ -16,7 +16,7 @@
 
 package diskong.gui;
 
-import diskong.AlbumVo;
+import diskong.core.AlbumVo;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
