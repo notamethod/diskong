@@ -18,7 +18,7 @@ package diskong.dao;
 
 import diskong.pojos2.Artist;
 
-public class ArtistDao {
+class ArtistDao {
 
 	public Artist getByID(String ID) {
 		

@@ -16,5 +16,5 @@
 
 package diskong.parser;
 
-public class ParserFactory {
+class ParserFactory {
 }

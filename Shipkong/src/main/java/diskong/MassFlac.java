@@ -21,11 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -57,14 +54,14 @@ import diskong.parser.fileutils.FilePath;
  * @author buck
  *
  */
-public class MassFlac {
+class MassFlac {
 
-	final static Logger LOG = LoggerFactory.getLogger(MassFlac.class);
+	private final static Logger LOG = LoggerFactory.getLogger(MassFlac.class);
 	private static final String UNKNOWN = "Unknown";
 	private int checkTagged;
 	private int taggedTrack;
-	static int NBCHECK = 200;
-	boolean IsSimulate=true;
+	private static int NBCHECK = 200;
+	private boolean IsSimulate=true;
 
 	public static void main(String[] args) {
 		MassFlac mf = new MassFlac();
@@ -80,7 +77,7 @@ public class MassFlac {
 		}
 	}
 
-	public void massTag(File file) {
+	private void massTag(File file) {
 		checkTagged = 0;
 		taggedTrack = 0;
 		DirectoryParser dirParser = new NioDirectoryParser();
@@ -210,7 +207,7 @@ public class MassFlac {
 
 		} catch (ReleaseNotFoundException e) {
 			String artist = regexx(album.getArtist(), "(\\((.+)\\))|(!)|(&)");
-			if (artist != null && !artist.equals("") && artist != album.getArtist()) {
+			if (artist != null && !artist.equals("") && !Objects.equals(artist, album.getArtist())) {
 				album.setExactMatch(false);
 				album.setArtist(artist);
 				return searchAlbum(album);
@@ -345,11 +342,7 @@ public class MassFlac {
 				}
 			}
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			exitCode = 99;
-		} catch (InterruptedException e) {
+		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			exitCode = 99;

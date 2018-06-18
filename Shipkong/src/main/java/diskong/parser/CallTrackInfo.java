@@ -35,9 +35,9 @@ import diskong.TrackInfo;
 import diskong.parser.fileutils.FilePath;
 
 public class CallTrackInfo implements Callable<TrackInfo> {
-	final static Logger LOG = LoggerFactory.getLogger(CallTrackInfo.class);
+	private final static Logger LOG = LoggerFactory.getLogger(CallTrackInfo.class);
 	private FilePath fPath;
-	AutoDetectParser parser;
+	private AutoDetectParser parser;
 
 	public CallTrackInfo(FilePath fPath) {
 		this.fPath = fPath;

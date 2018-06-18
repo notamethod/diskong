@@ -33,8 +33,8 @@ import java.util.concurrent.*;
 
 public class AudioService {
 
-    final static Logger LOG = LoggerFactory.getLogger(AudioService.class);
-    static int NBCHECK = 200;
+    private final static Logger LOG = LoggerFactory.getLogger(AudioService.class);
+    private static int NBCHECK = 200;
     AlbumService albumService = new AlbumService();
 
 

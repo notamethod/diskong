@@ -39,11 +39,11 @@ import diskong.parser.fileutils.FilePath;
 
 public class NioDirectoryParser implements DirectoryParser {
 
-	final static Logger LOG = LoggerFactory.getLogger(NioDirectoryParser.class);
+	private final static Logger LOG = LoggerFactory.getLogger(NioDirectoryParser.class);
 
-	static int cpt = 0;
+	private static int cpt = 0;
 
-	Map<Path, List<FilePath>> map = new HashMap<>();
+	private Map<Path, List<FilePath>> map = new HashMap<>();
 
 
 	public Map<Path, List<FilePath>> parse(String dirName) {

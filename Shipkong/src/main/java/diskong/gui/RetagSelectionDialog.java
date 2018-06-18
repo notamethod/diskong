@@ -19,10 +19,9 @@ package diskong.gui;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class RetagSelectionDialog extends JDialog {
+class RetagSelectionDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;

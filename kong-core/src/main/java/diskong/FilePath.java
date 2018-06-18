@@ -20,8 +20,8 @@ import java.io.File;
 import java.nio.file.Path;
 
 public class FilePath {
-	File file;
-	Path path;
+	private File file;
+	private Path path;
 	public FilePath(File file, Path path) {
 		super();
 		this.file = file;

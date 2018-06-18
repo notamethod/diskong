@@ -38,7 +38,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "name",
     "resource_url"
 })
-public class Extraartist {
+class Extraartist {
 
     @JsonProperty("id")
     private Integer id;

@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
-    final static Logger LOG = LoggerFactory.getLogger(DiscogSearch.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DiscogSearch.class);
     // base URL for the API calls
     private static final String URL_API = "https://api.discogs.com/";
     private static final String URL_API_IMG = "https://api.discogs.com/";
@@ -122,7 +122,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         }
     }
 
-    public JSONObject search(String query) throws ApiConfigurationException {
+    private JSONObject search(String query) throws ApiConfigurationException {
         client.removeAllFilters();
         // Create a resource to be used to make Twitter API calls
         WebResource resource = client.resource(URL_API + URL_SEARCH + query);
@@ -222,7 +222,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         return available;
     }
 
-    public class UserAgentFilter extends ClientFilter {
+    class UserAgentFilter extends ClientFilter {
         private final String header;
         private final String value;
 

@@ -16,23 +16,18 @@
 
 package diskong.gui;
 
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import diskong.AlbumVo;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
-import java.util.ResourceBundle;
 
-public class ManualSearchDialog extends JDialog {
+class ManualSearchDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField tfArtist;
     private JTextField tfTitle;
-    AlbumVo avo = new AlbumVo();
+    private AlbumVo avo = new AlbumVo();
 
 
     public ManualSearchDialog(String artist, String title) {

@@ -20,7 +20,7 @@ import org.apache.tika.metadata.Metadata;
 
 
 
-public class TrackInfo {
+class TrackInfo {
 	public Metadata getMetadata() {
 		return metadata;
 	}

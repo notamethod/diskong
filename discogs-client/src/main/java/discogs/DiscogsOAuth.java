@@ -40,7 +40,7 @@ import com.sun.jersey.oauth.signature.OAuthSecrets;
  * Hello world!
  * 
  */
-public class DiscogsOAuth  {
+class DiscogsOAuth  {
 
 	// base URL for the API calls
 	private static final String URL_API = "https://api.discogs.com/";
@@ -59,8 +59,8 @@ public class DiscogsOAuth  {
 
 
 	
-	final static Logger logger = LoggerFactory.getLogger(DiscogsOAuth.class);
-	Properties authProperties = new Properties();
+	private final static Logger logger = LoggerFactory.getLogger(DiscogsOAuth.class);
+	private Properties authProperties = new Properties();
 	private Client client;
 
 	public DiscogsOAuth() throws ApiConfigurationException {
@@ -153,11 +153,11 @@ public class DiscogsOAuth  {
 
 
 
-	public class UserAgentFilter extends ClientFilter {
+	class UserAgentFilter extends ClientFilter {
 		private final String header;
 		private final String value;
 
-		public UserAgentFilter(String header, String value) {
+		UserAgentFilter(String header, String value) {
 			this.header = header;
 			this.value = value;
 		}

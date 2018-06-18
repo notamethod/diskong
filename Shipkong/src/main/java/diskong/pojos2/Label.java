@@ -37,7 +37,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "name",
     "resource_url"
 })
-public class Label {
+class Label {
 
     @JsonProperty("entity_type")
     private String entity_type;

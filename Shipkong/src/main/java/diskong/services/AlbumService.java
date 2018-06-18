@@ -36,9 +36,9 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class AlbumService {
-    final static Logger LOG = LoggerFactory.getLogger(AlbumService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(AlbumService.class);
     private static final String UNKNOWN = "Unknown";
-    boolean isSimulate = true;
+    private boolean isSimulate = true;
 
     public void setSimulate(boolean simulate) {
         isSimulate = simulate;
@@ -177,11 +177,7 @@ public class AlbumService {
                 }
             }
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            exitCode = 99;
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             exitCode = 99;

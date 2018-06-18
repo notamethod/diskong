@@ -28,14 +28,14 @@ import java.util.List;
 @SuppressWarnings("SpellCheckingInspection")
 public class AlbumModel extends AbstractTableModel{
 
-    List<AlbumVo> albums;
+    private List<AlbumVo> albums;
 
     public AlbumModel() {
         super();
         //albums= new ArrayList<>();
     }
 
-    String[] colName=new String[]{"Title","Artist","style", "image"};
+    private String[] colName=new String[]{"Title","Artist","style", "image"};
     public AlbumModel(List<AlbumVo> albums) {
         this.albums = albums;
     }

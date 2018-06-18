@@ -30,8 +30,8 @@ import diskong.parser.MetaUtils;
 import diskong.parser.fileutils.FilePath;
 
 public class AlbumVo implements IAlbumVo {
-	final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
-	final static String VARIOUS="Various";
+	private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
+	private final static String VARIOUS="Various";
 	
 	private List<TrackInfo> tracks = new ArrayList<>();
 	private String title;
@@ -74,7 +74,7 @@ public class AlbumVo implements IAlbumVo {
 		
 	}
 	// add track to album
-	public void add(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException {
+	private void add(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException {
 		// check if all tracks in folder belong to same album
 		if (metadata.get(Metadata.CONTENT_TYPE).contains("flac") || metadata.get(Metadata.CONTENT_TYPE).contains("vorbis")) {
 			if (title == null) {

@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "username",
     "resource_url"
 })
-public class Contributor {
+class Contributor {
 
     @JsonProperty("username")
     private String username;

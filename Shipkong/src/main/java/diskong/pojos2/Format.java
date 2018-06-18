@@ -36,7 +36,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "name",
     "qty"
 })
-public class Format {
+class Format {
 
     @JsonProperty("descriptions")
     private List<String> descriptions = new ArrayList<String>();

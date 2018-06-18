@@ -19,9 +19,9 @@ package diskong.demo;
 import java.io.File;
 import java.io.IOException;
 
-public class DirectoryParser {
+class DirectoryParser {
 
-	static int cpt=0;
+	private static int cpt=0;
 	public static void main(String[] args) {
 		DirectoryParser dp = new DirectoryParser();
 		

@@ -36,7 +36,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "description",
     "title"
 })
-public class Video {
+class Video {
 
     @JsonProperty("uri")
     private String uri;

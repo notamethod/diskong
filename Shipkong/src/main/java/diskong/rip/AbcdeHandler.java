@@ -43,10 +43,10 @@ public class AbcdeHandler {
     public final String OUTPUT_FORMAT = "OUTPUTFORMAT";
     public final String WAVOUTPUTDIR = "WAVOUTPUTDIR";
     public final String DEFAULT_OUTPUT_FORMAT = "'${ARTISTFILE}-${ALBUMFILE}/${TRACKNUM}.${TRACKFILE}'";
-    final String TITLE_SEPARATOR = "----";
-    final String COMMAND_NAME = "abcde";
-    Properties ripProperties = new Properties();
-    String configurationFileName;
+    private final String TITLE_SEPARATOR = "----";
+    private final String COMMAND_NAME = "abcde";
+    final Properties ripProperties = new Properties();
+    private String configurationFileName;
     private String artist;
     private String album;
 
@@ -114,12 +114,7 @@ public class AbcdeHandler {
                 throw new RipperException(parseError(output, exitCode), result, exitCode);
             }
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            exitCode = 99;
-            throw new RipperException("exit code is " + exitCode);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             exitCode = 99;

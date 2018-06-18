@@ -34,13 +34,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RipForm {
+class RipForm {
 
-    final String[] formats = new String[]{"flac", "m4a", "mp3", "mpc", "ogg", "opus", "spx", "vorbis", "wav", "wv", "ape"};
-    final Logger LOG = LoggerFactory.getLogger(RipForm.class);
-    AbcdeHandler ah;
+    private final String[] formats = new String[]{"flac", "m4a", "mp3", "mpc", "ogg", "opus", "spx", "vorbis", "wav", "wv", "ape"};
+    private final Logger LOG = LoggerFactory.getLogger(RipForm.class);
+    private AbcdeHandler ah;
     TableModelListener tListener;
-    TrackModel model ;
+    private TrackModel model ;
     List<TrackVO> tracks = new ArrayList<>();
     private JPanel JPanel1;
     private JButton button1;

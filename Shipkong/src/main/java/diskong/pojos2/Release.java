@@ -60,7 +60,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "identifiers",
     "tracklist"
 })
-public class Release {
+class Release {
 
     @JsonProperty("id")
     private Integer id;

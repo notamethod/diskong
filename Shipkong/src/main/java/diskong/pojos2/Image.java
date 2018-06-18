@@ -37,7 +37,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "uri150",
     "resource_url"
 })
-public class Image {
+class Image {
 
     @JsonProperty("type")
     private String type;

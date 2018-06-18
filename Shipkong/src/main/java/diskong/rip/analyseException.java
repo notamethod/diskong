@@ -16,7 +16,7 @@
 
 package diskong.rip;
 
-public class analyseException extends Exception {
+class analyseException extends Exception {
     public analyseException(String str) {
         super(str);
     }

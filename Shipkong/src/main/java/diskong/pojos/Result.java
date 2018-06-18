@@ -24,7 +24,7 @@ import javax.annotation.Generated;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Generated("com.googlecode.jsonschema2pojo")
-public class Result {
+class Result {
 
 private List<String> style = new ArrayList<String>();
 private String thumb;

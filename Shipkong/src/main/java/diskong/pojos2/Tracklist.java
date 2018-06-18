@@ -34,7 +34,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "position",
     "title"
 })
-public class Tracklist {
+class Tracklist {
 
     @JsonProperty("duration")
     private String duration;

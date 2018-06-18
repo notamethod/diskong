@@ -22,9 +22,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class NioDirectoryParser {
+class NioDirectoryParser {
 
-	static int cpt=0;
+	private static int cpt=0;
 	public static void main(String[] args) {
 		NioDirectoryParser dp = new NioDirectoryParser();
 		

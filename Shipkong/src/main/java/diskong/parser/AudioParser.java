@@ -27,6 +27,7 @@ import java.nio.file.StandardOpenOption;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
@@ -46,7 +47,7 @@ import diskong.parser.fileutils.FilePath;
 public class AudioParser {
 
 	private Tika tika;
-	AutoDetectParser autoParser;
+	private AutoDetectParser autoParser;
 
 	public AudioParser() {
 		super();
@@ -54,7 +55,7 @@ public class AudioParser {
 		this.autoParser= new AutoDetectParser();
 	}
 
-	final static Logger LOG = LoggerFactory.getLogger(AudioParser.class);
+	private final static Logger LOG = LoggerFactory.getLogger(AudioParser.class);
 
 	public static void main(String[] args) {
 		String fic = "/mnt/media1/music/Collective Soul/Dosage/02. Heavy.flac";
@@ -62,9 +63,6 @@ public class AudioParser {
 		AudioParser ap = new AudioParser();
 		try {
 			ap.parse(new File(fic));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -77,7 +75,7 @@ public class AudioParser {
 		}
 	}
 
-	public void parse(File f) throws IOException, SAXException, TikaException {
+	private void parse(File f) throws IOException, SAXException, TikaException {
 
 		Metadata metadata = new Metadata();
 		BodyContentHandler ch = new BodyContentHandler();
@@ -112,7 +110,7 @@ public class AudioParser {
 		is.close();
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("artist:" + metadata.get(XMPDM.ARTIST) + " album:" + metadata.get(XMPDM.ALBUM) + " track:no:"
-					+ metadata.get(XMPDM.TRACK_NUMBER) + " title:" + metadata.get(Metadata.TITLE));
+					+ metadata.get(XMPDM.TRACK_NUMBER) + " title:" + metadata.get(TikaCoreProperties.TITLE));
 			for (String genre : metadata.getValues(XMPDM.GENRE)) {
 				LOG.debug(" genre " + genre);
 			}

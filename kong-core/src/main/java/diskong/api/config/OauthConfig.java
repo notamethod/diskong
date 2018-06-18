@@ -33,16 +33,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
-public class OauthConfig extends JDialog {
-
-	private final JPanel contentPanel = new JPanel();
+class OauthConfig extends JDialog {
 
 	private static final String PRODUCT="discog";
 	/** Directory to store user credentials. */
 	  private static final java.io.File DATA_STORE_FILE =
 	      new java.io.File(System.getProperty("user.home"), ".oauth_store/keys");
 	  
-	  Properties props;
+	  private Properties props;
 	/**
 	 * Launch the application.
 	 */
@@ -67,9 +65,10 @@ public class OauthConfig extends JDialog {
 	 * Create the dialog.
 	 * @throws IOException 
 	 */
-	public OauthConfig() throws IOException {
+	private OauthConfig() throws IOException {
 		setBounds(100, 100, 556, 291);
 		getContentPane().setLayout(new BorderLayout());
+		JPanel contentPanel = new JPanel();
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
@@ -132,7 +131,7 @@ public class OauthConfig extends JDialog {
 	}
 
 	
-protected void init() throws IOException {
+private void init() throws IOException {
  props = new Properties();
  if (!DATA_STORE_FILE.exists()){
 	 DATA_STORE_FILE.getParentFile().mkdirs();
@@ -145,7 +144,7 @@ protected void init() throws IOException {
 
 }
 		
-	protected void save(String valCombo, String reqUrl, String accessUrl, String autUrl) throws IOException {
+	private void save(String valCombo, String reqUrl, String accessUrl, String autUrl) throws IOException {
 	
 	//	if (valCombo!=null){
 			//props.setProperty("combo."+valCombo, valCombo);

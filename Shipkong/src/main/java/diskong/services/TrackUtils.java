@@ -22,8 +22,8 @@ import diskong.parser.MetaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TrackUtils {
-    final static Logger LOG = LoggerFactory.getLogger(TrackUtils.class);
+class TrackUtils {
+    private final static Logger LOG = LoggerFactory.getLogger(TrackUtils.class);
 
     static boolean isAllOK(IAlbumVo iAlbum) {
         String preferences = "genre_exists+style_exists";

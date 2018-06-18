@@ -16,9 +16,6 @@
 
 package diskong.gui;
 
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import diskong.AlbumVo;
 import diskong.IAlbumVo;
 import diskong.Utils;
@@ -31,14 +28,12 @@ import diskong.parser.fileutils.FilePath;
 import diskong.services.AlbumService;
 import diskong.services.AudioService;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;
 import org.dpr.swingtools.components.JDropText;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -51,16 +46,16 @@ import java.util.Objects;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
-public class MainForm {
+class MainForm {
 
-    TableModelListener tListener;
-    AlbumModel model = new AlbumModel();
-    AudioService service = new AudioService();
-    AlbumService albumService = new AlbumService();
-    Map<Path, List<FilePath>> map;
-    List<AlbumVo> albums = new ArrayList<>();
+    private TableModelListener tListener;
+    private AlbumModel model = new AlbumModel();
+    private AudioService service = new AudioService();
+    private AlbumService albumService = new AlbumService();
+    private Map<Path, List<FilePath>> map;
+    private List<AlbumVo> albums = new ArrayList<>();
     //MonSwingWorker worker;
-    RetrieveAlbumsTasks worker;
+    private RetrieveAlbumsTasks worker;
     private JButton analyseAlbumButton;
     private JPanel Panel1;
     private JTable table1;
@@ -283,7 +278,7 @@ public class MainForm {
         progressBar1.setMaximum(map.size());
     }
 
-    class MonSwingWorker extends SwingWorker {
+    private class MonSwingWorker extends SwingWorker {
 
         public MonSwingWorker() {
 

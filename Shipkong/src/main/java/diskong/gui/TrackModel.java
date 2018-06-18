@@ -16,27 +16,20 @@
 
 package diskong.gui;
 
-import diskong.AlbumVo;
-import diskong.TrackInfo;
-
-import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.awt.*;
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 
 @SuppressWarnings("SpellCheckingInspection")
-public class TrackModel extends AbstractTableModel{
+class TrackModel extends AbstractTableModel{
 
-    List<TrackVO> tracks;
+    private List<TrackVO> tracks;
 
     public TrackModel() {
         super();
         //albums= new ArrayList<>();
     }
 
-    String[] colName=new String[]{"Num.", "Title","Artist"};
+    private String[] colName=new String[]{"Num.", "Title","Artist"};
     public TrackModel(List<TrackVO> albums) {
         this.tracks = tracks;
     }

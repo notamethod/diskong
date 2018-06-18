@@ -20,7 +20,7 @@ import org.apache.tika.metadata.Metadata;
 
 public class WrongTrackAlbumException extends Exception {
 
-	Metadata metadata;
+	private Metadata metadata;
 	public WrongTrackAlbumException(Metadata metadata) {
 		this.metadata=metadata;
 	}

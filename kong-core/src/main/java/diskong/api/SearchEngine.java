@@ -16,7 +16,7 @@
 
 package diskong.api;
 
-public class SearchEngine {
+class SearchEngine {
 
 	public void guessRelease(){
 		

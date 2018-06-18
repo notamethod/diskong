@@ -34,7 +34,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "description",
     "value"
 })
-public class Identifier {
+class Identifier {
 
     @JsonProperty("type")
     private String type;

@@ -26,7 +26,7 @@ import javax.annotation.Generated;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Generated("com.googlecode.jsonschema2pojo")
-public class Release {
+class Release {
 
 private Pagination pagination;
 private List<Result> results = new ArrayList<Result>();

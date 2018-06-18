@@ -16,30 +16,23 @@
 
 package diskong.gui;
 
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import diskong.rip.AbcdeHandler;
-import diskong.rip.RipperException;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GuiPreferences extends JDialog {
+class GuiPreferences extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField tempFolder;
     private JTextField tfOutputDir;
     private JTextField outputFormat;
-    AbcdeHandler ah;
+    private AbcdeHandler ah;
     public GuiPreferences() {
         setContentPane(contentPane);
         setModal(true);
