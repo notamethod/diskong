@@ -16,11 +16,13 @@
 
 package diskong.parser;
 
+import diskong.core.FilePath;
+
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import diskong.parser.fileutils.FilePath;
+
 
 public interface DirectoryParser {
 

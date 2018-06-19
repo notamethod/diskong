@@ -20,7 +20,7 @@ import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 @SuppressWarnings("SpellCheckingInspection")
-class TrackModel extends AbstractTableModel{
+public class TrackModel extends AbstractTableModel{
 
     private List<TrackVO> tracks;
 

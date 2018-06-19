@@ -16,9 +16,9 @@
 
 package diskong;
 
+import diskong.core.FilePath;
 import org.apache.tika.metadata.Metadata;
 
-import diskong.parser.fileutils.FilePath;
 
 public class TrackInfo {
 	public Metadata getMetadata() {
@@ -39,7 +39,6 @@ public class TrackInfo {
 	public TrackInfo(FilePath fPath, Metadata metadata) {
 		this.metadata=metadata;
 		this.fPath=fPath;
-		
 	}
 
 }

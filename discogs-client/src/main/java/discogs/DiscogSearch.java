@@ -63,8 +63,6 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         LOG.info("Entering application.");
         DiscogSearch app = new DiscogSearch();
 
-        //app.getProfile("croger42");
-
         app.search("type=all&artist=babybird");
     }
 

@@ -32,10 +32,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import diskong.core.FilePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import diskong.parser.fileutils.FilePath;
 
 public class NioDirectoryParser implements DirectoryParser {
 

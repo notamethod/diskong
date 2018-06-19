@@ -8,14 +8,14 @@
         <outputRelativeToContentRoot value="true" />
         <module name="discogs-client" />
         <module name="kong-app" />
-        <module name="kong-core" />
+        <module name="kong-common" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="discogs-client" target="1.8" />
       <module name="diskong" target="1.8" />
       <module name="kong-app" target="1.8" />
-      <module name="kong-core" target="1.8" />
+      <module name="kong-common" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
