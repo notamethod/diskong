@@ -17,10 +17,13 @@
 package diskong.api;
 
 import diskong.core.IAlbumVo;
-import diskong.core.ReleaseNotFoundException;
+import diskong.core.EmptyResultException;
+
+import java.util.List;
 
 public interface DatabaseSearch {
 
-	IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException, ApiConfigurationException;
+	IAlbumVo searchRelease(IAlbumVo album) throws EmptyResultException, ApiConfigurationException;
+	List<IAlbumVo> searchArtist(String artist, String title) throws EmptyResultException, ApiConfigurationException;
 
 }

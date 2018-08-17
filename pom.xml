@@ -24,13 +24,15 @@
     <modules>
         <module>kong-core</module>
         <module>discogs-client</module>
-        <module>Shipkong</module>
+        <module>kong-app</module>
 
     </modules>
     <name>Diskong</name>
     <properties>
-        <tika.version>1.17</tika.version>
+        <tika.version>1.18</tika.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>log4j</groupId>
@@ -111,6 +113,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>16.0.1</version>
+
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.12</version>
@@ -150,7 +158,6 @@
                             <verbose>true</verbose>
                             <source>1.8</source>
                             <target>1.8</target>
-
                         </configuration>
                         <goals>
                             <goal>compile</goal>

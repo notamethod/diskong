@@ -18,6 +18,7 @@ package diskong.app.cdrip;
 
 
 import diskong.gui.TrackVO;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,8 @@ public class AbcdeHandler {
         return album;
     }
 
-    final static Logger logger = LoggerFactory.getLogger(AbcdeHandler.class);
+    final static Logger LOG = LoggerFactory.getLogger(AbcdeHandler.class);
+
     public final String OUTPUT_DIR = "OUTPUTDIR";
     public final String FORMAT_PREFIX = "-o ";
     public final String OUTPUT_FORMAT = "OUTPUTFORMAT";
@@ -45,6 +47,7 @@ public class AbcdeHandler {
     public final String DEFAULT_OUTPUT_FORMAT = "'${ARTISTFILE}-${ALBUMFILE}/${TRACKNUM}.${TRACKFILE}'";
     private final String TITLE_SEPARATOR = "----";
     private final String COMMAND_NAME = "abcde";
+    final String CDDB = "CDDBMETHOD";
     final Properties ripProperties = new Properties();
     private String configurationFileName;
     private String artist;
@@ -56,8 +59,9 @@ public class AbcdeHandler {
 
             ClassLoader classLoader = getClass().getClassLoader();
             is = classLoader.getResourceAsStream("abcde.conf");
-            URL u = classLoader.getResource("abcde.conf");
 
+            @NotNull
+            URL u = classLoader.getResource("abcde.conf");
 
             configurationFileName = Paths.get(u.toURI()).toFile().getAbsolutePath();
             is = classLoader.getResourceAsStream("abcde.conf");
@@ -114,11 +118,14 @@ public class AbcdeHandler {
                 throw new RipperException(parseError(output, exitCode), result, exitCode);
             }
 
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            exitCode = 99;
+            exitCode = 98;
             throw new RipperException("exit code is " + exitCode);
+        } catch (IOException  e) {
+            exitCode = 99;
+            throw new RipperException("abcde error", exitCode, e);
         } finally {
             if (exitCode == 88){
 

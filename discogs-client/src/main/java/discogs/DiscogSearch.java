@@ -19,12 +19,12 @@ package discogs;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.*;
 import com.sun.jersey.api.client.filter.ClientFilter;
-import diskong.core.AlbumVo;
-import diskong.core.IAlbumVo;
-import diskong.core.ReleaseNotFoundException;
 import diskong.api.AbstractDatabase;
 import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
+import diskong.core.AlbumVo;
+import diskong.core.EmptyResultException;
+import diskong.core.IAlbumVo;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringUtils;
@@ -123,7 +123,8 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
     private JSONObject search(String query) throws ApiConfigurationException {
         client.removeAllFilters();
         // Create a resource to be used to make Twitter API calls
-        WebResource resource = client.resource(URL_API + URL_SEARCH + query);
+String qq = "q=Mashrou'Leila*&title=Ibn%20El%20Leil";
+        WebResource resource = client.resource(URL_API + URL_SEARCH + qq);
         // Add the filter to the resource
         DiscogsOAuth auth = new DiscogsOAuth();
         auth.addAuthentificationFilters(resource);
@@ -146,7 +147,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         return jsonObject;
     }
 
-    public IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException, ApiConfigurationException {
+    public IAlbumVo searchRelease(IAlbumVo album) throws EmptyResultException, ApiConfigurationException {
         IAlbumVo albumInfo = new AlbumVo();
         String query = null;
         if (album == null || StringUtils.isBlank(album.getTitle())) {
@@ -155,6 +156,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         }
         try {
             query = getReleaseQuery(album);
+            query = query.replaceAll("'", "%27");
         } catch (Exception e) {
             LOG.error("invalid query" + query, e);
         }
@@ -162,7 +164,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         try {
             JSONArray results = jsonObject.getJSONArray("results");
             if (results.length() == 0)
-                throw new ReleaseNotFoundException(album.getTitle());
+                throw new EmptyResultException(album.getTitle());
             JSONObject result = results.getJSONObject(0);
 
             // TODO: multi genre
@@ -188,6 +190,52 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         return albumInfo;
     }
 
+    public List<IAlbumVo> searchArtist(String artist,String title) throws EmptyResultException, ApiConfigurationException {
+
+        String query = null;
+//Mashrou'Leila
+        List<IAlbumVo> values = new ArrayList<>();
+        try {
+            query = getArtistQuery(artist, title);
+            // query = query.replaceAll("'", "%27");
+        } catch (Exception e) {
+            LOG.error("invalid query" + query, e);
+        }
+        JSONObject jsonObject = search(query);
+        try {
+            JSONArray results = jsonObject.getJSONArray("results");
+            if (results.length() == 0)
+                throw new EmptyResultException(artist);
+            for (int i = 0; i < results.length(); i++) {
+                IAlbumVo albumInfo = new AlbumVo();
+                JSONObject result = results.getJSONObject(i);
+                // TODO: multi genre
+                albumInfo.setTitle(result.getString("title"));
+                try {
+                    albumInfo.setArtist(result.getString("artist"));
+
+                } catch (JSONException j) {
+                }
+                try {
+                    albumInfo.setCoverImageUrl(result.getString("cover_image"));
+                } catch (JSONException j) {
+                }
+//                albumInfo.setStyles(result.getJSONArray("style"));
+//                albumInfo.setGenres(result.getJSONArray("genre"));
+                values.add(albumInfo);
+            }
+
+
+            //albumInfo.setImages(result.getJSONArray("image"));
+
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+
+        }
+        return values;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -207,15 +255,35 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
     }
 
+
+    protected String getArtistQuery(String artist, String title) throws URIException {
+
+        StringBuilder sb = new StringBuilder();
+        String sep="";
+        if (artist != null) {
+            sb.append("artist=").append(artist);
+            sep="&";
+        }
+        if (title!=null){
+
+                sb.append(sep).append("title=").append(title);
+
+        }
+
+
+        return URIUtil.encodeQuery(sb.toString());
+
+    }
+
     @Override
     public boolean isAPIAvailable() {
-        boolean available=true;
+        boolean available = true;
 
-            File file = new File(System.getProperty("user.home")+"/.shipkong/authapis.ini");
-       if (!file.exists()){
-                log.error("no configuration file found");
-                available = false;
-            }
+        File file = new File(System.getProperty("user.home") + "/.shipkong/authapis.ini");
+        if (!file.exists()) {
+            log.error("no configuration file found");
+            available = false;
+        }
 
         return available;
     }

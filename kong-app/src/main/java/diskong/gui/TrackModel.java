@@ -30,7 +30,7 @@ public class TrackModel extends AbstractTableModel{
     }
 
     private String[] colName=new String[]{"Num.", "Title","Artist"};
-    public TrackModel(List<TrackVO> albums) {
+    public TrackModel(List<TrackVO> tracks) {
         this.tracks = tracks;
     }
 

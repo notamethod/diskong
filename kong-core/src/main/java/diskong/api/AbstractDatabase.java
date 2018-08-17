@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import diskong.core.IAlbumVo;
-import diskong.core.ReleaseNotFoundException;
+import diskong.core.EmptyResultException;
 
 public abstract class AbstractDatabase {
 	
@@ -30,9 +30,9 @@ public abstract class AbstractDatabase {
 	/**
 	 * Search for an unique album release
 	 * @param album
-	 * @throws ReleaseNotFoundException 
+	 * @throws EmptyResultException
 	 */
-	public abstract IAlbumVo searchRelease(IAlbumVo album) throws ReleaseNotFoundException, ApiConfigurationException ;
+	public abstract IAlbumVo searchRelease(IAlbumVo album) throws EmptyResultException, ApiConfigurationException ;
 
 	//protected  abstract void search(String query);
 

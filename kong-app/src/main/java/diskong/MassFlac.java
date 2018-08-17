@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import diskong.api.ApiConfigurationException;
 import diskong.core.*;
-import diskong.core.AlbumVo;
 import diskong.core.TagState;
 import diskong.core.TrackInfo;
 import diskong.tag.metatag.ArgAction;
@@ -209,7 +208,7 @@ class MassFlac {
 				alInfos.setStyle(UNKNOWN);
 			LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
 
-		} catch (ReleaseNotFoundException e) {
+		} catch (EmptyResultException e) {
 			String artist = regexx(album.getArtist(), "(\\((.+)\\))|(!)|(&)");
 			if (artist != null && !artist.equals("") && !Objects.equals(artist, album.getArtist())) {
 				album.setExactMatch(false);

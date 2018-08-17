@@ -18,6 +18,8 @@ package diskong.app.cdrip;
 
 public class RipperException extends Throwable {
     private String messageCode;
+    private int exitCode=-1;
+
     public RipperException(String s, Throwable throwable) {
         super(s, throwable);
     }
@@ -27,13 +29,32 @@ public class RipperException extends Throwable {
     }
 
     public String getMessageCode() {
-        return messageCode;
+        switch (exitCode)
+        {
+            case 99:
+                return "abcde is not installed, please install it (sudo apt-get install abcde)";
+            default:
+                if (messageCode!=null)
+                    return messageCode;
+                else
+                    return "exitCode is "+exitCode;
+        }
+
+
+
     }
 
     public RipperException(String error, String info, int exitCode) {
         super(error + "\n" + info);
         //TODO: i18n
-        messageCode = error;
+        messageCode = error+ "\n" + info;
+
+    }
+
+    public RipperException(String error, int exitCode, Throwable throwable) {
+        super(error, throwable);
+        //TODO: i18n
+        exitCode = exitCode;
 
     }
 }

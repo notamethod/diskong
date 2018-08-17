@@ -115,9 +115,8 @@ public class AlbumVo implements IAlbumVo {
 
 	@Override
 	public String toString() {
-		return "test";
-//		return "AlbumVo [title=" + title + ", artist=" + artist + ", genre=" + genres.toString() + ", style="
-//				+ styles.toString()/* + ", tracks=" + tracks + "]"*/;
+
+		return "AlbumVo [title=" + title + ", artist=" + artist /* + ", tracks=" + tracks + "]"*/;
 	}
 
 	public List<TrackInfo> getTracks() {

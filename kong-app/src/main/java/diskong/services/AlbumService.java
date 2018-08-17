@@ -22,7 +22,7 @@ import diskong.api.DatabaseSearchFactory;
 import diskong.api.SearchAPI;
 import diskong.core.AlbumVo;
 import diskong.core.IAlbumVo;
-import diskong.core.ReleaseNotFoundException;
+import diskong.core.EmptyResultException;
 import diskong.core.TrackInfo;
 import diskong.parser.MetaUtils;
 import diskong.tag.metatag.ArgAction;
@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -42,12 +43,11 @@ public class AlbumService {
     private final static Logger LOG = LoggerFactory.getLogger(AlbumService.class);
     private static final String UNKNOWN = "Unknown";
     private boolean isSimulate = true;
+    private SearchAPI searchAPI;
 
     public void setSimulate(boolean simulate) {
         isSimulate = simulate;
     }
-
-    private SearchAPI searchAPI;
 
     public SearchAPI getSearchAPI() {
         return searchAPI;
@@ -70,13 +70,13 @@ public class AlbumService {
             if (alInfos.getStyles().isEmpty())
                 alInfos.setStyle(UNKNOWN);
             LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
-            if (null== alInfos.getArtist() || alInfos.getArtist().isEmpty())
+            if (null == alInfos.getArtist() || alInfos.getArtist().isEmpty())
                 alInfos.setArtist(album.getArtist());
-            if (null== alInfos.getArtist() || alInfos.getArtist().isEmpty() || !alInfos.getTitle().equals(album.getTitle()))
+            if (null == alInfos.getArtist() || alInfos.getArtist().isEmpty() || !alInfos.getTitle().equals(album.getTitle()))
                 alInfos.setTitle(album.getTitle());
 
 
-        } catch (ReleaseNotFoundException e) {
+        } catch (EmptyResultException e) {
             String artist = TrackUtils.regexx(album.getArtist(), "(\\((.+)\\))|(!)|(&)");
             if (artist != null && !artist.equals("") && !artist.equals(album.getArtist())) {
                 album.setExactMatch(false);
@@ -108,6 +108,20 @@ public class AlbumService {
         }
         return alInfos;
 
+    }
+
+    public List<IAlbumVo> searchArtist(String artist, String title) throws ApiConfigurationException, EmptyResultException {
+
+
+        int tagged = 0;
+        List<IAlbumVo> alInfos = null;
+        LOG.info("Connecting to database:" + SearchAPI.DISCOGS);
+        this.searchAPI = SearchAPI.DISCOGS;
+        DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
+
+        alInfos = ds.searchArtist(artist, title);
+
+        return alInfos;
     }
 
     /**
@@ -213,15 +227,15 @@ public class AlbumService {
         // metaflac --remove-tag=genre --set-tag=GENRE=Rruick
         // --set-tag=GENRE=Rack /mnt/media1/music/Weezer/test/01.\ Ain’t\ Got\
         // Nobody.flac
-        for (String name : metadata.names()){
-         // ?   if (metadata.isMultiValued(name)){
+        for (String name : metadata.names()) {
+            // ?   if (metadata.isMultiValued(name)){
             name.replaceAll("xmpDM:", "");
-            args.add(ArgAction.REMOVE_TAG,name);
-                for (String value : metadata.getValues(name)) {
+            args.add(ArgAction.REMOVE_TAG, name);
+            for (String value : metadata.getValues(name)) {
 
-                    args.add(ArgAction.SET_TAG, name, value);
-                }
-     //       }
+                args.add(ArgAction.SET_TAG, name, value);
+            }
+            //       }
         }
 
 //        for (String value : metadata.getValues(XMPDM.ARTIST)) {
@@ -279,14 +293,15 @@ public class AlbumService {
     }
 
     /**
-     *  retag all tracks with metada infos.
+     * retag all tracks with metada infos.
+     *
      * @param data
      * @param album
      * @return number of tagged tracks
      */
     public int retagAlbum(Metadata data, IAlbumVo album) {
         int tagged = 0;
-        if (data == null || data.size()<1) {
+        if (data == null || data.size() < 1) {
             LOG.warn("NO DATA");
             return 0;
         }

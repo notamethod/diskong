@@ -37,23 +37,23 @@ public class RipForm {
 
     private final String[] formats = new String[]{"flac", "m4a", "mp3", "mpc", "ogg", "opus", "spx", "vorbis", "wav", "wv", "ape"};
     private final Logger LOG = LoggerFactory.getLogger(RipForm.class);
-    private AbcdeHandler ah;
     TableModelListener tListener;
-    private TrackModel model ;
     List<TrackVO> tracks = new ArrayList<>();
+    private AbcdeHandler ah;
+    private TrackModel model;
     private JPanel JPanel1;
     private JButton button1;
     private JTextArea textArea1;
     private JButton ripButton;
     private JComboBox comboBox2;
     private JTextField outputFormat;
-    private JCheckBox albumArtCheckBox;
     private JLabel jCoverImage;
     private JButton button2;
     private JLabel jlTitle;
     private JLabel jlArtist;
     private JScrollPane scrollPane1;
     private JTable table1;
+    private boolean albumArt = true;
 
     public RipForm() {
 
@@ -86,9 +86,8 @@ public class RipForm {
                 List<String> liste = new ArrayList<>();
 
                 liste.add(ah.FORMAT_PREFIX + comboBox2.getSelectedItem());
-                if (albumArtCheckBox.isSelected()) {
-                    liste.add(ArgAction.DEFAULT.getString());
-                }
+                // no more an option: if (albumArtCheckBox.isSelected()) {
+                liste.add(ArgAction.DEFAULT.getString());
 
                 try {
 
@@ -113,7 +112,7 @@ public class RipForm {
             }
 
             public void componentShown(ComponentEvent e) {
-             //   rf.searchCD();
+                //   rf.searchCD();
             }
         });
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -131,7 +130,7 @@ public class RipForm {
         List<String> liste = new ArrayList<>();
 
         StringBuilder action = new StringBuilder("-a clean,cddb");
-        if (albumArtCheckBox.isSelected()) {
+        if (albumArt) {
             action.append(",").append(ArgAction.GETIMAGE.getString());
         }
         liste.add(action.toString());
@@ -139,14 +138,20 @@ public class RipForm {
 
             List l = ah.parseTrack(ah.process(liste));
             model.setElements(l);
-            ImageIcon imageIcon = new ImageIcon(ah.getCoverImage()); // load the image to a imageIcon
-
-            Image newimg = imageIcon.getImage();
+            jlArtist.setVisible(true);
+            jlTitle.setVisible(true);
             jlArtist.setText(ah.getArtist());
             jlTitle.setText(ah.getAlbum());
-            newimg = newimg.getScaledInstance(120, 120, Image.SCALE_SMOOTH); // scale it the smooth way
-            imageIcon = new ImageIcon(newimg);  // transform it back
-            jCoverImage.setIcon(imageIcon);
+
+            if (ah.getCoverImage() == null) {
+                jCoverImage.setText("No cover image found");
+            } else {
+                ImageIcon imageIcon = new ImageIcon(ah.getCoverImage()); // load the image to a imageIcon
+                Image newimg = imageIcon.getImage();
+                newimg = newimg.getScaledInstance(120, 120, Image.SCALE_SMOOTH); // scale it the smooth way
+                imageIcon = new ImageIcon(newimg);  // transform it back
+                jCoverImage.setIcon(imageIcon);
+            }
         } catch (RipperException e) {
             LOG.error("process error", e);
             JOptionPane.showMessageDialog(null,
@@ -161,8 +166,11 @@ public class RipForm {
     private void createUIComponents() {
 
         comboBox2 = new JComboBox(formats);
-         model = new TrackModel();
+        model = new TrackModel();
         table1 = new JTable(model);
+        table1.getColumnModel().getColumn(0).setPreferredWidth(10);
+        table1.getColumnModel().getColumn(1).setPreferredWidth(150);
+        table1.getColumnModel().getColumn(2).setPreferredWidth(80);
 
     }
 

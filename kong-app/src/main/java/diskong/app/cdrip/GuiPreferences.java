@@ -30,7 +30,9 @@ public class GuiPreferences extends JDialog {
     private JTextField tempFolder;
     private JTextField tfOutputDir;
     private JTextField outputFormat;
+    private JComboBox comboBox1;
     private AbcdeHandler ah;
+
     public GuiPreferences() {
         setContentPane(contentPane);
         setModal(true);
@@ -74,26 +76,12 @@ public class GuiPreferences extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-
+        comboBox1.addItem("cddb");
+        comboBox1.addItem("musicbrainz");
         tfOutputDir.setText(ah.getRipProperties().getProperty(ah.OUTPUT_DIR));
         tempFolder.setText(ah.getRipProperties().getProperty(ah.WAVOUTPUTDIR));
         outputFormat.setText(ah.getRipProperties().getProperty(ah.OUTPUT_FORMAT, ah.DEFAULT_OUTPUT_FORMAT));
-    }
-
-    private void onOK() throws IOException {
-
-            final Map<String, String> params = new HashMap<>();
-            params.put(ah.OUTPUT_DIR, tfOutputDir.getText());
-            params.put(ah.WAVOUTPUTDIR, tempFolder.getText());
-            params.put(ah.OUTPUT_FORMAT, outputFormat.getText());
-            ah.configure(params);
-
-        dispose();
-    }
-
-    private void onCancel() {
-        // add your code here if necessary
-        dispose();
+        comboBox1.setSelectedItem(ah.getRipProperties().getProperty(ah.CDDB));
     }
 
     public static void main(String[] args) {
@@ -103,7 +91,22 @@ public class GuiPreferences extends JDialog {
         System.exit(0);
     }
 
+    private void onOK() throws IOException {
 
+        final Map<String, String> params = new HashMap<>();
+        params.put(ah.OUTPUT_DIR, tfOutputDir.getText());
+        params.put(ah.WAVOUTPUTDIR, tempFolder.getText());
+        params.put(ah.OUTPUT_FORMAT, outputFormat.getText());
+        params.put(ah.CDDB, comboBox1.getSelectedItem().toString());
+        ah.configure(params);
+
+        dispose();
+    }
+
+    private void onCancel() {
+        // add your code here if necessary
+        dispose();
+    }
 
 
 }
