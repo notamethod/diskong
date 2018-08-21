@@ -21,12 +21,16 @@ import diskong.core.AlbumVo;
 import diskong.core.EmptyResultException;
 import diskong.core.IAlbumVo;
 import diskong.services.AlbumService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import javax.swing.*;
 
 import java.awt.event.*;
 
 public class SearchDialog extends JDialog {
+    private final static Logger LOG = LoggerFactory.getLogger(SearchDialog.class);
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -75,7 +79,10 @@ public class SearchDialog extends JDialog {
                     nbCount.setText(String.valueOf(values.size()));
                     System.out.println(values);
                 } catch (ApiConfigurationException e) {
-                    e.printStackTrace();
+                    LOG.error("oauth error", e);
+
+                    JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 } catch (EmptyResultException e) {
                     e.printStackTrace();
                 }

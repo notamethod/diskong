@@ -41,7 +41,7 @@ public class RipForm {
     List<TrackVO> tracks = new ArrayList<>();
     private AbcdeHandler ah;
     private TrackModel model;
-    private JPanel JPanel1;
+    private JPanel JPanelOne;
     private JButton button1;
     private JTextArea textArea1;
     private JButton ripButton;
@@ -105,7 +105,7 @@ public class RipForm {
     public static void main(String[] args) {
         JFrame frame = new JFrame("RipForm");
         RipForm rf = new RipForm();
-        frame.setContentPane(rf.JPanel1);
+        frame.setContentPane(rf.JPanelOne);
         frame.addComponentListener(new ComponentAdapter() {
             public void componentHidden(ComponentEvent e) {
                 /* code run when component hidden*/
@@ -120,8 +120,8 @@ public class RipForm {
         frame.setVisible(true);
     }
 
-    public JPanel getJPanel1() {
-        return JPanel1;
+    public JPanel getJPanelOne() {
+        return JPanelOne;
     }
 
     private void searchCD() {

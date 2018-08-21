@@ -21,15 +21,6 @@
           </component>
         </children>
       </scrollpane>
-      <component id="34b64" class="javax.swing.JButton" binding="analyzeDirButton">
-        <constraints>
-          <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="1" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <enabled value="true"/>
-          <text value="Analyze directory"/>
-        </properties>
-      </component>
       <component id="95e1" class="javax.swing.JLabel" binding="nbFiles">
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
@@ -106,12 +97,6 @@
           </grid>
         </children>
       </grid>
-      <component id="a528d" class="org.dpr.swingtools.components.JDropText" binding="pathField">
-        <constraints>
-          <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties/>
-      </component>
       <component id="e0508" class="javax.swing.JLabel">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -151,6 +136,21 @@
           </component>
         </children>
       </toolbar>
+      <component id="34b64" class="javax.swing.JButton" binding="analyzeDirButton">
+        <constraints>
+          <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="1" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <text value="Analyze directory"/>
+        </properties>
+      </component>
+      <component id="a528d" class="org.dpr.swingtools.components.JDropText" binding="pathField" custom-create="true">
+        <constraints>
+          <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
     </children>
   </grid>
 </form>

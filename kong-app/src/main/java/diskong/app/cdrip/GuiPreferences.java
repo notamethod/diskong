@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GuiPreferences extends JDialog {
-    private JPanel contentPane;
+    private JPanel contentPane1;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField tempFolder;
@@ -34,7 +34,7 @@ public class GuiPreferences extends JDialog {
     private AbcdeHandler ah;
 
     public GuiPreferences() {
-        setContentPane(contentPane);
+        setContentPane(contentPane1);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
@@ -70,7 +70,7 @@ public class GuiPreferences extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
+        contentPane1.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }

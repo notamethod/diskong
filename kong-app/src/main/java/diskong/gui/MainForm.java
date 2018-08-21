@@ -32,6 +32,8 @@ import diskong.services.AudioService;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 import org.dpr.swingtools.components.JDropText;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
@@ -49,6 +51,8 @@ import java.util.Objects;
 import static javax.swing.UIManager.setLookAndFeel;
 
 class MainForm {
+
+    private final static Logger LOG = LoggerFactory.getLogger(MainForm.class);
 
     private TableModelListener tListener;
     private AlbumModel model = new AlbumModel();
@@ -112,7 +116,9 @@ class MainForm {
                     try {
                         a2 = albumService.searchAlbum(album);
                     } catch (ApiConfigurationException e) {
-                        e.printStackTrace();
+                        LOG.error("oauth error", e);
+                        JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
                     if (a2 != null)
                         //found: ok
@@ -137,7 +143,9 @@ class MainForm {
                         try {
                             a2 = albumService.searchAlbum(album);
                         } catch (ApiConfigurationException e) {
-                            e.printStackTrace();
+                            LOG.error("oauth error", e);
+                            JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
+                            return;
                         }
                         if (a2.getCoverImageUrl() != null) {
                             Path target = album.getTracks().get(0).getfPath().getPath().getParent();
@@ -174,7 +182,7 @@ class MainForm {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 JFrame frame = new JFrame("RipForm");
-                frame.setContentPane(new RipForm().getJPanel1());
+                frame.setContentPane(new RipForm().getJPanelOne());
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 frame.pack();
                 frame.setVisible(true);
@@ -227,7 +235,10 @@ class MainForm {
             try {
                 a2 = albumService.searchAlbum(albumToSearch);
             } catch (ApiConfigurationException e) {
-                e.printStackTrace();
+                LOG.error("oauth error", e);
+
+                JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
+                return null;
             }
             if (a2 != null) {
                 //found: ok
@@ -260,7 +271,7 @@ class MainForm {
         JFrame frame = new JFrame("MainForm");
         frame.setContentPane(new MainForm().Panel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        pathField.setEditable(false);
         frame.pack();
         frame.setVisible(true);
 
@@ -269,6 +280,9 @@ class MainForm {
     private void createUIComponents() {
         table1 = new JTable(model);
         table1.setRowHeight(48);
+        pathField = new JDropText();
+        pathField.setEditable(true);
+        pathField.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }
 
     private void parseDir(File file) {
