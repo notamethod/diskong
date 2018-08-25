@@ -18,13 +18,16 @@ package diskong.core;
 
 
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class AlbumVo implements IAlbumVo {
@@ -34,8 +37,7 @@ public class AlbumVo implements IAlbumVo {
 	private List<TrackInfo> tracks = new ArrayList<>();
 	private String title;
 	private String artist;
-	private String genre;
-	private String style;
+	private String id;
 
     @Override
     public String getCoverImageUrl() {
@@ -58,12 +60,19 @@ public class AlbumVo implements IAlbumVo {
 	private List<String> styles;
 	private List<String> genres;
 	private List<String> images;
+
 	private boolean exactMatch=true;
 	public boolean isExactMatch() {
 		return exactMatch;
 	}
 	public void setExactMatch(boolean exactMatch) {
 		this.exactMatch = exactMatch;
+	}
+
+	@Override
+	public void setGenres(List<String> genres) {
+        this.genres = genres;
+
 	}
 
 	private TagState tagState;
@@ -88,20 +97,21 @@ public class AlbumVo implements IAlbumVo {
 				artist=VARIOUS;
 				//throw new WrongTrackArtistException(metadata);
 			}
-			if (genre == null) {
-				genre = metadata.get(XMPDM.GENRE);
-				genres= new ArrayList<>();
-				genres.add(genre);
-			} else if (!genre.equals(metadata.get(XMPDM.GENRE))) {
-				genres.add(metadata.get(XMPDM.GENRE));
+			if (genres == null) {
+				genres = MetaUtils.getGenre(metadata);
+
 			}
-			if (style == null) {
-				style = metadata.get("style");
-				styles= new ArrayList<>();
-				styles.add(style);
-			} else if (!style.equals(metadata.get(MetaUtils.STYLE))) {
-				styles.add(metadata.get(MetaUtils.STYLE));
+//			else if (!genre.equals(metadata.get(XMPDM.GENRE))) {
+//				genres.add(metadata.get(XMPDM.GENRE));
+//			}
+			if (styles == null) {
+				styles = MetaUtils.getStyle(metadata);
+//				styles= new ArrayList<>();
+//				styles.add(style);
 			}
+//			else if (!style.equals(metadata.get(MetaUtils.STYLE))) {
+//				styles.add(metadata.get(MetaUtils.STYLE));
+//			}
 			tracks.add(new TrackInfo(fPath, metadata));
 
 		} else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") && (fPath.getFile().getName().toLowerCase().contains("folder") ||fPath.getFile().getName().toLowerCase().contains("cover"))){
@@ -125,6 +135,18 @@ public class AlbumVo implements IAlbumVo {
 
 	public void setTracks(List<TrackInfo> tracks) {
 		this.tracks = tracks;
+		Collections.sort(this.tracks);
+	}
+
+	@Override
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.id=id;
+
 	}
 
 	/* (non-Javadoc)
@@ -200,7 +222,14 @@ public class AlbumVo implements IAlbumVo {
 		}
 		
 	}
-		@Override
+
+	@Override
+	public void setStyles(List<String> styles) {
+		this.styles = styles;
+
+	}
+
+	@Override
 		public void setGenres(JSONArray jsonArray) {
 			genres = new ArrayList<>();
 			for (int i=0; i<jsonArray.length(); i++) {
@@ -213,6 +242,26 @@ public class AlbumVo implements IAlbumVo {
 			}
 			
 		}
+
+    @Override
+    public void setTracks(JSONArray jsonArray) {
+        tracks = new ArrayList<>();
+        for (int i=0; i<jsonArray.length(); i++) {
+            try {
+                JSONObject result=jsonArray.getJSONObject(i);
+                Metadata metadata = new Metadata();
+				metadata.set(TikaCoreProperties.TITLE, (String) result.get("title"));
+				 metadata.set(XMPDM.TRACK_NUMBER, (String) result.get("position"));
+				metadata.set(XMPDM.DURATION, (String) result.get("duration"));
+                TrackInfo track = new TrackInfo(metadata);
+				tracks.add(track);
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        Collections.sort(tracks);
+    }
 
 	@Override
 	public void setImages(JSONArray jsonArray) {

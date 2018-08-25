@@ -17,10 +17,12 @@
 package diskong.core;
 
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
+import org.apache.tika.metadata.XMPDM;
+import org.jetbrains.annotations.NotNull;
 
 
-
-public class TrackInfo {
+public class TrackInfo implements Comparable<TrackInfo> {
 	public Metadata getMetadata() {
 		return metadata;
 	}
@@ -29,17 +31,43 @@ public class TrackInfo {
 		return fPath;
 	}
 
-	private Metadata metadata;
+
+	private final Metadata metadata;
 	private FilePath fPath;
 
-	public TrackInfo(Metadata metadata) {
+	public TrackInfo(@NotNull Metadata metadata) {
 		this.metadata=metadata;
 	}
 
-	public TrackInfo(FilePath fPath, Metadata metadata) {
+	public TrackInfo(FilePath fPath, @NotNull Metadata metadata) {
 		this.metadata=metadata;
 		this.fPath=fPath;
 		
 	}
 
+	public String getTitle() {
+		return metadata.get(TikaCoreProperties.TITLE);
+	}
+
+    public String getNumber() {
+        return metadata.get(XMPDM.TRACK_NUMBER);
+    }
+
+    public Object getArtist() {
+        return metadata.get(XMPDM.ARTIST);
+    }
+
+    @Override
+    public int compareTo(@NotNull TrackInfo o) {
+
+
+	    if (this.getNumber() !=null) {
+            String thisNumber = this.getNumber().replaceAll("\\.", "");
+            if (o.getNumber() != null) {
+                String otherNumber = o.getNumber().replaceAll("\\.", "");
+                return (Integer.valueOf(thisNumber) - Integer.valueOf(otherNumber));
+            }
+        }
+        return 0;
+    }
 }

@@ -25,5 +25,6 @@ public interface DatabaseSearch {
 
 	IAlbumVo searchRelease(IAlbumVo album) throws EmptyResultException, ApiConfigurationException;
 	List<IAlbumVo> searchArtist(String artist, String title) throws EmptyResultException, ApiConfigurationException;
+	IAlbumVo getReleaseById(IAlbumVo album) throws  EmptyResultException, ApiConfigurationException;
 
-}
+	}

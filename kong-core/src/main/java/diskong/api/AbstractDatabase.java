@@ -36,7 +36,7 @@ public abstract class AbstractDatabase {
 
 	//protected  abstract void search(String query);
 
-	protected  abstract String getReleaseQuery(IAlbumVo album) throws Exception;
+	//protected  abstract String getReleaseQuery(IAlbumVo album) throws Exception;
 
 	public abstract boolean isAPIAvailable();
 }

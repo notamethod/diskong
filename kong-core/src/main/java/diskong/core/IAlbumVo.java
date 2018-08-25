@@ -23,6 +23,10 @@ import org.codehaus.jettison.json.JSONArray;
 
 public interface IAlbumVo {
 
+	String getId();
+
+	void setId(String id);
+
 	String getTitle();
 
 	void setTitle(String title);
@@ -45,7 +49,10 @@ public interface IAlbumVo {
 	
 	 List<TrackInfo> getTracks();
 
+    void setTracks(JSONArray jsonArray);
+
 	void setStyles(JSONArray jsonArray);
+	void setStyles(List<String> styles);
 
 	void setGenres(JSONArray jsonArray);
 	
@@ -60,4 +67,7 @@ public interface IAlbumVo {
 	boolean isExactMatch();
 	void setExactMatch(boolean exactMatch);
 
+	void setGenres(List<String> genres);
+
+    void setTracks(List<TrackInfo> tracks);
 }

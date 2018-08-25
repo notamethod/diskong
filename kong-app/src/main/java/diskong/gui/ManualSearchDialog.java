@@ -22,7 +22,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 class ManualSearchDialog extends JDialog {
-    private JPanel contentPane;
+    private JPanel contentPane1;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField tfArtist;
@@ -32,7 +32,7 @@ class ManualSearchDialog extends JDialog {
 
     public ManualSearchDialog(String artist, String title) {
 
-        setContentPane(contentPane);
+        setContentPane(contentPane1);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
@@ -57,7 +57,7 @@ class ManualSearchDialog extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
+        contentPane1.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }

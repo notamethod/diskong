@@ -21,16 +21,17 @@ import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Map;
 
-class RetagSelectionDialog extends JDialog {
-    private JPanel contentPane;
+public class RetagSelectionDialog extends JDialog {
+    private JPanel contentPane1;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JCheckBox cbStyle;
     private JCheckBox cbAlbumArt;
+    private JCheckBox cbTrackName;
     private Map<String, Boolean> retagElements = new HashMap<>();
 
     public RetagSelectionDialog() {
-        setContentPane(contentPane);
+        setContentPane(contentPane1);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
@@ -55,7 +56,7 @@ class RetagSelectionDialog extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
+        contentPane1.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
@@ -69,6 +70,8 @@ class RetagSelectionDialog extends JDialog {
             retagElements.put("style", true);
         if (cbAlbumArt.isSelected())
             retagElements.put("albumart", true);
+        if (cbTrackName.isSelected())
+            retagElements.put("trackname", true);
 
         dispose();
     }

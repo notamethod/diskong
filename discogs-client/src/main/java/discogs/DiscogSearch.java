@@ -19,6 +19,7 @@ package discogs;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.*;
 import com.sun.jersey.api.client.filter.ClientFilter;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import diskong.api.AbstractDatabase;
 import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
@@ -34,7 +35,9 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +53,12 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
     // private static final String URL_API = "http://localhost:8080/";
     private static final String URL_IDENTITY = "oauth/identity";
     private static final String URL_PROFILE = "users/";
+    private static final String URL_RELEASES = "releases/";
     private static final String URL_SEARCH = "database/search?";
+    private static final String URL_MASTER__RELEASE_VERSION = "/masters/{0}/versions";
+    private static final String DEFAULT_COUNTRY = "Europe";
+    private static final String DEFAULT_FORMAT = "cd";
+
     private Client client;
 
     public DiscogSearch() {
@@ -122,9 +130,9 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
     private JSONObject search(String query) throws ApiConfigurationException {
         client.removeAllFilters();
-        // Create a resource to be used to make Twitter API calls
-String qq = "q=Mashrou'Leila*&title=Ibn%20El%20Leil";
-        WebResource resource = client.resource(URL_API + URL_SEARCH + qq);
+        // Create a resource to be used to make Discogs calls
+
+        WebResource resource = client.resource(URL_API + URL_SEARCH + query);
         // Add the filter to the resource
         DiscogsOAuth auth = new DiscogsOAuth();
         auth.addAuthentificationFilters(resource);
@@ -148,45 +156,133 @@ String qq = "q=Mashrou'Leila*&title=Ibn%20El%20Leil";
     }
 
     public IAlbumVo searchRelease(IAlbumVo album) throws EmptyResultException, ApiConfigurationException {
-        IAlbumVo albumInfo = new AlbumVo();
+
         String query = null;
         if (album == null || StringUtils.isBlank(album.getTitle())) {
             LOG.error("insufficient data for search query..." + album);
             return null;
         }
         try {
-            query = getReleaseQuery(album);
+            query = getMasterReleaseQuery(album);
             query = query.replaceAll("'", "%27");
         } catch (Exception e) {
             LOG.error("invalid query" + query, e);
         }
         JSONObject jsonObject = search(query);
+        IAlbumVo albumInfo = null;
         try {
-            JSONArray results = jsonObject.getJSONArray("results");
-            if (results.length() == 0)
-                throw new EmptyResultException(album.getTitle());
-            JSONObject result = results.getJSONObject(0);
-
-            // TODO: multi genre
-            albumInfo.setTitle(result.getString("title"));
-            try {
-                albumInfo.setArtist(result.getString("artist"));
-
-            } catch (JSONException j) {
-            }
-            try {
-                albumInfo.setCoverImageUrl(result.getString("cover_image"));
-            } catch (JSONException j) {
-            }
-            albumInfo.setStyles(result.getJSONArray("style"));
-            albumInfo.setGenres(result.getJSONArray("genre"));
-            //albumInfo.setImages(result.getJSONArray("image"));
+            albumInfo = albumMapping(jsonObject, album.getTitle());
 
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
+            //TODO: exception
             e.printStackTrace();
-
         }
+        IAlbumVo albumInfo2=getReleaseFromMaster(albumInfo);
+        fillAlbum(albumInfo, albumInfo2);
+        IAlbumVo albumInfo3 = getReleaseById(albumInfo2);
+        fillAlbum(albumInfo, albumInfo3);
+
+        return albumInfo;
+    }
+
+    private void fillAlbum(IAlbumVo albumInfo, IAlbumVo otherAlbumInfo) {
+        if ( albumInfo.getStyles()== null || albumInfo.getStyles().isEmpty())
+            albumInfo.setStyles(otherAlbumInfo.getStyles());
+        if ( albumInfo.getGenres()== null || albumInfo.getGenres().isEmpty())
+            albumInfo.setGenres(otherAlbumInfo.getGenres());
+        if ( albumInfo.getTracks()== null || albumInfo.getTracks().isEmpty())
+            albumInfo.setTracks(otherAlbumInfo.getTracks());
+
+    }
+
+    private IAlbumVo albumMapping(JSONObject jsonObject, String title) throws JSONException, EmptyResultException {
+        IAlbumVo albumInfo = new AlbumVo();
+        JSONArray results = jsonObject.getJSONArray("results");
+        if (results.length() == 0)
+            throw new EmptyResultException(title);
+        JSONObject result = results.getJSONObject(0);
+
+        // TODO: multi genre
+        albumInfo.setTitle(result.getString("title"));
+        try {
+            albumInfo.setArtist(result.getString("artist"));
+
+        } catch (JSONException j) {
+        }
+        try {
+            albumInfo.setCoverImageUrl(result.getString("cover_image"));
+        } catch (JSONException j) {
+        }
+        albumInfo.setStyles(result.getJSONArray("style"));
+        albumInfo.setGenres(result.getJSONArray("genre"));
+
+        albumInfo.setId(result.getString("id"));
+        //albumInfo.setImages(result.getJSONArray("image"));
+        return albumInfo;
+    }
+
+    private IAlbumVo fullAlbumMapping(JSONObject jsonObject, String title) throws JSONException, EmptyResultException {
+        IAlbumVo albumInfo = new AlbumVo();
+        JSONArray results = jsonObject.getJSONArray("tracklist");
+        if (results.length() == 0)
+            throw new EmptyResultException(title);
+
+            albumInfo.setTracks(results);
+
+
+
+        // TODO: multi genre
+        //artisits ?
+       albumInfo.setTitle(jsonObject.getString("title"));
+//        try {
+//            albumInfo.setArtist(result.getString("artist"));
+//
+//        } catch (JSONException j) {
+//        }
+//        try {
+//            albumInfo.setCoverImageUrl(result.getString("cover_image"));
+//        } catch (JSONException j) {
+//        }
+        try {
+            albumInfo.setStyles(jsonObject.getJSONArray("styles"));
+        } catch (JSONException j) {
+        }
+        try {
+            albumInfo.setGenres(jsonObject.getJSONArray("genres"));
+        } catch (JSONException j) {
+        }
+
+
+//
+//        albumInfo.setId(result.getString("id"));
+        //imgae from master
+        //albumInfo.setImages(result.getJSONArray("image"));
+        return albumInfo;
+    }
+
+    private IAlbumVo albumMappingList(JSONObject jsonObject, String title) throws JSONException, EmptyResultException {
+        IAlbumVo albumInfo = new AlbumVo();
+        JSONArray results = jsonObject.getJSONArray("versions");
+        if (results.length() == 0)
+            throw new EmptyResultException(title);
+        JSONObject result = results.getJSONObject(0);
+
+//        // TODO: multi genre
+//        albumInfo.setTitle(result.getString("title"));
+//        try {
+//            albumInfo.setArtist(result.getString("artist"));
+//
+//        } catch (JSONException j) {
+//        }
+//        try {
+//            albumInfo.setCoverImageUrl(result.getString("cover_image"));
+//        } catch (JSONException j) {
+//        }
+//        albumInfo.setStyles(result.getJSONArray("style"));
+//        albumInfo.setGenres(result.getJSONArray("genre"));
+
+        albumInfo.setId(result.getString("id"));
+        //albumInfo.setImages(result.getJSONArray("image"));
         return albumInfo;
     }
 
@@ -239,10 +335,9 @@ String qq = "q=Mashrou'Leila*&title=Ibn%20El%20Leil";
     /*
      * (non-Javadoc)
      *
-     * @see diskong.AbstractDatabase#getReleaseQuery(diskong.AlbumVo)
+     * @see diskong.AbstractDatabase#getMasterReleaseQuery(diskong.AlbumVo)
      */
-    @Override
-    protected String getReleaseQuery(IAlbumVo album) throws URIException {
+    protected String getMasterReleaseQuery(IAlbumVo album) throws URIException {
 
         StringBuilder sb = new StringBuilder();
         sb.append("type=master");
@@ -252,6 +347,67 @@ String qq = "q=Mashrou'Leila*&title=Ibn%20El%20Leil";
         sb.append("&title=").append(album.getTitle());
 
         return URIUtil.encodeQuery(sb.toString());
+    }
+
+
+
+    public IAlbumVo getReleaseFromMaster(IAlbumVo album) throws  EmptyResultException, ApiConfigurationException {
+
+        client.removeAllFilters();
+        String msg = MessageFormat.format(URL_MASTER__RELEASE_VERSION, album.getId());
+        // Create a resource to be used to make Twitter API calls
+
+        MultivaluedMap<String, String> params = new MultivaluedMapImpl();
+        params.add("country", DEFAULT_COUNTRY);
+        params.add("format", DEFAULT_FORMAT);
+
+        WebResource resource = client.resource(URL_API + msg).queryParams(params);
+        IAlbumVo albumVo= null;
+        // Add the filter to the resource
+        DiscogsOAuth auth = new DiscogsOAuth();
+        auth.addAuthentificationFilters(resource);
+
+
+        try {
+            JSONObject jsonObject = resource.get(JSONObject.class);
+            albumVo= albumMappingList(jsonObject, album.getTitle());
+
+            // }
+        } catch (JSONException ex) {
+            LOG.error(DiscogSearch.class.getName(), ex);
+        }
+        return albumVo;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see diskong.AbstractDatabase#getMasterReleaseQuery(diskong.AlbumVo)
+     */
+    public IAlbumVo getReleaseById(IAlbumVo album) throws  EmptyResultException, ApiConfigurationException {
+
+        client.removeAllFilters();
+
+
+        // Create a resource to be used to make Twitter API calls
+        WebResource resource = client.resource(URL_API + URL_RELEASES + album.getId());
+
+        // Add the filter to the resource
+        DiscogsOAuth auth = new DiscogsOAuth();
+        auth.addAuthentificationFilters(resource);
+        // Parse the JSON array
+        // JSONArray jsonArray = resource.get(JSONArray.class);
+        List<String> statuses = new ArrayList<>();
+
+        try {
+            // for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = resource.get(JSONObject.class);
+            return fullAlbumMapping(jsonObject, album.getTitle());
+            // }
+        } catch (JSONException ex) {
+            LOG.error(DiscogSearch.class.getName(), ex);
+            return null;
+        }
 
     }
 

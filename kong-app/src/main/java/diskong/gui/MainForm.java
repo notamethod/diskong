@@ -16,6 +16,8 @@
 
 package diskong.gui;
 
+import diskong.app.tagger.TaggerException;
+import diskong.app.tagger.TaggerForm;
 import diskong.core.AlbumVo;
 import diskong.core.FilePath;
 import diskong.core.IAlbumVo;
@@ -38,8 +40,11 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -53,11 +58,10 @@ import static javax.swing.UIManager.setLookAndFeel;
 class MainForm {
 
     private final static Logger LOG = LoggerFactory.getLogger(MainForm.class);
-
+    protected AlbumService albumService = new AlbumService();
     private TableModelListener tListener;
     private AlbumModel model = new AlbumModel();
     private AudioService service = new AudioService();
-    private AlbumService albumService = new AlbumService();
     private Map<Path, List<FilePath>> map;
     private List<AlbumVo> albums = new ArrayList<>();
     //MonSwingWorker worker;
@@ -81,6 +85,7 @@ class MainForm {
 
     public MainForm() {
 
+        
         analyzeDirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -124,7 +129,8 @@ class MainForm {
                         //found: ok
                         JOptionPane.showMessageDialog(null, album.getTitle() + " found using API: " + albumService.getSearchAPI());
                     else {
-                        a2 = manualSearch(album);
+                        GenericForm gf = new GenericForm();
+                        a2 = gf.manualSearch(album);
 
                     }
                     originalInfo = album;
@@ -175,7 +181,20 @@ class MainForm {
                 }
 
                 albumService.setSimulate(false);
-                albumService.retagAlbum(data, originalInfo);
+                try {
+                    try {
+                        albumService.searchAlbumByID(correctedInfo);
+                    } catch (ApiConfigurationException e) {
+                        e.printStackTrace();
+                    }
+                    albumService.retagAlbum(data, originalInfo);
+                } catch (TaggerException e) {
+                    LOG.error("error", e);
+                    JOptionPane.showMessageDialog(null,
+                            e.getMessage(), "information", JOptionPane.ERROR_MESSAGE);
+
+                }
+
             }
         });
         ripButton.addActionListener(new ActionListener() {
@@ -196,7 +215,22 @@ class MainForm {
                 gui.setVisible(true);
             }
         });
+
+        table1.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable table =(JTable) mouseEvent.getSource();
+                Point point = mouseEvent.getPoint();
+                int row = table.rowAtPoint(point);
+                if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    TaggerForm gui = new TaggerForm(((AlbumModel)table.getModel()).getRow(table.getSelectedRow()));
+                    gui.pack();
+                    gui.setVisible(true);
+                }
+            }
+        });
+
     }
+
 
     public static void main(String[] args) {
         MainForm mf = new MainForm();
@@ -220,41 +254,7 @@ class MainForm {
         return data;
     }
 
-    /**
-     * Do a manual with title and artist/
-     *
-     * @param album contains artist and title previously not found
-     */
-    private IAlbumVo manualSearch(IAlbumVo album) {
-        IAlbumVo a2 = null;
-        //manual search
-        ManualSearchDialog ms = new ManualSearchDialog(album.getArtist(), album.getTitle());
-        ms.setVisible(true);
-        AlbumVo albumToSearch = ms.getAlbumInfos();
-        if (albumToSearch != null) {
-            try {
-                a2 = albumService.searchAlbum(albumToSearch);
-            } catch (ApiConfigurationException e) {
-                LOG.error("oauth error", e);
 
-                JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
-                return null;
-            }
-            if (a2 != null) {
-                //found: ok
-                JOptionPane.showMessageDialog(null, album.getTitle() + " found using API: " + albumService.getSearchAPI());
-                System.out.println(a2.toString());
-                a2.setArtist(albumToSearch.getArtist());
-                a2.setTitle(albumToSearch.getTitle());
-                return a2;
-            } else
-                return manualSearch(album);
-
-
-        }
-        return null;
-
-    }
 
     public void init() {
 
