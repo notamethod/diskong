@@ -82,7 +82,7 @@ public class NioDirectoryParser implements DirectoryParser {
                 }
 			});
 			for (Path path : stream) {
-				LOG.debug("parsedir" + path.getFileName());
+				LOG.trace("parsedir" + path.getFileName());
 
 				if (Files.isDirectory(path)) {
 

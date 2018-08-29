@@ -19,12 +19,13 @@ package diskong.api;
 import diskong.core.IAlbumVo;
 import diskong.core.EmptyResultException;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.List;
 
 public interface DatabaseSearch {
 
 	IAlbumVo searchRelease(IAlbumVo album) throws EmptyResultException, ApiConfigurationException;
 	List<IAlbumVo> searchArtist(String artist, String title) throws EmptyResultException, ApiConfigurationException;
-	IAlbumVo getReleaseById(IAlbumVo album) throws  EmptyResultException, ApiConfigurationException;
-
+	IAlbumVo findReleaseById(IAlbumVo album) throws  EmptyResultException, ApiConfigurationException;
+	public boolean isAPIAvailable();
 	}

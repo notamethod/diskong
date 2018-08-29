@@ -20,7 +20,6 @@ import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
 import diskong.api.DatabaseSearchFactory;
 import diskong.api.SearchAPI;
-import diskong.app.cdrip.RipperException;
 import diskong.app.tagger.TaggerException;
 import diskong.core.AlbumVo;
 import diskong.core.IAlbumVo;
@@ -73,7 +72,7 @@ public class AlbumService {
 
         if (album.getId() != null) {
             try {
-                ds.getReleaseById(album);
+                ds.findReleaseById(album);
             } catch (EmptyResultException e) {
                 e.printStackTrace();
             }
@@ -88,9 +87,6 @@ public class AlbumService {
         this.searchAPI = SearchAPI.DISCOGS;
         DatabaseSearch ds = DatabaseSearchFactory.getApi(SearchAPI.DISCOGS);
         try {
-            if (album.getId()!=null) {
-                 ds.getReleaseById(album);
-            }
 
             alInfos = ds.searchRelease(album);
             if (alInfos.getStyles().isEmpty())
@@ -129,7 +125,7 @@ public class AlbumService {
                 return searchAlbum(album);
             }
 
-
+            LOG.error("album not found !");
             return null;
         }
         return alInfos;

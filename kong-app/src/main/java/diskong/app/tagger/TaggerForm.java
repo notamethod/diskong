@@ -16,6 +16,7 @@
 
 package diskong.app.tagger;
 
+import diskong.Utils;
 import diskong.api.ApiConfigurationException;
 import diskong.core.AlbumVo;
 import diskong.core.IAlbumVo;
@@ -30,7 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.Map;
 
 public class TaggerForm extends JDialog {
@@ -47,6 +53,7 @@ public class TaggerForm extends JDialog {
     private JLabel pageTitle;
     private JLabel styles;
     private JLabel genres;
+    private JLabel jlImg;
 
     AlbumVo albumOri;
     IAlbumVo albumNew;
@@ -100,7 +107,8 @@ public class TaggerForm extends JDialog {
                 }
                 if (a2 != null)
                     //found: ok
-                    JOptionPane.showMessageDialog(null, albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
+                    LOG.info(albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
+                    //JOptionPane.showMessageDialog(null, albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
                 else {
                     GenericForm gf = new GenericForm();
                     a2 = gf.manualSearch(albumOri);
@@ -108,7 +116,10 @@ public class TaggerForm extends JDialog {
                 }
                 if (a2 != null) {
                     albumNew = a2;
-                    ((TrackTagModel) table1.getModel()).setNewInfo(a2);
+                    if (a2.getTracks().size() == albumOri.getTracks().size())
+                        ((TrackTagModel) table1.getModel()).setNewInfo(a2);
+                    else
+                        JOptionPane.showMessageDialog(null, "nombre de pistes ne correspond pas " + albumService.getSearchAPI());
                     styles.setText(String.join(", ", a2.getStyles()));
 
                     genres.setText(String.join(", ", a2.getGenres()));
@@ -135,9 +146,11 @@ public class TaggerForm extends JDialog {
                     try {
                         Metadata data = new Metadata();
 
-                            MetaUtils.setStyle(albumNew, data);
-                            MetaUtils.setGenre(albumNew, data);
-                        albumService.retagAlbum(data, albumOri);
+                        MetaUtils.setStyle(albumNew, data);
+                        MetaUtils.setGenre(albumNew, data);
+                        int taggedTracks = albumService.retagAlbum(data, albumOri);
+                        JOptionPane.showMessageDialog(null,
+                                taggedTracks + " tracks tagged", "information", JOptionPane.ERROR_MESSAGE);
 
 
                     } catch (TaggerException e) {
@@ -161,13 +174,38 @@ public class TaggerForm extends JDialog {
                     }
 
                 }
-            }
-            });
 
-        pageTitle.setText(albumOri.getArtist()+" - "+albumOri.getTitle());
+                if (map.get("albumart") != null) {
+
+                    if (albumNew.getCoverImageUrl() != null) {
+                        Path target = albumOri.getTracks().get(0).getfPath().getPath().getParent();
+
+                        try {
+                            Utils.downloadFile(albumNew.getCoverImageUrl(), target.resolve("folder.jpg"));
+                            JOptionPane.showMessageDialog(null, "image recovered");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        });
+
+        pageTitle.setText(albumOri.getArtist() + " - " + albumOri.getTitle());
         styles.setText(String.join(", ", albumOri.getStyles()));
 
         genres.setText(String.join(", ", albumOri.getGenres()));
+
+        if (albumOri.getFolderImagePath() != null) {
+            ImageIcon imgi;
+            try {
+                imgi = new ImageIcon(new File(albumOri.getFolderImagePath()).toURI().toURL());
+                jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -195,4 +233,6 @@ public class TaggerForm extends JDialog {
         table1.getColumnModel().getColumn(1).setPreferredWidth(150);
         table1.getColumnModel().getColumn(2).setPreferredWidth(80);
     }
+
+
 }

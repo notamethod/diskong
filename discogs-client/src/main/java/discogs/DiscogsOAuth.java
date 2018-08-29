@@ -71,7 +71,7 @@ class DiscogsOAuth  {
 		}
 		// Create a Jersey client
 		client = Client.create();
-		client.addFilter(new LoggingFilter());
+		client.addFilter(new LoggingFilter(new JulFacade()));
 	}
 
 
@@ -104,7 +104,8 @@ class DiscogsOAuth  {
 		// Create the OAuth client filter
 		OAuthClientFilter oauthFilter = new OAuthClientFilter(client.getProviders(), params, secrets);
 
-		resource.addFilter(new LoggingFilter(System.out));
+		resource.addFilter(new LoggingFilter(new JulFacade()));
+
 		resource.addFilter(new UserAgentFilter(HttpHeaders.USER_AGENT, "<<diskong-user-agent>>"));
 		// Add the filter to the resource
 		resource.addFilter(oauthFilter);
@@ -143,7 +144,7 @@ class DiscogsOAuth  {
 		OAuthParameters params = new OAuthParameters().consumerKey(authProperties.getProperty(PROP_CONSUMER_KEY)).signatureMethod("HMAC-SHA1")
 				.version("1.0").token(authProperties.getProperty(PROP_ACCESS_OAUTH_TOKEN));
 		// Create the OAuth client filter
-		resource.addFilter(new LoggingFilter(System.out));
+		resource.addFilter(new LoggingFilter(new JulFacade()));
 		resource.addFilter(new UserAgentFilter(HttpHeaders.USER_AGENT, "<<diskong-user-agent>>"));
 		resource.addFilter(new OAuthClientFilter(client.getProviders(), params, secrets));
 		
@@ -171,5 +172,14 @@ class DiscogsOAuth  {
 		}
 
 	}
+
+
+
+
+
+    private static class JulFacade extends java.util.logging.Logger {
+        JulFacade() { super("Jersey", null); }
+        @Override public void info(String msg) { logger.trace(msg); }
+    }
 
 }

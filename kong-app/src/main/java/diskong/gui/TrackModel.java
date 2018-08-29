@@ -16,13 +16,15 @@
 
 package diskong.gui;
 
+import diskong.core.TrackInfo;
+
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class TrackModel extends AbstractTableModel{
 
-    private List<TrackVO> tracks;
+    private List<TrackInfo> tracks;
 
     public TrackModel() {
         super();
@@ -30,11 +32,11 @@ public class TrackModel extends AbstractTableModel{
     }
 
     private String[] colName=new String[]{"Num.", "Title","Artist"};
-    public TrackModel(List<TrackVO> tracks) {
+    public TrackModel(List<TrackInfo> tracks) {
         this.tracks = tracks;
     }
 
-    public void setElements(List<TrackVO> tracks) {
+    public void setElements(List<TrackInfo> tracks) {
         this.tracks = tracks;
         fireTableDataChanged();
     }
@@ -59,7 +61,7 @@ public class TrackModel extends AbstractTableModel{
 
     @Override
     public Object getValueAt(int row, int column) {
-        TrackVO track = tracks.get(row);
+        TrackInfo track = tracks.get(row);
 
         switch (column) {
 
@@ -77,7 +79,7 @@ public class TrackModel extends AbstractTableModel{
 
     }
 
-    public TrackVO getRow(int row){
+    public TrackInfo getRow(int row){
         return tracks.get(row);
     }
 }

@@ -16,8 +16,9 @@
 
 package diskong.app.cdrip;
 
+import diskong.core.TrackInfo;
 import diskong.gui.TrackModel;
-import diskong.gui.TrackVO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class RipForm {
     private final String[] formats = new String[]{"flac", "m4a", "mp3", "mpc", "ogg", "opus", "spx", "vorbis", "wav", "wv", "ape"};
     private final Logger LOG = LoggerFactory.getLogger(RipForm.class);
     TableModelListener tListener;
-    List<TrackVO> tracks = new ArrayList<>();
+    List<TrackInfo> tracks = new ArrayList<>();
     private AbcdeHandler ah;
     private TrackModel model;
     private JPanel JPanelOne;

@@ -86,7 +86,7 @@ public class AudioService {
             ExecutorService executor = Executors.newFixedThreadPool(10);
             List<Future<diskong.core.TrackInfo>> list = new ArrayList<>();
             for (FilePath fPath : entry.getValue()) {
-                LOG.debug(fPath.getFile().getAbsolutePath());
+                LOG.trace(fPath.getFile().getAbsolutePath());
                 Callable<diskong.core.TrackInfo> worker = new CallTrackInfo(fPath, autoParser);
                 Future<diskong.core.TrackInfo> submit = executor.submit(worker);
                 list.add(submit);

@@ -17,7 +17,7 @@
 package diskong.app.cdrip;
 
 
-import diskong.gui.TrackVO;
+import diskong.core.TrackInfo;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,12 +137,12 @@ public class AbcdeHandler {
         return actionResult;
     }
 
-    public List<TrackVO> parseTrack(List<String> actionResult) throws analyseException {
-        List<TrackVO> tracks = new ArrayList<>();
+    public List<TrackInfo> parseTrack(List<String> actionResult) throws analyseException {
+        List<TrackInfo> tracks = new ArrayList<>();
         for (String line:actionResult){
             String[] splitted = line.split(":");
             if(splitted.length>1) {
-                TrackVO track = new TrackVO(Integer.valueOf(splitted[0]), splitted[1], artist);
+                TrackInfo track = new TrackInfo(Integer.valueOf(splitted[0]), splitted[1], artist);
                 tracks.add(track);
             }
         }

@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class TrackInfo implements Comparable<TrackInfo> {
+
+
 	public Metadata getMetadata() {
 		return metadata;
 	}
@@ -31,8 +33,7 @@ public class TrackInfo implements Comparable<TrackInfo> {
 		return fPath;
 	}
 
-
-	private final Metadata metadata;
+	private  final Metadata metadata;
 	private FilePath fPath;
 
 	public TrackInfo(@NotNull Metadata metadata) {
@@ -44,6 +45,13 @@ public class TrackInfo implements Comparable<TrackInfo> {
 		this.fPath=fPath;
 		
 	}
+
+    public TrackInfo(Integer pos, String title, String artist) {
+	    metadata = new Metadata();
+        metadata.set(TikaCoreProperties.TITLE, title);
+        metadata.set(XMPDM.TRACK_NUMBER, String.valueOf(pos));
+        metadata.set(XMPDM.ARTIST, artist);
+    }
 
 	public String getTitle() {
 		return metadata.get(TikaCoreProperties.TITLE);
@@ -65,8 +73,12 @@ public class TrackInfo implements Comparable<TrackInfo> {
             String thisNumber = this.getNumber().replaceAll("\\.", "");
             if (o.getNumber() != null) {
                 String otherNumber = o.getNumber().replaceAll("\\.", "");
-                return (Integer.valueOf(thisNumber) - Integer.valueOf(otherNumber));
-            }
+				try {
+					return (Integer.valueOf(thisNumber) - Integer.valueOf(otherNumber));
+				} catch (NumberFormatException e) {
+					return 0;
+				}
+			}
         }
         return 0;
     }

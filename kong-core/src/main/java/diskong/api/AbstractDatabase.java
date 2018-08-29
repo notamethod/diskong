@@ -24,7 +24,6 @@ import diskong.core.EmptyResultException;
 
 public abstract class AbstractDatabase {
 	
-	protected final static Logger log = LoggerFactory.getLogger(AbstractDatabase.class);
 
 
 	/**

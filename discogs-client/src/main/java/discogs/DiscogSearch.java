@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ import java.util.List;
 /**
  * Hello world!
  */
-public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
+public class DiscogSearch implements DatabaseSearch {
 
     private final static Logger LOG = LoggerFactory.getLogger(DiscogSearch.class);
     // base URL for the API calls
@@ -56,7 +57,10 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
     private static final String URL_RELEASES = "releases/";
     private static final String URL_SEARCH = "database/search?";
     private static final String URL_MASTER__RELEASE_VERSION = "/masters/{0}/versions";
-    private static final String DEFAULT_COUNTRY = "Europe";
+    private static final String URL_MASTER_ = "/masters/";
+
+    private static final String DEFAULT_REGION = "Europe";
+    private static final String DEFAULT_COUNTRY = "France";
     private static final String DEFAULT_FORMAT = "cd";
 
     private Client client;
@@ -94,7 +98,6 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
             StringBuilder builder = new StringBuilder();
             builder.append(jsonObject.getString("username")).append(jsonObject.getString("resource_url"));
             statuses.add(builder.toString());
-            LOG.debug(builder.toString());
             // }
         } catch (JSONException ex) {
             LOG.error(DiscogSearch.class.getName(), ex);
@@ -120,8 +123,6 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
             StringBuilder builder = new StringBuilder();
             builder.append(jsonObject.getString("username")).append(jsonObject.getString("resource_url"));
             statuses.add(builder.toString());
-            LOG.debug(builder.toString());
-            LOG.debug(jsonObject.toString());
             // }
         } catch (JSONException ex) {
             LOG.error(DiscogSearch.class.getName(), ex);
@@ -131,23 +132,17 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
     private JSONObject search(String query) throws ApiConfigurationException {
         client.removeAllFilters();
         // Create a resource to be used to make Discogs calls
-
-        WebResource resource = client.resource(URL_API + URL_SEARCH + query);
+        String searchParam = URL_API + URL_SEARCH + query;
+        LOG.debug("search with url: " + searchParam);
+        WebResource resource = client.resource(searchParam);
         // Add the filter to the resource
         DiscogsOAuth auth = new DiscogsOAuth();
         auth.addAuthentificationFilters(resource);
-        // Parse the JSON array
-        // JSONArray jsonArray = resource.get(JSONArray.class);
-        List<String> statuses = new ArrayList<>();
-        // for (int i = 0; i < jsonArray.length(); i++) {
+
         JSONObject jsonObject = null;
         try {
             jsonObject = resource.get(JSONObject.class);
-            StringBuilder builder = new StringBuilder();
-            // builder.append(jsonObject.getString("username")).append(jsonObject.getString("resource_url"));
-            // statuses.add(builder.toString());
-
-            LOG.debug(jsonObject.toString());
+            LOG.trace(jsonObject.toString());
 
         } catch (Exception ex) {
             LOG.error(DiscogSearch.class.getName(), ex);
@@ -162,63 +157,158 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
             LOG.error("insufficient data for search query..." + album);
             return null;
         }
+
+        MultivaluedMap mapFilter = new MultivaluedMapImpl();
+        int numTracks = album.getTracks().size();
+        JSONObject jsonObject = null;
         try {
-            query = getMasterReleaseQuery(album);
-            query = query.replaceAll("'", "%27");
-        } catch (Exception e) {
-            LOG.error("invalid query" + query, e);
+            jsonObject = searchMaster(album.getArtist(), album.getTitle());
+        } catch (URIException e) {
+            e.printStackTrace();
         }
-        JSONObject jsonObject = search(query);
         IAlbumVo albumInfo = null;
         try {
-            albumInfo = albumMapping(jsonObject, album.getTitle());
+            for (IAlbumVo albumInfoTmp : albumMapping(jsonObject, album.getTitle())) {
+                IAlbumVo albumInfoTmp3 = findReleaseById(albumInfoTmp, URL_MASTER_);
+
+                albumInfo = albumInfoTmp;
+                break;
+            }
+
 
         } catch (JSONException e) {
             //TODO: exception
             e.printStackTrace();
         }
-        IAlbumVo albumInfo2=getReleaseFromMaster(albumInfo);
+
+        if (albumInfo == null) {
+            throw new EmptyResultException(album.getTitle());
+        }
+        MultivaluedMap<String, String> params = new MultivaluedMapImpl();
+        params.add("country", DEFAULT_REGION);
+        params.add("format", DEFAULT_FORMAT);
+        IAlbumVo albumInfo2 = null;
+        try {
+            albumInfo2 = findReleaseFromMaster(albumInfo, params, album.getTracks().size());
+
+        } catch (EmptyResultException e) {
+            params.remove("country");
+            //params.putSingle("country", DEFAULT_COUNTRY);
+            try {
+                albumInfo2 = findReleaseFromMaster(albumInfo, params, album.getTracks().size());
+            } catch (EmptyResultException e1) {
+                params.remove("format");
+                albumInfo2 = findReleaseFromMaster(albumInfo, params, album.getTracks().size());
+            }
+        }
+
+
+        //use other filter
+        if (albumInfo2 == null) {
+            throw new EmptyResultException("");
+        }
         fillAlbum(albumInfo, albumInfo2);
-        IAlbumVo albumInfo3 = getReleaseById(albumInfo2);
+        IAlbumVo albumInfo3 = findReleaseById(albumInfo2);
         fillAlbum(albumInfo, albumInfo3);
 
         return albumInfo;
     }
 
+    private JSONObject searchMaster(String artist, String title) throws URIException, ApiConfigurationException {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("type=master");
+        if (artist != null) {
+            sb.append("&artist=").append(artist);
+        }
+        sb.append("&title=").append(title);
+        // sb.append("&format=").append(DEFAULT_FORMAT);
+        String queryWithoutCountry = URIUtil.encodeQuery(sb.toString());
+        //sb.append("&country=").append(DEFAULT_REGION);
+        String query = URIUtil.encodeQuery(sb.toString());
+
+        LOG.debug("getMasterReleaseQuery: " + query);
+
+        //TODO
+        //query = query.replaceAll("'", "%27");
+
+        client.removeAllFilters();
+        // Create a resource to be used to make Discogs calls
+        String searchParam = URL_API + URL_SEARCH + query;
+        LOG.debug("search with url: " + searchParam);
+        WebResource resource = client.resource(searchParam);
+        // Add the filter to the resource
+        DiscogsOAuth auth = new DiscogsOAuth();
+        auth.addAuthentificationFilters(resource);
+
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = resource.get(JSONObject.class);
+            JSONArray results = jsonObject.getJSONArray("results");
+            if (results.length() == 0) {
+                throw new EmptyResultException(query);
+            }
+            if (results.length() > 1) {
+                filterMultiMaster();
+            }
+            LOG.trace(jsonObject.toString());
+
+        } catch (Exception ex) {
+            LOG.error(DiscogSearch.class.getName(), ex);
+        }
+        return jsonObject;
+    }
+
+    private void filterMultiMaster() {
+        System.out.println("TODODODOOD");
+//        if (results.length() == 0){
+//            resource = client.resource(URL_API + URL_SEARCH + queryWithoutCountry);
+//            // Add the filter to the resource
+//            //DiscogsOAuth auth = new DiscogsOAuth();
+//            auth.addAuthentificationFilters(resource);
+//            jsonObject = resource.get(JSONObject.class);
+//        }
+    }
+
     private void fillAlbum(IAlbumVo albumInfo, IAlbumVo otherAlbumInfo) {
-        if ( albumInfo.getStyles()== null || albumInfo.getStyles().isEmpty())
+        if (albumInfo.getStyles() == null || albumInfo.getStyles().isEmpty())
             albumInfo.setStyles(otherAlbumInfo.getStyles());
-        if ( albumInfo.getGenres()== null || albumInfo.getGenres().isEmpty())
+        if (albumInfo.getGenres() == null || albumInfo.getGenres().isEmpty())
             albumInfo.setGenres(otherAlbumInfo.getGenres());
-        if ( albumInfo.getTracks()== null || albumInfo.getTracks().isEmpty())
+        if (albumInfo.getTracks() == null || albumInfo.getTracks().isEmpty())
             albumInfo.setTracks(otherAlbumInfo.getTracks());
 
     }
 
-    private IAlbumVo albumMapping(JSONObject jsonObject, String title) throws JSONException, EmptyResultException {
-        IAlbumVo albumInfo = new AlbumVo();
+    private List<IAlbumVo> albumMapping(JSONObject jsonObject, String title) throws JSONException, EmptyResultException {
+        List<IAlbumVo> albumInfos = new ArrayList<>();
         JSONArray results = jsonObject.getJSONArray("results");
         if (results.length() == 0)
             throw new EmptyResultException(title);
-        JSONObject result = results.getJSONObject(0);
 
-        // TODO: multi genre
-        albumInfo.setTitle(result.getString("title"));
-        try {
-            albumInfo.setArtist(result.getString("artist"));
+        LOG.info("results found: " + results.length());
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject result = results.getJSONObject(i);
+            IAlbumVo albumInfo = new AlbumVo();
+            // TODO: multi genre
+            albumInfo.setTitle(result.getString("title"));
+            try {
+                albumInfo.setArtist(result.getString("artist"));
 
-        } catch (JSONException j) {
+            } catch (JSONException j) {
+            }
+            try {
+                albumInfo.setCoverImageUrl(result.getString("cover_image"));
+            } catch (JSONException j) {
+            }
+            albumInfo.setStyles(result.getJSONArray("style"));
+            albumInfo.setGenres(result.getJSONArray("genre"));
+
+            albumInfo.setId(result.getString("id"));
+            albumInfos.add(albumInfo);
         }
-        try {
-            albumInfo.setCoverImageUrl(result.getString("cover_image"));
-        } catch (JSONException j) {
-        }
-        albumInfo.setStyles(result.getJSONArray("style"));
-        albumInfo.setGenres(result.getJSONArray("genre"));
 
-        albumInfo.setId(result.getString("id"));
-        //albumInfo.setImages(result.getJSONArray("image"));
-        return albumInfo;
+        return albumInfos;
     }
 
     private IAlbumVo fullAlbumMapping(JSONObject jsonObject, String title) throws JSONException, EmptyResultException {
@@ -227,22 +317,13 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         if (results.length() == 0)
             throw new EmptyResultException(title);
 
-            albumInfo.setTracks(results);
-
+        albumInfo.setTracks(results);
 
 
         // TODO: multi genre
         //artisits ?
-       albumInfo.setTitle(jsonObject.getString("title"));
-//        try {
-//            albumInfo.setArtist(result.getString("artist"));
-//
-//        } catch (JSONException j) {
-//        }
-//        try {
-//            albumInfo.setCoverImageUrl(result.getString("cover_image"));
-//        } catch (JSONException j) {
-//        }
+        albumInfo.setTitle(jsonObject.getString("title"));
+
         try {
             albumInfo.setStyles(jsonObject.getJSONArray("styles"));
         } catch (JSONException j) {
@@ -260,33 +341,48 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         return albumInfo;
     }
 
-    private IAlbumVo albumMappingList(JSONObject jsonObject, String title) throws JSONException, EmptyResultException {
+    private IAlbumVo albumMappingList(JSONObject jsonObject, String title, String masterFormat, int size) throws JSONException, EmptyResultException {
         IAlbumVo albumInfo = new AlbumVo();
+        boolean searchMatch = false;
+        //List<IAlbumVo> releases = new ArrayList<>();
         JSONArray results = jsonObject.getJSONArray("versions");
         if (results.length() == 0)
             throw new EmptyResultException(title);
-        JSONObject result = results.getJSONObject(0);
+        JSONObject result = null;
+        for (int i = 0; i < results.length(); i++) {
+            result = results.getJSONObject(i);
+           // int numTracks = jsonObject.getJSONArray("tracklist").length();
 
-//        // TODO: multi genre
-//        albumInfo.setTitle(result.getString("title"));
-//        try {
-//            albumInfo.setArtist(result.getString("artist"));
-//
-//        } catch (JSONException j) {
-//        }
-//        try {
-//            albumInfo.setCoverImageUrl(result.getString("cover_image"));
-//        } catch (JSONException j) {
-//        }
-//        albumInfo.setStyles(result.getJSONArray("style"));
-//        albumInfo.setGenres(result.getJSONArray("genre"));
+            if (masterFormat == null) {
+                searchMatch = true;
+                break;
+            }
+            try {
+                JSONArray jsa = result.getJSONArray("major_formats");
+                if (jsa != null) {
+                    String majorFormat = (String) jsa.get(0);
+                    if (masterFormat.equalsIgnoreCase(majorFormat)) {
+                        searchMatch = true;
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                break;
+            }
+
+
+        }
+
+        LOG.debug("versions found: " + results.length());
+        if (!searchMatch)
+            throw new EmptyResultException("");
 
         albumInfo.setId(result.getString("id"));
-        //albumInfo.setImages(result.getJSONArray("image"));
+        LOG.debug("returning version: " + albumInfo.getId());
         return albumInfo;
     }
 
-    public List<IAlbumVo> searchArtist(String artist,String title) throws EmptyResultException, ApiConfigurationException {
+    public List<IAlbumVo> searchArtist(String artist, String title) throws EmptyResultException, ApiConfigurationException {
 
         String query = null;
 //Mashrou'Leila
@@ -332,45 +428,32 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
         return values;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see diskong.AbstractDatabase#getMasterReleaseQuery(diskong.AlbumVo)
-     */
-    protected String getMasterReleaseQuery(IAlbumVo album) throws URIException {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("type=master");
-        if (album.getArtist() != null) {
-            sb.append("&artist=").append(album.getArtist());
-        }
-        sb.append("&title=").append(album.getTitle());
-
-        return URIUtil.encodeQuery(sb.toString());
-    }
-
-
-
-    public IAlbumVo getReleaseFromMaster(IAlbumVo album) throws  EmptyResultException, ApiConfigurationException {
+    public IAlbumVo findReleaseFromMaster(@NotNull IAlbumVo album, MultivaluedMap<String, String> paramsFilter, int size) throws EmptyResultException, ApiConfigurationException {
 
         client.removeAllFilters();
         String msg = MessageFormat.format(URL_MASTER__RELEASE_VERSION, album.getId());
         // Create a resource to be used to make Twitter API calls
 
-        MultivaluedMap<String, String> params = new MultivaluedMapImpl();
-        params.add("country", DEFAULT_COUNTRY);
-        params.add("format", DEFAULT_FORMAT);
 
-        WebResource resource = client.resource(URL_API + msg).queryParams(params);
-        IAlbumVo albumVo= null;
+        String searchParam = URL_API + msg;
+        LOG.debug("findReleaseFromMaster with url: " + searchParam);
+        if (paramsFilter != null)
+            LOG.debug("findReleaseFromMaster with param filters: " + paramsFilter.toString());
+        WebResource resource = null;
+        if (paramsFilter != null)
+            resource = client.resource(searchParam).queryParams(paramsFilter);
+        else
+            resource = client.resource(searchParam);
+        IAlbumVo albumVo = null;
         // Add the filter to the resource
         DiscogsOAuth auth = new DiscogsOAuth();
         auth.addAuthentificationFilters(resource);
 
-
+        String masterFormat = paramsFilter.getFirst("format");
         try {
             JSONObject jsonObject = resource.get(JSONObject.class);
-            albumVo= albumMappingList(jsonObject, album.getTitle());
+            albumVo = albumMappingList(jsonObject, album.getTitle(), masterFormat, size);
 
             // }
         } catch (JSONException ex) {
@@ -384,20 +467,18 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
      *
      * @see diskong.AbstractDatabase#getMasterReleaseQuery(diskong.AlbumVo)
      */
-    public IAlbumVo getReleaseById(IAlbumVo album) throws  EmptyResultException, ApiConfigurationException {
+    protected IAlbumVo findReleaseById(IAlbumVo album, String releaseType) throws EmptyResultException, ApiConfigurationException {
 
         client.removeAllFilters();
+        String urlQuery = URL_API + releaseType + album.getId();
 
-
+        LOG.debug("find release by ID " + urlQuery);
         // Create a resource to be used to make Twitter API calls
-        WebResource resource = client.resource(URL_API + URL_RELEASES + album.getId());
+        WebResource resource = client.resource(URL_API + releaseType + album.getId());
 
         // Add the filter to the resource
         DiscogsOAuth auth = new DiscogsOAuth();
         auth.addAuthentificationFilters(resource);
-        // Parse the JSON array
-        // JSONArray jsonArray = resource.get(JSONArray.class);
-        List<String> statuses = new ArrayList<>();
 
         try {
             // for (int i = 0; i < jsonArray.length(); i++) {
@@ -411,18 +492,22 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
     }
 
+    public IAlbumVo findReleaseById(IAlbumVo album) throws EmptyResultException, ApiConfigurationException {
+        return findReleaseById(album, URL_RELEASES);
+    }
+
 
     protected String getArtistQuery(String artist, String title) throws URIException {
 
         StringBuilder sb = new StringBuilder();
-        String sep="";
+        String sep = "";
         if (artist != null) {
             sb.append("artist=").append(artist);
-            sep="&";
+            sep = "&";
         }
-        if (title!=null){
+        if (title != null) {
 
-                sb.append(sep).append("title=").append(title);
+            sb.append(sep).append("title=").append(title);
 
         }
 
@@ -437,7 +522,7 @@ public class DiscogSearch extends AbstractDatabase implements DatabaseSearch {
 
         File file = new File(System.getProperty("user.home") + "/.shipkong/authapis.ini");
         if (!file.exists()) {
-            log.error("no configuration file found");
+            LOG.error("no configuration file found");
             available = false;
         }
 

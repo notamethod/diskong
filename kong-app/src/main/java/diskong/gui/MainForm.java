@@ -127,7 +127,8 @@ class MainForm {
                     }
                     if (a2 != null)
                         //found: ok
-                        JOptionPane.showMessageDialog(null, album.getTitle() + " found using API: " + albumService.getSearchAPI());
+                        LOG.info(album.getTitle() + " found using API: " + albumService.getSearchAPI());
+                       // JOptionPane.showMessageDialog(null, album.getTitle() + " found using API: " + albumService.getSearchAPI());
                     else {
                         GenericForm gf = new GenericForm();
                         a2 = gf.manualSearch(album);
