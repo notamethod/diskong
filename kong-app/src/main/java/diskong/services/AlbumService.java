@@ -89,7 +89,7 @@ public class AlbumService {
         try {
 
             alInfos = ds.searchRelease(album);
-            if (alInfos.getStyles().isEmpty())
+            if (alInfos.getStyles() != null && alInfos.getStyles().isEmpty())
                 alInfos.setStyle(UNKNOWN);
             LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
             if (null == alInfos.getArtist() || alInfos.getArtist().isEmpty())

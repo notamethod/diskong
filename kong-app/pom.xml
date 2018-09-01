@@ -41,9 +41,15 @@
             <groupId>org.dpr</groupId>
             <version>0.0.1-SNAPSHOT</version>
 
-        <artifactId>discogs-client</artifactId>
+            <artifactId>discogs-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>FLAC</groupId>
+            <artifactId>FLAC-library-Java</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>

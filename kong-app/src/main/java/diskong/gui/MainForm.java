@@ -16,6 +16,7 @@
 
 package diskong.gui;
 
+import diskong.app.detail.DetailForm;
 import diskong.app.tagger.TaggerException;
 import diskong.app.tagger.TaggerForm;
 import diskong.core.AlbumVo;
@@ -223,7 +224,7 @@ class MainForm {
                 Point point = mouseEvent.getPoint();
                 int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
-                    TaggerForm gui = new TaggerForm(((AlbumModel)table.getModel()).getRow(table.getSelectedRow()));
+                    DetailForm gui = new DetailForm(((AlbumModel)table.getModel()).getRow(table.getSelectedRow()));
                     gui.pack();
                     gui.setVisible(true);
                 }
