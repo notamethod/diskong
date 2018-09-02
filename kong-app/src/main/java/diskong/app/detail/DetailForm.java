@@ -16,12 +16,17 @@
 
 package diskong.app.detail;
 
+import diskong.api.ApiConfigurationException;
 import diskong.api.EventListener;
 import diskong.api.GuiListener;
 import diskong.app.FlacPlayer;
+import diskong.app.tagger.TaggerForm;
 import diskong.core.AlbumVo;
 
+import diskong.core.IAlbumVo;
+import diskong.gui.GenericForm;
 import diskong.gui.TrackModel;
+import diskong.gui.TrackTagModel;
 import diskong.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +57,7 @@ public class DetailForm extends JDialog implements EventListener {
     private JLabel jlImg;
     private JButton playButton;
     private JSlider musicSlider;
+    private JToggleButton togglePlayButton;
     private BasicSliderUI sliderUi;
     private MySwingWorker worker;
     private List<GuiListener> listeners;
@@ -64,8 +70,8 @@ public class DetailForm extends JDialog implements EventListener {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         sliderUi = new MetalSliderUI();
-         listeners = new ArrayList<GuiListener>();
-       // musicSlider.setUI(sliderUi);
+        listeners = new ArrayList<GuiListener>();
+        // musicSlider.setUI(sliderUi);
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -99,18 +105,47 @@ public class DetailForm extends JDialog implements EventListener {
             @Override
             public void actionPerformed(ActionEvent event) {
                 AlbumService albumService = new AlbumService();
+                IAlbumVo a2 = null;
+                try {
+                    a2 = albumService.searchAlbum(albumOri);
+                } catch (ApiConfigurationException e) {
+                    LOG.error("oauth error", e);
+                    JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (a2 != null)
+                    //found: ok
+                    LOG.info(albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
+                    //JOptionPane.showMessageDialog(null, albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
+                else {
+                    GenericForm gf = new GenericForm();
+                    a2 = gf.manualSearch(albumOri);
 
+                }
+                if (a2 != null) {
+                    IAlbumVo albumNew = a2;
+                    if (a2.getTracks().size() == albumOri.getTracks().size()) {
+                        TaggerForm tf = new TaggerForm(albumOri, albumNew);
+                        tf.pack();
+
+                        tf.setVisible(true);
+                    }
+                    else
+                        JOptionPane.showMessageDialog(null, "nombre de pistes ne correspond pas " + albumService.getSearchAPI());
+                    styles.setText(String.join(", ", a2.getStyles()));
+
+                    genres.setText(String.join(", ", a2.getGenres()));
+                }
 
             }
         });
 
 
-
         pageTitle.setText(albumOri.getArtist() + " - " + albumOri.getTitle());
         styles.setText(String.join(", ", albumOri.getStyles()));
-
         genres.setText(String.join(", ", albumOri.getGenres()));
 
+        // setting (if any) image from folder
         if (albumOri.getFolderImagePath() != null) {
             ImageIcon imgi;
             try {
@@ -127,8 +162,6 @@ public class DetailForm extends JDialog implements EventListener {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         worker = new MySwingWorker(albumOri, albumOri);
-
-                       // GuiListener gl = worker.getGuiListener();
                         worker.execute();
 
                     }
@@ -148,15 +181,42 @@ public class DetailForm extends JDialog implements EventListener {
 
             public void mouseReleased(MouseEvent ev) {
                 moveSlider(ev);
-                for(GuiListener listener : listeners){
+                for (GuiListener listener : listeners) {
                     listener.seekRequested((double) musicSlider.getValue() / musicSlider.getMaximum());
                 }
 
             }
         });
 
+        togglePlayButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AbstractButton abstractButton = (AbstractButton) e.getSource();
+                boolean selected = abstractButton.getModel().isSelected();
+                if (selected && worker==null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            worker = new MySwingWorker(albumOri, albumOri);
+                            worker.execute();
+
+                        }
+                    });
+                }
+                if (!selected && worker!=null) {
+                    for (GuiListener listener : listeners) {
+                        listener.pauseRequested();
+                    }
+
+                }
+            }
+        });
     }
 
+    /**
+     * update slider position
+     *
+     * @param t new position
+     */
     public void setPosition(double t) {
         if (Double.isNaN(t))
             return;
@@ -199,7 +259,7 @@ public class DetailForm extends JDialog implements EventListener {
     }
 
     @Override
-    public void somethingHappened(double v) {
+    public void componentUpdateRequested(double v) {
         System.out.println("event !!");
         setPosition(v);
     }
@@ -210,21 +270,8 @@ public class DetailForm extends JDialog implements EventListener {
     }
 
 
-    /*-- Helper interface --*/
-
-    public interface Listener {
-
-        public void seekRequested(double t);  // 0.0 <= t <= 1.0
-
-        public void windowClosing();
-
-        public void pauseRequested();
-
-
-    }
-
     private class MySwingWorker extends
-            SwingWorker<AlbumVo, AlbumVo>{
+            SwingWorker<AlbumVo, AlbumVo> {
         public MySwingWorker(AlbumVo albumOri, AlbumVo albumOri2) {
         }
 
@@ -240,21 +287,3 @@ public class DetailForm extends JDialog implements EventListener {
 
     }
 }
-//    public void installUI( JComponent c ) {
-//        trackWidth = ((Integer)UIManager.get( "Slider.trackWidth" )).intValue();
-//        tickLength = safeLength = ((Integer)UIManager.get( "Slider.majorTickLength" )).intValue();
-//        horizThumbIcon = SAFE_HORIZ_THUMB_ICON =
-//                UIManager.getIcon( "Slider.horizontalThumbIcon" );
-//        vertThumbIcon = SAFE_VERT_THUMB_ICON =
-//                UIManager.getIcon( "Slider.verticalThumbIcon" );
-//
-//        super.installUI( c );
-//
-//        thumbColor = UIManager.getColor("Slider.thumb");
-//        highlightColor = UIManager.getColor("Slider.highlight");
-//        darkShadowColor = UIManager.getColor("Slider.darkShadow");
-//
-//        scrollListener.setScrollByBlock( false );
-//
-//        prepareFilledSliderField();
-//    }

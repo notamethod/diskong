@@ -59,6 +59,10 @@ public class TaggerForm extends JDialog {
     IAlbumVo albumNew;
 
     public TaggerForm(AlbumVo albumOri) {
+
+        this(albumOri, null);
+    }
+    public TaggerForm(AlbumVo albumOri, IAlbumVo albumNew) {
         this.albumOri = albumOri;
         setContentPane(contentPane);
         setModal(true);
@@ -92,7 +96,10 @@ public class TaggerForm extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
+        if (albumNew != null) {
 
+            ((TrackTagModel) table1.getModel()).setNewInfo(albumNew);
+        }
         analyseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -115,7 +122,7 @@ public class TaggerForm extends JDialog {
 
                 }
                 if (a2 != null) {
-                    albumNew = a2;
+//                    albumNew = a2;
                     if (a2.getTracks().size() == albumOri.getTracks().size())
                         ((TrackTagModel) table1.getModel()).setNewInfo(a2);
                     else

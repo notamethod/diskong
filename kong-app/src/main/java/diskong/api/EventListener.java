@@ -17,5 +17,5 @@
 package diskong.api;
 
 public interface EventListener {
-    void somethingHappened(double v);
+    void componentUpdateRequested(double v);
 }

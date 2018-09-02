@@ -190,7 +190,7 @@ public class FlacPlayer  implements Player, GuiListener {
 
     void notifySomethingHappened(double v){
         for(EventListener listener : listeners){
-            listener.somethingHappened(v);
+            listener.componentUpdateRequested(v);
         }
     }
 
@@ -229,7 +229,10 @@ public class FlacPlayer  implements Player, GuiListener {
 
         @Override
         public void pauseRequested() {
-
+            synchronized (seekRequest) {
+                seekRequest[0] = -2;
+                seekRequest.notify();
+            }
         }
     }
 

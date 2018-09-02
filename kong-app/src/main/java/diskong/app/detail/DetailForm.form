@@ -106,6 +106,14 @@
               <text resource-bundle="Messages" key="play"/>
             </properties>
           </component>
+          <component id="49539" class="javax.swing.JToggleButton" binding="togglePlayButton">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="2" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="play"/>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="372ac" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
