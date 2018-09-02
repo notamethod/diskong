@@ -205,6 +205,11 @@ public class FlacPlayer  implements Player, GuiListener {
 
     }
 
+    @Override
+    public void resumeRequested() {
+
+    }
+
     public interface Listener {
 
         public void seekRequested(double t);  // 0.0 <= t <= 1.0
@@ -231,6 +236,14 @@ public class FlacPlayer  implements Player, GuiListener {
         public void pauseRequested() {
             synchronized (seekRequest) {
                 seekRequest[0] = -2;
+                seekRequest.notify();
+            }
+        }
+
+        @Override
+        public void resumeRequested() {
+            synchronized (seekRequest) {
+                seekRequest[0] = -1;
                 seekRequest.notify();
             }
         }

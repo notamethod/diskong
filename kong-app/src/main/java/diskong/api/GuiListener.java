@@ -21,4 +21,6 @@ public interface GuiListener {
 
 
     public void pauseRequested();
+
+    void resumeRequested();
 }

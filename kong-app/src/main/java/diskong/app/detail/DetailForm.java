@@ -208,6 +208,12 @@ public class DetailForm extends JDialog implements EventListener {
                     }
 
                 }
+                if (selected && worker!=null) {
+                    for (GuiListener listener : listeners) {
+                        listener.resumeRequested();
+                    }
+
+                }
             }
         });
     }
