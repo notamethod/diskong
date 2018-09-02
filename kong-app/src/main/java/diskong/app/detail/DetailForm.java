@@ -16,6 +16,8 @@
 
 package diskong.app.detail;
 
+import diskong.api.EventListener;
+import diskong.api.GuiListener;
 import diskong.app.FlacPlayer;
 import diskong.core.AlbumVo;
 
@@ -31,8 +33,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DetailForm extends JDialog {
+public class DetailForm extends JDialog implements EventListener {
 
     private final static Logger LOG = LoggerFactory.getLogger(DetailForm.class);
     private JPanel contentPane;
@@ -49,6 +53,8 @@ public class DetailForm extends JDialog {
     private JButton playButton;
     private JSlider musicSlider;
     private BasicSliderUI sliderUi;
+    private MySwingWorker worker;
+    private List<GuiListener> listeners;
 
     AlbumVo albumOri;
 
@@ -58,6 +64,7 @@ public class DetailForm extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         sliderUi = new MetalSliderUI();
+         listeners = new ArrayList<GuiListener>();
        // musicSlider.setUI(sliderUi);
 
         buttonOK.addActionListener(new ActionListener() {
@@ -117,8 +124,16 @@ public class DetailForm extends JDialog {
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FlacPlayer player = new FlacPlayer(albumOri);
-                player.playAlbum();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        worker = new MySwingWorker(albumOri, albumOri);
+
+                       // GuiListener gl = worker.getGuiListener();
+                        worker.execute();
+
+                    }
+                });
+
             }
         });
         musicSlider.addMouseMotionListener(new MouseMotionAdapter() {
@@ -126,6 +141,20 @@ public class DetailForm extends JDialog {
                 moveSlider(ev);
             }
         });
+        musicSlider.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent ev) {
+                moveSlider(ev);
+            }
+
+            public void mouseReleased(MouseEvent ev) {
+                moveSlider(ev);
+                for(GuiListener listener : listeners){
+                    listener.seekRequested((double) musicSlider.getValue() / musicSlider.getMaximum());
+                }
+
+            }
+        });
+
     }
 
     public void setPosition(double t) {
@@ -169,6 +198,17 @@ public class DetailForm extends JDialog {
 
     }
 
+    @Override
+    public void somethingHappened(double v) {
+        System.out.println("event !!");
+        setPosition(v);
+    }
+
+
+    public void addListener(GuiListener listener) {
+        listeners.add(listener);
+    }
+
 
     /*-- Helper interface --*/
 
@@ -179,6 +219,23 @@ public class DetailForm extends JDialog {
         public void windowClosing();
 
         public void pauseRequested();
+
+
+    }
+
+    private class MySwingWorker extends
+            SwingWorker<AlbumVo, AlbumVo>{
+        public MySwingWorker(AlbumVo albumOri, AlbumVo albumOri2) {
+        }
+
+        @Override
+        protected AlbumVo doInBackground() throws Exception {
+            FlacPlayer player = new FlacPlayer(albumOri);
+            addListener(player.getListener());
+            player.addListener(DetailForm.this);
+            player.playAlbum();
+            return null;
+        }
 
 
     }

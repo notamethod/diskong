@@ -262,7 +262,7 @@ public final class SeekableFlacPlayerGui {
 
 
         private void moveSlider(MouseEvent ev) {
-            slider.setValue(sliderUi.valueForXPosition(ev.getX()));
+           // slider.setValue(sliderUi.valueForXPosition(ev.getX()));
         }
 
 

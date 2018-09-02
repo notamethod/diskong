@@ -17,6 +17,8 @@
 package diskong.app;
 
 
+import diskong.api.EventListener;
+import diskong.api.GuiListener;
 import diskong.core.IAlbumVo;
 import diskong.core.TrackInfo;
 import io.nayuki.flac.common.StreamInfo;
@@ -27,10 +29,14 @@ import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FlacPlayer implements Player {
+public class FlacPlayer  implements Player, GuiListener {
+    private List<EventListener> listeners = new ArrayList<EventListener>();
     private IAlbumVo album;
     public Listener listener;
+    final double[] seekRequest = {-1};
 
     public FlacPlayer(IAlbumVo album) {
         this.album = album;
@@ -84,7 +90,10 @@ public class FlacPlayer implements Player {
         line.start();
 
         // Create GUI object, event handler, communication object
-        final double[] seekRequest = {-1};
+
+
+
+
 
         listener = new Listener() {
             public void seekRequested(double t) {
@@ -106,7 +115,7 @@ public class FlacPlayer implements Player {
 
             @Override
             public void setPosition(double v) {
-
+                notifySomethingHappened(v);
             }
         };
 
@@ -169,6 +178,33 @@ public class FlacPlayer implements Player {
         }
     }
 
+    @Override
+    public void addListener(EventListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public GuiListener getListener() {
+        return new GuiListenerImpl();
+    }
+
+    void notifySomethingHappened(double v){
+        for(EventListener listener : listeners){
+            listener.somethingHappened(v);
+        }
+    }
+
+
+    @Override
+    public void seekRequested(double t) {
+
+    }
+
+    @Override
+    public void pauseRequested() {
+
+    }
+
     public interface Listener {
 
         public void seekRequested(double t);  // 0.0 <= t <= 1.0
@@ -180,6 +216,23 @@ public class FlacPlayer implements Player {
 
         public void setPosition(double v);
     }
+
+    public class GuiListenerImpl implements  GuiListener{
+
+        @Override
+        public void seekRequested(double t) {
+            synchronized (seekRequest) {
+                seekRequest[0] = t;
+                seekRequest.notify();
+            }
+        }
+
+        @Override
+        public void pauseRequested() {
+
+        }
+    }
+
 
 }
 

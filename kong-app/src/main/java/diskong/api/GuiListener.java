@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package diskong.app;
+package diskong.api;
 
-import diskong.api.EventListener;
-import diskong.api.GuiListener;
-import diskong.app.detail.DetailForm;
+public interface GuiListener {
+    public void seekRequested(double t);  // 0.0 <= t <= 1.0
 
-public interface Player {
-    void addListener(EventListener myListener);
 
-    GuiListener getListener();
+    public void pauseRequested();
 }
