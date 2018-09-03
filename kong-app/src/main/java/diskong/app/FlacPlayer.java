@@ -32,33 +32,65 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlacPlayer  implements Player, GuiListener {
+public class FlacPlayer implements Player {
     private List<EventListener> listeners = new ArrayList<EventListener>();
     private IAlbumVo album;
     public Listener listener;
     final double[] seekRequest = {-1};
+    private boolean hasNext;
+    private boolean hasPrevious;
+
+    public final int RESUME = -1;
+    public final int PAUSE = -2;
+    public final int NEXT = -3;
+    public final int PREVIOUS = -4;
 
     public FlacPlayer(IAlbumVo album) {
         this.album = album;
     }
 
     public void playAlbum() {
-        for (TrackInfo track : album.getTracks()) {
-            try {
-                playTrack(track);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (LineUnavailableException e) {
-                e.printStackTrace();
-            }
+        int playedTrack = 0;
+        List<TrackInfo> tracks = album.getTracks();
+        int numTracks = tracks.size();
+        try {
+       while (playedTrack>=0){
+           System.out.println(playedTrack);
+           int returnedPlayInfo = play(tracks.get(playedTrack).getfPath().getFile(), playedTrack<=numTracks);
+           if (returnedPlayInfo == NEXT) {
+               System.out.println("next req");
+               playedTrack++;
+           }
+           if (returnedPlayInfo == PREVIOUS && playedTrack>0) {
+               System.out.println("prev req");
+               playedTrack--;
+           }
+       }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
         }
+
+//        for (TrackInfo track : album.getTracks()) {
+//            try {
+//                play(track.getfPath().getFile(), true);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } catch (LineUnavailableException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
     }
 
-    private void playTrack(@NotNull TrackInfo track) throws InterruptedException, IOException, LineUnavailableException {
-        play(track.getfPath().getFile());
+    private int playTrack(@NotNull TrackInfo track) throws InterruptedException, IOException, LineUnavailableException {
+
+        return play(track.getfPath().getFile(), false);
     }
 
     private void playFile(Path path) {
@@ -70,7 +102,7 @@ public class FlacPlayer  implements Player, GuiListener {
 
     }
 
-    private void play(File inFile) throws
+    private int play(File inFile, boolean hasNext) throws
             LineUnavailableException, IOException, InterruptedException {
 
 
@@ -90,28 +122,8 @@ public class FlacPlayer  implements Player, GuiListener {
         line.start();
 
         // Create GUI object, event handler, communication object
-
-
-
-
-
         listener = new Listener() {
-            public void seekRequested(double t) {
-                synchronized (seekRequest) {
-                    seekRequest[0] = t;
-                    seekRequest.notify();
-                }
-            }
 
-            public void windowClosing() {
-                System.exit(0);
-            }
-
-            @Override
-            public void pauseRequested() {
-                seekRequest[0] = -2;
-                seekRequest.notify();
-            }
 
             @Override
             public void setPosition(double v) {
@@ -134,12 +146,27 @@ public class FlacPlayer  implements Player, GuiListener {
             double seekReq;
             synchronized (seekRequest) {
                 seekReq = seekRequest[0];
-                if (seekReq != -2)
+                if (seekReq > -2)
                     seekRequest[0] = -1;
             }
 
             // Decode next audio block, or seek and decode
             int blockSamples;
+            if (seekReq == NEXT && hasNext){
+                line.stop();
+                synchronized (seekRequest) {
+                        seekRequest[0] = -1;
+                }
+                return NEXT;
+            }
+            if (seekReq == PREVIOUS){
+                line.stop();
+                synchronized (seekRequest) {
+                    seekRequest[0] = -1;
+                }
+                return PREVIOUS;
+            }
+
             if (seekReq == -2)
                 continue;
             else if (seekReq == -1)
@@ -158,11 +185,18 @@ public class FlacPlayer  implements Player, GuiListener {
 
             // Wait when end of stream reached
             if (blockSamples == 0) {
-                synchronized (seekRequest) {
-                    while (seekRequest[0] == -1)
-                        seekRequest.wait();
+                if (hasNext) {
+                    return 0;
+                } else {
+                    synchronized (seekRequest) {
+                        while (seekRequest[0] == -1) {
+                            seekRequest.wait();
+                        }
+                    }
+                    continue;
                 }
-                continue;
+
+
             }
 
             // Convert samples to channel-interleaved bytes in little endian
@@ -176,6 +210,7 @@ public class FlacPlayer  implements Player, GuiListener {
             }
             line.write(sampleBytes, 0, sampleBytesLen);
         }
+
     }
 
     @Override
@@ -188,41 +223,18 @@ public class FlacPlayer  implements Player, GuiListener {
         return new GuiListenerImpl();
     }
 
-    void notifySomethingHappened(double v){
-        for(EventListener listener : listeners){
+    void notifySomethingHappened(double v) {
+        for (EventListener listener : listeners) {
             listener.componentUpdateRequested(v);
         }
     }
 
-
-    @Override
-    public void seekRequested(double t) {
-
-    }
-
-    @Override
-    public void pauseRequested() {
-
-    }
-
-    @Override
-    public void resumeRequested() {
-
-    }
-
     public interface Listener {
-
-        public void seekRequested(double t);  // 0.0 <= t <= 1.0
-
-        public void windowClosing();
-
-        public void pauseRequested();
-
 
         public void setPosition(double v);
     }
 
-    public class GuiListenerImpl implements  GuiListener{
+    public class GuiListenerImpl implements GuiListener {
 
         @Override
         public void seekRequested(double t) {
@@ -235,7 +247,7 @@ public class FlacPlayer  implements Player, GuiListener {
         @Override
         public void pauseRequested() {
             synchronized (seekRequest) {
-                seekRequest[0] = -2;
+                seekRequest[0] = PAUSE;
                 seekRequest.notify();
             }
         }
@@ -246,6 +258,23 @@ public class FlacPlayer  implements Player, GuiListener {
                 seekRequest[0] = -1;
                 seekRequest.notify();
             }
+        }
+
+        @Override
+        public void nextRequested() {
+            synchronized (seekRequest) {
+                seekRequest[0] = NEXT;
+                seekRequest.notify();
+            }
+        }
+
+        @Override
+        public void previousRequested() {
+            synchronized (seekRequest) {
+                seekRequest[0] = PREVIOUS;
+                seekRequest.notify();
+            }
+
         }
     }
 

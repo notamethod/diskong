@@ -224,7 +224,12 @@ class MainForm {
                 Point point = mouseEvent.getPoint();
                 int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
-                    DetailForm gui = new DetailForm(((AlbumModel)table.getModel()).getRow(table.getSelectedRow()));
+                    DetailForm gui = null;
+                    try {
+                        gui = new DetailForm(((AlbumModel)table.getModel()).getRow(table.getSelectedRow()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     gui.pack();
                     gui.setVisible(true);
                 }

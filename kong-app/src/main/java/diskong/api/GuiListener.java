@@ -17,10 +17,13 @@
 package diskong.api;
 
 public interface GuiListener {
-    public void seekRequested(double t);  // 0.0 <= t <= 1.0
+    void seekRequested(double t);  // 0.0 <= t <= 1.0
 
-
-    public void pauseRequested();
+    void pauseRequested();
 
     void resumeRequested();
+
+    void nextRequested();
+
+    void previousRequested();
 }

@@ -31,12 +31,14 @@ import diskong.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
 import javax.swing.plaf.metal.MetalSliderUI;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,16 +57,17 @@ public class DetailForm extends JDialog implements EventListener {
     private JLabel styles;
     private JLabel genres;
     private JLabel jlImg;
-    private JButton playButton;
     private JSlider musicSlider;
     private JToggleButton togglePlayButton;
+    private JButton prevBtn;
+    private JButton button1;
     private BasicSliderUI sliderUi;
     private MySwingWorker worker;
     private List<GuiListener> listeners;
 
     AlbumVo albumOri;
 
-    public DetailForm(AlbumVo albumOri) {
+    public DetailForm(AlbumVo albumOri) throws IOException {
         this.albumOri = albumOri;
         setContentPane(contentPane);
         setModal(true);
@@ -72,7 +75,9 @@ public class DetailForm extends JDialog implements EventListener {
         sliderUi = new MetalSliderUI();
         listeners = new ArrayList<GuiListener>();
         // musicSlider.setUI(sliderUi);
-
+        musicSlider.setPaintTrack(true);
+        musicSlider.setUI(new ColoredThumbSliderUI(musicSlider, Color.red));
+        //setPaintTrack(
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onOK();
@@ -156,19 +161,6 @@ public class DetailForm extends JDialog implements EventListener {
             }
         }
 
-        playButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        worker = new MySwingWorker(albumOri, albumOri);
-                        worker.execute();
-
-                    }
-                });
-
-            }
-        });
         musicSlider.addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseDragged(MouseEvent ev) {
                 moveSlider(ev);
@@ -187,7 +179,11 @@ public class DetailForm extends JDialog implements EventListener {
 
             }
         });
-
+        togglePlayButton.setDisabledIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
+        togglePlayButton.setDisabledSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
+        togglePlayButton.setPressedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
+        togglePlayButton.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
+        togglePlayButton.setSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_pause.svg.png"))));
         togglePlayButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -211,6 +207,28 @@ public class DetailForm extends JDialog implements EventListener {
                 if (selected && worker!=null) {
                     for (GuiListener listener : listeners) {
                         listener.resumeRequested();
+                    }
+
+                }
+            }
+        });
+        button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (worker!=null) {
+                    for (GuiListener listener : listeners) {
+                        listener.nextRequested();
+                    }
+
+                }
+            }
+        });
+        prevBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (worker!=null) {
+                    for (GuiListener listener : listeners) {
+                        listener.previousRequested();
                     }
 
                 }
@@ -249,7 +267,7 @@ public class DetailForm extends JDialog implements EventListener {
         dispose();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         DetailForm dialog = new DetailForm(new AlbumVo());
         dialog.pack();
         dialog.setVisible(true);
@@ -291,5 +309,50 @@ public class DetailForm extends JDialog implements EventListener {
         }
 
 
+    }
+
+    /**
+     * Change slider style (and thumb color), thanks to Gregg Bolinger
+     *
+     * color properties from UIManager
+     * UIManager.put("Slider.foreground", Color.red);
+     * UIManager.put("Slider.focus", Color.red);
+     * UIManager.put("Slider.highlight", Color.red);
+     * UIManager.put("Slider.shadow", Color.red);
+     * UIManager.put("Slider.background", Color.red);
+     */
+    class ColoredThumbSliderUI extends BasicSliderUI
+    {
+
+        Color thumbColor;
+        ColoredThumbSliderUI(JSlider s, Color tColor) {
+            super(s);
+            thumbColor=tColor;
+        }
+
+        public void paint( Graphics g, JComponent c ) {
+            recalculateIfInsetsChanged();
+            recalculateIfOrientationChanged();
+            Rectangle clip = g.getClipBounds();
+
+            if ( slider.getPaintTrack() && clip.intersects( trackRect ) ) {
+                paintTrack( g );
+            }
+            if ( slider.getPaintTicks() && clip.intersects( tickRect ) ) {
+                paintTicks( g );
+            }
+            if ( slider.getPaintLabels() && clip.intersects( labelRect ) ) {
+                paintLabels( g );
+            }
+            if ( slider.hasFocus() && clip.intersects( focusRect ) ) {
+                paintFocus( g );
+            }
+            if ( clip.intersects( thumbRect ) ) {
+                Color savedColor = slider.getBackground();
+                slider.setBackground(thumbColor);
+                paintThumb( g );
+                slider.setBackground(savedColor);
+            }
+        }
     }
 }
