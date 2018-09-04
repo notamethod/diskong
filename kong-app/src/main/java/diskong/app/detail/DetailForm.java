@@ -24,6 +24,8 @@ import diskong.app.tagger.TaggerForm;
 import diskong.core.AlbumVo;
 
 import diskong.core.IAlbumVo;
+import diskong.core.TrackInfo;
+import diskong.gui.AlbumModel;
 import diskong.gui.GenericForm;
 import diskong.gui.TrackModel;
 import diskong.gui.TrackTagModel;
@@ -134,8 +136,7 @@ public class DetailForm extends JDialog implements EventListener {
                         tf.pack();
 
                         tf.setVisible(true);
-                    }
-                    else
+                    } else
                         JOptionPane.showMessageDialog(null, "nombre de pistes ne correspond pas " + albumService.getSearchAPI());
                     styles.setText(String.join(", ", a2.getStyles()));
 
@@ -189,22 +190,22 @@ public class DetailForm extends JDialog implements EventListener {
             public void actionPerformed(ActionEvent e) {
                 AbstractButton abstractButton = (AbstractButton) e.getSource();
                 boolean selected = abstractButton.getModel().isSelected();
-                if (selected && worker==null) {
+                if (selected && worker == null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            worker = new MySwingWorker(albumOri, albumOri);
+                            worker = new MySwingWorker(albumOri, 0);
                             worker.execute();
 
                         }
                     });
                 }
-                if (!selected && worker!=null) {
+                if (!selected && worker != null) {
                     for (GuiListener listener : listeners) {
                         listener.pauseRequested();
                     }
 
                 }
-                if (selected && worker!=null) {
+                if (selected && worker != null) {
                     for (GuiListener listener : listeners) {
                         listener.resumeRequested();
                     }
@@ -215,7 +216,7 @@ public class DetailForm extends JDialog implements EventListener {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (worker!=null) {
+                if (worker != null) {
                     for (GuiListener listener : listeners) {
                         listener.nextRequested();
                     }
@@ -226,11 +227,38 @@ public class DetailForm extends JDialog implements EventListener {
         prevBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (worker!=null) {
+                if (worker != null) {
                     for (GuiListener listener : listeners) {
                         listener.previousRequested();
                     }
 
+                }
+            }
+        });
+
+        table1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable table = (JTable) mouseEvent.getSource();
+                Point point = mouseEvent.getPoint();
+               final int row = table.rowAtPoint(point);
+                if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    //worker not null: a track is playing
+                    if (worker != null) {
+                        TrackInfo tm = ((TrackModel) table.getModel()).getRow(table.getSelectedRow());
+                        for (GuiListener listener : listeners) {
+                            listener.selectTrackRequested(row);
+                        }
+                    }else{
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                worker = new MySwingWorker(albumOri, row);
+                                worker.execute();
+
+                            }
+                        });
+
+                    }
                 }
             }
         });
@@ -249,6 +277,15 @@ public class DetailForm extends JDialog implements EventListener {
             public void run() {
                 if (!musicSlider.getValueIsAdjusting())
                     musicSlider.setValue((int) Math.round(val * musicSlider.getMaximum()));
+            }
+        });
+    }
+    //select a row in the table (the row being payed)
+    public void selectRow(int t) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                table1.setRowSelectionInterval(t, t);
+
             }
         });
     }
@@ -284,8 +321,13 @@ public class DetailForm extends JDialog implements EventListener {
 
     @Override
     public void componentUpdateRequested(double v) {
-        System.out.println("event !!");
         setPosition(v);
+    }
+
+    @Override
+    public void TableUpdateRequested(int row) {
+        selectRow(row);
+
     }
 
 
@@ -295,8 +337,10 @@ public class DetailForm extends JDialog implements EventListener {
 
 
     private class MySwingWorker extends
-            SwingWorker<AlbumVo, AlbumVo> {
-        public MySwingWorker(AlbumVo albumOri, AlbumVo albumOri2) {
+            SwingWorker<AlbumVo, Integer> {
+        Integer row;
+        public MySwingWorker(AlbumVo albumOri, Integer intValue) {
+            row=intValue;
         }
 
         @Override
@@ -304,7 +348,7 @@ public class DetailForm extends JDialog implements EventListener {
             FlacPlayer player = new FlacPlayer(albumOri);
             addListener(player.getListener());
             player.addListener(DetailForm.this);
-            player.playAlbum();
+            player.playAlbum(row);
             return null;
         }
 
@@ -313,7 +357,7 @@ public class DetailForm extends JDialog implements EventListener {
 
     /**
      * Change slider style (and thumb color), thanks to Gregg Bolinger
-     *
+     * <p>
      * color properties from UIManager
      * UIManager.put("Slider.foreground", Color.red);
      * UIManager.put("Slider.focus", Color.red);
@@ -321,36 +365,36 @@ public class DetailForm extends JDialog implements EventListener {
      * UIManager.put("Slider.shadow", Color.red);
      * UIManager.put("Slider.background", Color.red);
      */
-    class ColoredThumbSliderUI extends BasicSliderUI
-    {
+    class ColoredThumbSliderUI extends BasicSliderUI {
 
         Color thumbColor;
+
         ColoredThumbSliderUI(JSlider s, Color tColor) {
             super(s);
-            thumbColor=tColor;
+            thumbColor = tColor;
         }
 
-        public void paint( Graphics g, JComponent c ) {
+        public void paint(Graphics g, JComponent c) {
             recalculateIfInsetsChanged();
             recalculateIfOrientationChanged();
             Rectangle clip = g.getClipBounds();
 
-            if ( slider.getPaintTrack() && clip.intersects( trackRect ) ) {
-                paintTrack( g );
+            if (slider.getPaintTrack() && clip.intersects(trackRect)) {
+                paintTrack(g);
             }
-            if ( slider.getPaintTicks() && clip.intersects( tickRect ) ) {
-                paintTicks( g );
+            if (slider.getPaintTicks() && clip.intersects(tickRect)) {
+                paintTicks(g);
             }
-            if ( slider.getPaintLabels() && clip.intersects( labelRect ) ) {
-                paintLabels( g );
+            if (slider.getPaintLabels() && clip.intersects(labelRect)) {
+                paintLabels(g);
             }
-            if ( slider.hasFocus() && clip.intersects( focusRect ) ) {
-                paintFocus( g );
+            if (slider.hasFocus() && clip.intersects(focusRect)) {
+                paintFocus(g);
             }
-            if ( clip.intersects( thumbRect ) ) {
+            if (clip.intersects(thumbRect)) {
                 Color savedColor = slider.getBackground();
                 slider.setBackground(thumbColor);
-                paintThumb( g );
+                paintThumb(g);
                 slider.setBackground(savedColor);
             }
         }

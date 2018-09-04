@@ -18,4 +18,7 @@ package diskong.api;
 
 public interface EventListener {
     void componentUpdateRequested(double v);
+
+
+    void TableUpdateRequested(int row);
 }

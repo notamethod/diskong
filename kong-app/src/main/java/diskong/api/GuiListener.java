@@ -26,4 +26,6 @@ public interface GuiListener {
     void nextRequested();
 
     void previousRequested();
+
+    void selectTrackRequested(int row);
 }

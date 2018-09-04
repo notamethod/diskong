@@ -23,7 +23,6 @@ import diskong.core.IAlbumVo;
 import diskong.core.TrackInfo;
 import io.nayuki.flac.common.StreamInfo;
 import io.nayuki.flac.decode.FlacDecoder;
-import org.jetbrains.annotations.NotNull;
 
 import javax.sound.sampled.*;
 import java.io.File;
@@ -50,13 +49,15 @@ public class FlacPlayer implements Player {
     }
 
     public void playAlbum() {
-        int playedTrack = 0;
+        playAlbum(0);
+    }
+    public void playAlbum(int firstToPlay) {
+        int playedTrack = firstToPlay;
         List<TrackInfo> tracks = album.getTracks();
         int numTracks = tracks.size();
         try {
        while (playedTrack>=0){
-           System.out.println(playedTrack);
-           int returnedPlayInfo = play(tracks.get(playedTrack).getfPath().getFile(), playedTrack<=numTracks);
+           int returnedPlayInfo = play(tracks.get(playedTrack).getfPath().getFile(), playedTrack<=numTracks, playedTrack);
            if (returnedPlayInfo == NEXT) {
                System.out.println("next req");
                playedTrack++;
@@ -64,6 +65,10 @@ public class FlacPlayer implements Player {
            if (returnedPlayInfo == PREVIOUS && playedTrack>0) {
                System.out.println("prev req");
                playedTrack--;
+           }
+           if (returnedPlayInfo >=0) {
+               System.out.println("play track req");
+               playedTrack = returnedPlayInfo;
            }
        }
         } catch (InterruptedException e) {
@@ -73,7 +78,7 @@ public class FlacPlayer implements Player {
         } catch (LineUnavailableException e) {
             e.printStackTrace();
         }
-
+        System.out.println(firstToPlay+"fin");
 //        for (TrackInfo track : album.getTracks()) {
 //            try {
 //                play(track.getfPath().getFile(), true);
@@ -88,10 +93,10 @@ public class FlacPlayer implements Player {
 
     }
 
-    private int playTrack(@NotNull TrackInfo track) throws InterruptedException, IOException, LineUnavailableException {
-
-        return play(track.getfPath().getFile(), false);
-    }
+//    private int playTrack(@NotNull TrackInfo track) throws InterruptedException, IOException, LineUnavailableException {
+//
+//        return play(track.getfPath().getFile(), false);
+//    }
 
     private void playFile(Path path) {
 
@@ -102,10 +107,23 @@ public class FlacPlayer implements Player {
 
     }
 
-    private int play(File inFile, boolean hasNext) throws
+    private int play(File inFile, boolean hasNext, int track) throws
             LineUnavailableException, IOException, InterruptedException {
 
+        listener = new Listener() {
 
+            @Override
+            public void setPosition(double v) {
+                notifyComponentToUpdate(v);
+            }
+
+            @Override
+            public void selectRow(int row) {
+                notifyTableToUpdate(row);
+            }
+        };
+        if (track>=0)
+            listener.selectRow(track);
         // Process header metadata blocks
         FlacDecoder decoder = new FlacDecoder(inFile);
         while (decoder.readAndHandleMetadataBlock() != null) ;
@@ -122,14 +140,7 @@ public class FlacPlayer implements Player {
         line.start();
 
         // Create GUI object, event handler, communication object
-        listener = new Listener() {
 
-
-            @Override
-            public void setPosition(double v) {
-                notifySomethingHappened(v);
-            }
-        };
 
         /*-- Audio player loop --*/
 
@@ -159,15 +170,22 @@ public class FlacPlayer implements Player {
                 }
                 return NEXT;
             }
-            if (seekReq == PREVIOUS){
+            else if (seekReq == PREVIOUS){
                 line.stop();
                 synchronized (seekRequest) {
                     seekRequest[0] = -1;
                 }
                 return PREVIOUS;
             }
+            else if (seekReq <=-900){
+                line.stop();
+                synchronized (seekRequest) {
+                    seekRequest[0] = -1;
+                }
+                return (int) (seekReq+1000);
+            }
 
-            if (seekReq == -2)
+            else if (seekReq == PAUSE)
                 continue;
             else if (seekReq == -1)
                 blockSamples = decoder.readAudioBlock(samples, 0);
@@ -186,7 +204,7 @@ public class FlacPlayer implements Player {
             // Wait when end of stream reached
             if (blockSamples == 0) {
                 if (hasNext) {
-                    return 0;
+                    return NEXT;
                 } else {
                     synchronized (seekRequest) {
                         while (seekRequest[0] == -1) {
@@ -223,15 +241,21 @@ public class FlacPlayer implements Player {
         return new GuiListenerImpl();
     }
 
-    void notifySomethingHappened(double v) {
+    void notifyComponentToUpdate(double v) {
         for (EventListener listener : listeners) {
             listener.componentUpdateRequested(v);
+        }
+    }
+    void notifyTableToUpdate(int row) {
+        for (EventListener listener : listeners) {
+            listener.TableUpdateRequested(row);
         }
     }
 
     public interface Listener {
 
         public void setPosition(double v);
+        public void selectRow(int row);
     }
 
     public class GuiListenerImpl implements GuiListener {
@@ -272,6 +296,15 @@ public class FlacPlayer implements Player {
         public void previousRequested() {
             synchronized (seekRequest) {
                 seekRequest[0] = PREVIOUS;
+                seekRequest.notify();
+            }
+
+        }
+
+        @Override
+        public void selectTrackRequested(int row) {
+            synchronized (seekRequest) {
+                seekRequest[0] = -1000+row;
                 seekRequest.notify();
             }
 
