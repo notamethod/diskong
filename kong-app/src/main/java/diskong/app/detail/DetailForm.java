@@ -70,6 +70,7 @@ public class DetailForm extends JDialog implements EventListener {
     AlbumVo albumOri;
 
     public DetailForm(AlbumVo albumOri) throws IOException {
+        //Test
         this.albumOri = albumOri;
         setContentPane(contentPane);
         setModal(true);
