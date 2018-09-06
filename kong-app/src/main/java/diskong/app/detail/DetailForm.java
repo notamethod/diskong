@@ -244,6 +244,7 @@ public class DetailForm extends JDialog implements EventListener {
                 Point point = mouseEvent.getPoint();
                final int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    togglePlayButton.setSelected(true);
                     //worker not null: a track is playing
                     if (worker != null) {
                         TrackInfo tm = ((TrackModel) table.getModel()).getRow(table.getSelectedRow());
