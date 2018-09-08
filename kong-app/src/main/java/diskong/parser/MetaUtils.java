@@ -32,8 +32,7 @@ public class MetaUtils {
 	public static final Property STYLE = Property.externalText("style");
 
 	public static List<String> getGenre(Metadata metadata) {
-		List<String> genres = new ArrayList<>();
-		genres.addAll(Arrays.asList(metadata.getValues(XMPDM.GENRE)));
+		List<String> genres = new ArrayList<>(Arrays.asList(metadata.getValues(XMPDM.GENRE)));
 		return genres;
 
 	}
@@ -47,13 +46,13 @@ public class MetaUtils {
 	//refactoring: setTag
 	public static void setGenre(IAlbumVo source, Metadata metadata) {
 
-		metadata.set(XMPDM.GENRE, source.getGenres().toArray(new String[source.getGenres().size()]));
+		metadata.set(XMPDM.GENRE, source.getGenres().toArray(new String[0]));
 
 	}
 
 	public static void setStyle(IAlbumVo source, Metadata metadata) {
 
-		metadata.set(STYLE, source.getStyles().toArray(new String[source.getStyles().size()]));
+		metadata.set(STYLE, source.getStyles().toArray(new String[0]));
 
 	}
 

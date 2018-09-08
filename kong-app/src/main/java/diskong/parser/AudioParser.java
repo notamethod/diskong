@@ -62,10 +62,7 @@ public class AudioParser {
 		AudioParser ap = new AudioParser();
 		try {
 			ap.parse(new File(fic));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SAXException e) {
+		} catch (IOException | SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TikaException e) {

@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 public class TaggerForm extends JDialog {
@@ -103,34 +104,7 @@ public class TaggerForm extends JDialog {
         analyseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                AlbumService albumService = new AlbumService();
-                IAlbumVo a2 = null;
-                try {
-                    a2 = albumService.searchAlbum(albumOri);
-                } catch (ApiConfigurationException e) {
-                    LOG.error("oauth error", e);
-                    JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                if (a2 != null)
-                    //found: ok
-                    LOG.info(albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
-                    //JOptionPane.showMessageDialog(null, albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
-                else {
-                    GenericForm gf = new GenericForm();
-                    a2 = gf.manualSearch(albumOri);
 
-                }
-                if (a2 != null) {
-//                    albumNew = a2;
-                    if (a2.getTracks().size() == albumOri.getTracks().size())
-                        ((TrackTagModel) table1.getModel()).setNewInfo(a2);
-                    else
-                        JOptionPane.showMessageDialog(null, "nombre de pistes ne correspond pas " + albumService.getSearchAPI());
-                    styles.setText(String.join(", ", a2.getStyles()));
-
-                    genres.setText(String.join(", ", a2.getGenres()));
-                }
 
             }
         });
@@ -204,10 +178,23 @@ public class TaggerForm extends JDialog {
 
         genres.setText(String.join(", ", albumOri.getGenres()));
 
-        if (albumOri.getFolderImagePath() != null) {
+
+        if (albumNew.getCoverImageUrl() != null) {
+            Path target = Paths.get(System.getProperty("java.io.tmpdir"));
+
+            Path fullTarget = target.resolve(albumNew.getId()+".jpg");
+            try {
+                Utils.downloadFile(albumNew.getCoverImageUrl(), fullTarget);
+                albumNew.setFolderImagePath(fullTarget.toString());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (albumNew.getFolderImagePath() != null) {
             ImageIcon imgi;
             try {
-                imgi = new ImageIcon(new File(albumOri.getFolderImagePath()).toURI().toURL());
+                imgi = new ImageIcon(new File(albumNew.getFolderImagePath()).toURI().toURL());
                 jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
             } catch (MalformedURLException e) {
                 e.printStackTrace();

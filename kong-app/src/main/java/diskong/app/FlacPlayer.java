@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FlacPlayer implements Player {
-    private List<EventListener> listeners = new ArrayList<EventListener>();
+    private List<EventListener> listeners = new ArrayList<>();
     private IAlbumVo album;
     public Listener listener;
     final double[] seekRequest = {-1};
@@ -254,8 +254,8 @@ public class FlacPlayer implements Player {
 
     public interface Listener {
 
-        public void setPosition(double v);
-        public void selectRow(int row);
+        void setPosition(double v);
+        void selectRow(int row);
     }
 
     public class GuiListenerImpl implements GuiListener {

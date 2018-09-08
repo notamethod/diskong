@@ -270,11 +270,11 @@ public final class SeekableFlacPlayerGui {
 
         public interface Listener {
 
-            public void seekRequested(double t);  // 0.0 <= t <= 1.0
+            void seekRequested(double t);  // 0.0 <= t <= 1.0
 
-            public void windowClosing();
+            void windowClosing();
 
-            public void pauseRequested();
+            void pauseRequested();
 
 
         }

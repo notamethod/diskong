@@ -26,6 +26,7 @@ import diskong.Utils;
 import diskong.api.ApiConfigurationException;
 import diskong.app.cdrip.GuiPreferences;
 import diskong.app.cdrip.RipForm;
+import diskong.core.TagState;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
 import diskong.parser.MetaUtils;
@@ -38,6 +39,7 @@ import org.dpr.swingtools.components.JDropText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -47,6 +49,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -205,6 +208,13 @@ class MainForm {
                 JFrame frame = new JFrame("RipForm");
                 frame.setContentPane(new RipForm().getJPanelOne());
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//                try {
+//                    frame.setIconImage(ImageIO.read(new FileInputStream("images/dk114.png")));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+                frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icon110.png"));
+
                 frame.pack();
                 frame.setVisible(true);
             }
@@ -278,6 +288,8 @@ class MainForm {
         JFrame frame = new JFrame("MainForm");
         frame.setContentPane(new MainForm().Panel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icon110.png"));
         pathField.setEditable(false);
         frame.pack();
         frame.setVisible(true);
@@ -285,8 +297,14 @@ class MainForm {
     }
 
     private void createUIComponents() {
+
+
         table1 = new JTable(model);
+        scrollPane1 = new JScrollPane(table1);
+        scrollPane1.setOpaque(false);
+        scrollPane1.getViewport().setOpaque(false);
         table1.setRowHeight(48);
+        table1.setOpaque(false);
         pathField = new JDropText();
         pathField.setEditable(true);
         pathField.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -365,9 +383,10 @@ class MainForm {
 
                 //FIXME:check parser creation
                 AlbumVo avo = service.parseDirectory(entry);
-                //albums.add(avo);
-                //model.setAlbums(albums);
-                publish(avo);
+                if (!avo.getState().equals(TagState.NOTRACKS)) {
+                    publish(avo);
+                }
+
 
 
 //                while (!enough && !isCancelled()) {

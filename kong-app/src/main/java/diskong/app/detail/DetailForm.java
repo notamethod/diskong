@@ -76,7 +76,7 @@ public class DetailForm extends JDialog implements EventListener {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         sliderUi = new MetalSliderUI();
-        listeners = new ArrayList<GuiListener>();
+        listeners = new ArrayList<>();
         // musicSlider.setUI(sliderUi);
         musicSlider.setPaintTrack(true);
         musicSlider.setUI(new ColoredThumbSliderUI(musicSlider, Color.red));
@@ -346,7 +346,7 @@ public class DetailForm extends JDialog implements EventListener {
         }
 
         @Override
-        protected AlbumVo doInBackground() throws Exception {
+        protected AlbumVo doInBackground() {
             FlacPlayer player = new FlacPlayer(albumOri);
             addListener(player.getListener());
             player.addListener(DetailForm.this);

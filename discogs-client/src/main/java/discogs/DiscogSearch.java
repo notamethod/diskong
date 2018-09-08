@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.transform.sax.SAXSource;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -277,6 +278,9 @@ public class DiscogSearch implements DatabaseSearch {
             albumInfo.setGenres(otherAlbumInfo.getGenres());
         if (albumInfo.getTracks() == null || albumInfo.getTracks().isEmpty())
             albumInfo.setTracks(otherAlbumInfo.getTracks());
+        if (albumInfo.getCoverImageUrl()==null)
+            albumInfo.setCoverImageUrl(otherAlbumInfo.getCoverImageUrl());
+
 
     }
 
@@ -299,7 +303,9 @@ public class DiscogSearch implements DatabaseSearch {
             }
             try {
                 albumInfo.setCoverImageUrl(result.getString("cover_image"));
+                System.out.println("image"+result.getString("cover_image"));
             } catch (JSONException j) {
+                j.printStackTrace();
             }
             albumInfo.setStyles(result.getJSONArray("style"));
             albumInfo.setGenres(result.getJSONArray("genre"));
@@ -311,11 +317,11 @@ public class DiscogSearch implements DatabaseSearch {
         return albumInfos;
     }
 
-    private IAlbumVo fullAlbumMapping(JSONObject jsonObject, String title) throws JSONException, EmptyResultException {
+    private IAlbumVo fullAlbumMapping(JSONObject jsonObject, IAlbumVo album) throws JSONException, EmptyResultException {
         IAlbumVo albumInfo = new AlbumVo();
         JSONArray results = jsonObject.getJSONArray("tracklist");
         if (results.length() == 0)
-            throw new EmptyResultException(title);
+            throw new EmptyResultException(album.getTitle());
 
         albumInfo.setTracks(results);
 
@@ -332,6 +338,16 @@ public class DiscogSearch implements DatabaseSearch {
             albumInfo.setGenres(jsonObject.getJSONArray("genres"));
         } catch (JSONException j) {
         }
+        albumInfo.setCoverImageUrl(album.getCoverImageUrl());
+        //change it
+        try {
+            String image = jsonObject.getString("cover_image");
+            System.out.println("image"+image);
+            if (image != null)
+                albumInfo.setCoverImageUrl(jsonObject.getString("cover_image"));
+        } catch (JSONException j) {
+//            j.printStackTrace();
+        }
 
 
 //
@@ -341,17 +357,17 @@ public class DiscogSearch implements DatabaseSearch {
         return albumInfo;
     }
 
-    private IAlbumVo albumMappingList(JSONObject jsonObject, String title, String masterFormat, int size) throws JSONException, EmptyResultException {
-        IAlbumVo albumInfo = new AlbumVo();
+    private IAlbumVo albumMappingList(JSONObject jsonObject, IAlbumVo albumOri, String masterFormat, int size) throws JSONException, EmptyResultException {
+        IAlbumVo albumInfo = albumOri.clone();
         boolean searchMatch = false;
         //List<IAlbumVo> releases = new ArrayList<>();
         JSONArray results = jsonObject.getJSONArray("versions");
         if (results.length() == 0)
-            throw new EmptyResultException(title);
+            throw new EmptyResultException(albumOri.getTitle());
         JSONObject result = null;
         for (int i = 0; i < results.length(); i++) {
             result = results.getJSONObject(i);
-           // int numTracks = jsonObject.getJSONArray("tracklist").length();
+            // int numTracks = jsonObject.getJSONArray("tracklist").length();
 
             if (masterFormat == null) {
                 searchMatch = true;
@@ -453,7 +469,7 @@ public class DiscogSearch implements DatabaseSearch {
         String masterFormat = paramsFilter.getFirst("format");
         try {
             JSONObject jsonObject = resource.get(JSONObject.class);
-            albumVo = albumMappingList(jsonObject, album.getTitle(), masterFormat, size);
+            albumVo = albumMappingList(jsonObject, album, masterFormat, size);
 
             // }
         } catch (JSONException ex) {
@@ -483,7 +499,7 @@ public class DiscogSearch implements DatabaseSearch {
         try {
             // for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = resource.get(JSONObject.class);
-            return fullAlbumMapping(jsonObject, album.getTitle());
+            return fullAlbumMapping(jsonObject, album);
             // }
         } catch (JSONException ex) {
             LOG.error(DiscogSearch.class.getName(), ex);

@@ -70,4 +70,10 @@ public interface IAlbumVo {
 	void setGenres(List<String> genres);
 
     void setTracks(List<TrackInfo> tracks);
+
+	void setFolderImagePath(String folderImagePath);
+
+    String getFolderImagePath();
+
+	 AlbumVo clone();
 }

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AlbumVo implements IAlbumVo {
+public class AlbumVo implements IAlbumVo, Cloneable {
 	private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
 	private final static String VARIOUS="Various";
 	
@@ -50,6 +50,10 @@ public class AlbumVo implements IAlbumVo {
     }
 
     private String coverImageUrl;
+
+    public void setFolderImagePath(String folderImagePath) {
+        this.folderImagePath = folderImagePath;
+    }
 
     public String getFolderImagePath() {
         return folderImagePath;
@@ -308,4 +312,18 @@ public class AlbumVo implements IAlbumVo {
 			
 		}
 
+	public AlbumVo clone() {
+        AlbumVo o = null;
+		try {
+			// On récupère l'instance à renvoyer par l'appel de la
+			// méthode super.clone()
+			o = (AlbumVo) super.clone();
+		} catch(CloneNotSupportedException cnse) {
+			// Ne devrait jamais arriver car nous implémentons
+			// l'interface Cloneable
+			cnse.printStackTrace(System.err);
+		}
+		// on renvoie le clone
+		return o;
+	}
 }

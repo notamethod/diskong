@@ -26,8 +26,7 @@ import static javax.swing.UIManager.setLookAndFeel;
 public class UIInfos {
 
 
-    public static void main(String[] args)
-            throws Exception {
+    public static void main(String[] args) {
 
         UIManager.LookAndFeelInfo auxLaF = null;
         UIManager.LookAndFeelInfo forcedLaf = null;

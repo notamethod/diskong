@@ -108,15 +108,13 @@ class OauthConfig extends JDialog {
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 		
 			JButton okButton = new JButton("OK");
-			okButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					try {
-						save((String)comboName.getSelectedItem(), txtRequestUrl.getText(), textAccessUrl.getText(),
-								textAutUrl.getText());
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+			okButton.addActionListener(e -> {
+				try {
+					save((String)comboName.getSelectedItem(), txtRequestUrl.getText(), textAccessUrl.getText(),
+							textAutUrl.getText());
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 			});
 			okButton.setActionCommand("OK");

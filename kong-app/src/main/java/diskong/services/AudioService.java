@@ -58,8 +58,10 @@ public class AudioService {
             }
             //FIXME:check parser creation
             diskong.core.AlbumVo avo =  parseDirectory(entry);
-            albums.add(avo);
-            model.setAlbums(albums);
+            if (!avo.getState().equals(TagState.NOTRACKS)) {
+                albums.add(avo);
+                model.setAlbums(albums);
+            }
 
 
             long endTime = System.currentTimeMillis();
@@ -86,7 +88,7 @@ public class AudioService {
             ExecutorService executor = Executors.newFixedThreadPool(10);
             List<Future<diskong.core.TrackInfo>> list = new ArrayList<>();
             for (FilePath fPath : entry.getValue()) {
-                LOG.trace(fPath.getFile().getAbsolutePath());
+                LOG.debug(fPath.getFile().getAbsolutePath());
                 Callable<diskong.core.TrackInfo> worker = new CallTrackInfo(fPath, autoParser);
                 Future<diskong.core.TrackInfo> submit = executor.submit(worker);
                 list.add(submit);
@@ -106,8 +108,10 @@ public class AudioService {
             }
             executor.shutdown();
 
-            if (album.getTracks().isEmpty())
+            if (album.getTracks().isEmpty()) {
+                LOG.info("Album or folder without tracks:" + album.toString() + album.getTracks().size());
                 album.setState(diskong.core.TagState.NOTRACKS);
+            }
             else
                 LOG.info("Album parsed:" + album.toString() + album.getTracks().size());
             //model.setAlbums(albums);

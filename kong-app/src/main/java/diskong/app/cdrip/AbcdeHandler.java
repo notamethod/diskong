@@ -61,7 +61,7 @@ public class AbcdeHandler {
             is = classLoader.getResourceAsStream("abcde.conf");
 
             @NotNull
-            URL u = classLoader.getResource("abcde.conf");
+            URL u = Objects.requireNonNull(classLoader.getResource("abcde.conf"));
 
             configurationFileName = Paths.get(u.toURI()).toFile().getAbsolutePath();
             is = classLoader.getResourceAsStream("abcde.conf");
@@ -179,16 +179,11 @@ public class AbcdeHandler {
 
     private String parseHeader(String line) {
         String trimedString = line.replaceAll("----", "");
-//        String[] strArray = trimedString.split(" ");
-//        for (int i = 0; i < 4; i++) {
-//            trimedString = trimedString.replaceAll(strArray[i], "");
-//        }
-        if (null!=trimedString){
-            String[] split = trimedString.split("/");
-            if (split.length==2){
-                artist=split[0].trim();
-                album = split[1].trim();
-            }
+
+        String[] split = trimedString.split("/");
+        if (split.length==2){
+            artist=split[0].trim();
+            album = split[1].trim();
         }
         return trimedString;
     }

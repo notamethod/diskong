@@ -28,7 +28,6 @@ public class Arguments {
 	private List<String> liste = new ArrayList<>();
 	
 	public void add(ArgAction actionTag, Property prop) {
-		// TODO Auto-generated method stub
 		StringBuilder buf = new StringBuilder();
 		buf.append(actionTag.getString()).append(prop.getName().contains(":")?prop.getName().split(":")[1]:prop.getName());//.append(" ");
 		liste.add(buf.toString());
@@ -36,7 +35,6 @@ public class Arguments {
 	}
 
 	public void add(ArgAction actionTag, String prop) {
-		// TODO Auto-generated method stub
 		StringBuilder buf = new StringBuilder();
 		buf.append(actionTag.getString()).append(prop.contains(":")?prop.split(":")[1]:prop);//.append(" ");
 		liste.add(buf.toString());
