@@ -23,5 +23,5 @@ abcde
 metatag
 
 <div align="left">
-        <img width="72%" src="/info/dk114.png" alt="Diskong logo" title="first logo"</img>
+        <img width="20%" src="/info/dk114.png" alt="Diskong logo" title="first logo"</img>
 </div>
