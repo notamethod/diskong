@@ -25,6 +25,7 @@
         <module>kong-core</module>
         <module>discogs-client</module>
         <module>kong-app</module>
+        <module>distribution</module>
 
     </modules>
     <name>Diskong</name>
@@ -146,6 +147,7 @@
         </dependency>
     </dependencies>
     <build>
+
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
