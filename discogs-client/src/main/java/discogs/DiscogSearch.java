@@ -20,7 +20,6 @@ import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.*;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import diskong.api.AbstractDatabase;
 import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
 import diskong.core.AlbumVo;
@@ -37,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.transform.sax.SAXSource;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -168,12 +166,13 @@ public class DiscogSearch implements DatabaseSearch {
             e.printStackTrace();
         }
         IAlbumVo albumInfo = null;
+        List<IAlbumVo> masters = new ArrayList<>();
         try {
             for (IAlbumVo albumInfoTmp : albumMapping(jsonObject, album.getTitle())) {
                 IAlbumVo albumInfoTmp3 = findReleaseById(albumInfoTmp, URL_MASTER_);
 
                 albumInfo = albumInfoTmp;
-                break;
+                masters.add(albumInfoTmp);
             }
 
 
@@ -181,40 +180,56 @@ public class DiscogSearch implements DatabaseSearch {
             //TODO: exception
             e.printStackTrace();
         }
-
-        if (albumInfo == null) {
+        if (masters.isEmpty()) {
             throw new EmptyResultException(album.getTitle());
         }
+        IAlbumVo albumInfo3 = null;
+        for (IAlbumVo ivo : masters){
+             albumInfo3 = GetNReleaseFromMaster(ivo, album.getTracks().size());
+             if (albumInfo3.getTracks().size() == album.getTracks().size())
+                 break;
+        }
+        return albumInfo3;
+
+    }
+
+    private IAlbumVo GetNReleaseFromMaster(IAlbumVo albumInfo, int size) throws ApiConfigurationException, EmptyResultException {
+
         MultivaluedMap<String, String> params = new MultivaluedMapImpl();
         params.add("country", DEFAULT_REGION);
         params.add("format", DEFAULT_FORMAT);
         IAlbumVo albumInfo2 = null;
         try {
-            albumInfo2 = findReleaseFromMaster(albumInfo, params, album.getTracks().size());
+            albumInfo2 = findReleaseFromMaster(albumInfo, params, size);
 
         } catch (EmptyResultException e) {
             params.remove("country");
             //params.putSingle("country", DEFAULT_COUNTRY);
             try {
-                albumInfo2 = findReleaseFromMaster(albumInfo, params, album.getTracks().size());
+                albumInfo2 = findReleaseFromMaster(albumInfo, params, size);
             } catch (EmptyResultException e1) {
                 params.remove("format");
-                albumInfo2 = findReleaseFromMaster(albumInfo, params, album.getTracks().size());
+                try {
+                    albumInfo2 = findReleaseFromMaster(albumInfo, params, size);
+                } catch (EmptyResultException e2) {
+                    e2.printStackTrace();
+                }
             }
         }
 
 
         //use other filter
         if (albumInfo2 == null) {
+            //TODO
             throw new EmptyResultException("");
         }
         fillAlbum(albumInfo, albumInfo2);
+        //get detail from release
         IAlbumVo albumInfo3 = findReleaseById(albumInfo2);
         fillAlbum(albumInfo, albumInfo3);
 
         return albumInfo;
     }
-
     private JSONObject searchMaster(String artist, String title) throws URIException, ApiConfigurationException {
 
         StringBuilder sb = new StringBuilder();
@@ -303,13 +318,12 @@ public class DiscogSearch implements DatabaseSearch {
             }
             try {
                 albumInfo.setCoverImageUrl(result.getString("cover_image"));
-                System.out.println("image"+result.getString("cover_image"));
             } catch (JSONException j) {
                 j.printStackTrace();
             }
             albumInfo.setStyles(result.getJSONArray("style"));
             albumInfo.setGenres(result.getJSONArray("genre"));
-
+            LOG.info("release id: "+result.getString("id"));
             albumInfo.setId(result.getString("id"));
             albumInfos.add(albumInfo);
         }
