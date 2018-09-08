@@ -25,10 +25,7 @@ import diskong.core.AlbumVo;
 
 import diskong.core.IAlbumVo;
 import diskong.core.TrackInfo;
-import diskong.gui.AlbumModel;
-import diskong.gui.GenericForm;
-import diskong.gui.TrackModel;
-import diskong.gui.TrackTagModel;
+import diskong.gui.*;
 import diskong.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -264,6 +261,9 @@ public class DetailForm extends JDialog implements EventListener {
                 }
             }
         });
+
+        TableColumnAdjuster tca = new TableColumnAdjuster(table1);
+        tca.adjustColumns();
     }
 
     /**
@@ -316,8 +316,10 @@ public class DetailForm extends JDialog implements EventListener {
     private void createUIComponents() {
         model = new TrackModel(albumOri.getTracks());
         table1 = new JTable(model);
-        table1.getColumnModel().getColumn(0).setPreferredWidth(10);
-        table1.getColumnModel().getColumn(1).setPreferredWidth(150);
+        //jp.setLayout(new GridLayout(1,1)); /* little trick ;) and believe me that this step is important to the automatic all columns resize! A import is also needed for using GridLayout*/
+        table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // this is obvius part
+//        table1.getColumnModel().getColumn(0).setPreferredWidth(10);
+//        table1.getColumnModel().getColumn(1).setPreferredWidth(150);
 
     }
 

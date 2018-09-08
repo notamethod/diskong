@@ -19,6 +19,7 @@ package diskong.gui;
 import diskong.core.TrackInfo;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -34,6 +35,7 @@ public class TrackModel extends AbstractTableModel{
     private String[] colName=new String[]{"Num.", "Title","Artist"};
     public TrackModel(List<TrackInfo> tracks) {
         this.tracks = tracks;
+        Collections.sort(this.tracks);
     }
 
     public void setElements(List<TrackInfo> tracks) {

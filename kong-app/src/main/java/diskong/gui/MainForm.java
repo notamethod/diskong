@@ -18,7 +18,6 @@ package diskong.gui;
 
 import diskong.app.detail.DetailForm;
 import diskong.app.tagger.TaggerException;
-import diskong.app.tagger.TaggerForm;
 import diskong.core.AlbumVo;
 import diskong.core.FilePath;
 import diskong.core.IAlbumVo;
@@ -39,7 +38,6 @@ import org.dpr.swingtools.components.JDropText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -49,7 +47,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -305,6 +302,7 @@ class MainForm {
         scrollPane1.getViewport().setOpaque(false);
         table1.setRowHeight(48);
         table1.setOpaque(false);
+        analyzeDirButton  = new JButton();
         pathField = new JDropText();
         pathField.setEditable(true);
         pathField.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
