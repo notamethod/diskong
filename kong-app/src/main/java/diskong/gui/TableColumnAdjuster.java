@@ -239,7 +239,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
      */
     public void setDynamicAdjustment(boolean isDynamicAdjustment)
     {
-        //  May need to add or remove the TableModelListener when changed
+        //  May need to addTrack or remove the TableModelListener when changed
 
         if (this.isDynamicAdjustment != isDynamicAdjustment)
         {

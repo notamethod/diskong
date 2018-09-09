@@ -76,4 +76,6 @@ public interface IAlbumVo {
     String getFolderImagePath();
 
 	 AlbumVo clone();
+
+	String getYear();
 }

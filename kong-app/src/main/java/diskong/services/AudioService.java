@@ -97,7 +97,7 @@ public class AudioService {
             for (Future<diskong.core.TrackInfo> future : list) {
                 try {
                     TrackInfo tinf = future.get();
-                    album.add(tinf); // (metafile)
+                    album.addTrack(tinf); // (metafile)
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 } catch (WrongTrackAlbumException e) {

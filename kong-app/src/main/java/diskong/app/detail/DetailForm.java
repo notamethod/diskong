@@ -34,6 +34,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
 import javax.swing.plaf.metal.MetalSliderUI;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -60,6 +61,7 @@ public class DetailForm extends JDialog implements EventListener {
     private JToggleButton togglePlayButton;
     private JButton prevBtn;
     private JButton button1;
+    private JLabel year;
     private BasicSliderUI sliderUi;
     private MySwingWorker worker;
     private List<GuiListener> listeners;
@@ -139,6 +141,7 @@ public class DetailForm extends JDialog implements EventListener {
                     styles.setText(String.join(", ", a2.getStyles()));
 
                     genres.setText(String.join(", ", a2.getGenres()));
+                    year.setText(a2.getYear());
                 }
 
             }
@@ -148,6 +151,7 @@ public class DetailForm extends JDialog implements EventListener {
         pageTitle.setText(albumOri.getArtist() + " - " + albumOri.getTitle());
         styles.setText(String.join(", ", albumOri.getStyles()));
         genres.setText(String.join(", ", albumOri.getGenres()));
+        year.setText(albumOri.getYear());
 
         // setting (if any) image from folder
         if (albumOri.getFolderImagePath() != null) {
@@ -263,7 +267,9 @@ public class DetailForm extends JDialog implements EventListener {
         });
 
         TableColumnAdjuster tca = new TableColumnAdjuster(table1);
+        tca.setColumnHeaderIncluded(false);
         tca.adjustColumns();
+
     }
 
     /**
@@ -297,12 +303,12 @@ public class DetailForm extends JDialog implements EventListener {
     }
 
     private void onOK() {
-        // add your code here
+        // addTrack your code here
         dispose();
     }
 
     private void onCancel() {
-        // add your code here if necessary
+        // addTrack your code here if necessary
         dispose();
     }
 
@@ -316,10 +322,20 @@ public class DetailForm extends JDialog implements EventListener {
     private void createUIComponents() {
         model = new TrackModel(albumOri.getTracks());
         table1 = new JTable(model);
-        //jp.setLayout(new GridLayout(1,1)); /* little trick ;) and believe me that this step is important to the automatic all columns resize! A import is also needed for using GridLayout*/
+        //make transparent background
+        scrollPane1 = new JScrollPane(table1);
+        scrollPane1.setOpaque(false);
+        scrollPane1.setViewportBorder(null);
+        scrollPane1.setBorder(BorderFactory.createEmptyBorder());
+        table1.setBorder(BorderFactory.createEmptyBorder());
+        table1.setOpaque(false);
+        //table1.setTableHeader(null);
+        //don't show header
+        table1.getTableHeader().setUI(null);
+        ((DefaultTableCellRenderer)table1.getDefaultRenderer(Object.class)).setOpaque(false);
+        //autoresize columns
         table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // this is obvius part
-//        table1.getColumnModel().getColumn(0).setPreferredWidth(10);
-//        table1.getColumnModel().getColumn(1).setPreferredWidth(150);
+
 
     }
 

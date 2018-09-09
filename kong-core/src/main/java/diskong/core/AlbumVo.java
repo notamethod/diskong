@@ -26,18 +26,24 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class AlbumVo implements IAlbumVo, Cloneable {
-	private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
-	private final static String VARIOUS="Various";
-	
-	private List<TrackInfo> tracks = new ArrayList<>();
-	private String title;
-	private String artist;
-	private String id;
+    private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
+    private final static String VARIOUS = "Various";
+
+    private List<TrackInfo> tracks = new ArrayList<>();
+    private String title;
+    private String artist;
+    private String id;
 
     @Override
     public String getCoverImageUrl() {
@@ -60,205 +66,225 @@ public class AlbumVo implements IAlbumVo, Cloneable {
     }
 
     private String folderImagePath;
-	
-	private List<String> styles;
-	private List<String> genres;
-	private List<String> images;
 
-	private boolean exactMatch=true;
-	public boolean isExactMatch() {
-		return exactMatch;
-	}
-	public void setExactMatch(boolean exactMatch) {
-		this.exactMatch = exactMatch;
-	}
+    private List<String> styles;
+    private List<String> genres;
+    private List<String> images;
 
-	@Override
-	public void setGenres(List<String> genres) {
+    private LocalDate releaseDate;
+
+    private boolean exactMatch = true;
+
+    public boolean isExactMatch() {
+        return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+        this.exactMatch = exactMatch;
+    }
+
+    @Override
+    public void setGenres(List<String> genres) {
         this.genres = genres;
 
-	}
+    }
 
-	private TagState tagState;
+    private TagState tagState;
 
-	public void add(Metadata metadata) {
-		
-	}
-	// add track to album
-	private void add(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException {
-		// check if all tracks in folder belong to same album
-		if (metadata.get(Metadata.CONTENT_TYPE).contains("flac") || metadata.get(Metadata.CONTENT_TYPE).contains("vorbis")) {
-			if (title == null) {
-				title = metadata.get(XMPDM.ALBUM);
-			} else if (!title.equals(metadata.get(XMPDM.ALBUM))) {
-				// wrong album ?
-				throw new WrongTrackAlbumException(metadata);
-			}
-			if (artist == null) {
-				artist = metadata.get(XMPDM.ARTIST);
-			} else if (!artist.equals(metadata.get(XMPDM.ARTIST))) {
-				// wrong artist or various ?
-				artist=VARIOUS;
-				//throw new WrongTrackArtistException(metadata);
-			}
-			if (genres == null) {
-				genres = MetaUtils.getGenre(metadata);
+    public void addTrack(Metadata metadata) {
 
-			}
-//			else if (!genre.equals(metadata.get(XMPDM.GENRE))) {
-//				genres.add(metadata.get(XMPDM.GENRE));
-//			}
-			if (styles == null) {
-				styles = MetaUtils.getStyle(metadata);
-//				styles= new ArrayList<>();
-//				styles.add(style);
-			}
-//			else if (!style.equals(metadata.get(MetaUtils.STYLE))) {
-//				styles.add(metadata.get(MetaUtils.STYLE));
-//			}
-			tracks.add(new TrackInfo(fPath, metadata));
+    }
 
-		} else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") && (fPath.getFile().getName().toLowerCase().contains("folder") ||fPath.getFile().getName().toLowerCase().contains("cover"))){
-			LOG.debug("cover image found " + fPath.getFile().getName());
-			folderImagePath = fPath.getFile().getAbsolutePath();
-		}
-		else {
-			LOG.debug("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
-		}
-	}
+    /**
+     * Add track to album
+     * @param fPath
+     * @param metadata
+     * @throws WrongTrackAlbumException
+     */
+    private void addTrack(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException {
+        // check if all tracks in folder belong to same album
+        if (metadata.get(Metadata.CONTENT_TYPE).contains("flac") || metadata.get(Metadata.CONTENT_TYPE).contains("vorbis")) {
+            if (title == null) {
+                title = metadata.get(XMPDM.ALBUM);
+            } else if (!title.equals(metadata.get(XMPDM.ALBUM))) {
+                // wrong album ?
+                throw new WrongTrackAlbumException(metadata);
+            }
+            if (artist == null) {
+                artist = metadata.get(XMPDM.ARTIST);
+            } else if (!artist.equals(metadata.get(XMPDM.ARTIST))) {
+                // wrong artist or various ?
+                artist = VARIOUS;
+                //throw new WrongTrackArtistException(metadata);
+            }
+            if (genres == null) {
+                genres = MetaUtils.getGenre(metadata);
 
-	@Override
-	public String toString() {
+            }
 
-		return "AlbumVo [title=" + title + ", artist=" + artist /* + ", tracks=" + tracks + "]"*/;
-	}
+            if (styles == null) {
+                styles = MetaUtils.getStyle(metadata);
+            }
 
-	public List<TrackInfo> getTracks() {
-		return tracks;
-	}
+            if (releaseDate == null) {
+                //may be a date or a year (afaik)
+                String dateInString = metadata.get(XMPDM.RELEASE_DATE);
+                final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                try {
+                    releaseDate = LocalDate.parse(dateInString, dtf);
+                } catch (DateTimeParseException e) {
+                    try {
+                        int a = Integer.parseInt(dateInString);
+                        releaseDate = LocalDate.parse(dateInString + "-01-01", dtf);
+                    } catch (DateTimeParseException | NumberFormatException e1) {
+                        System.out.println("date error " + dateInString);
+                    }
+                }
+            }
 
-	public void setTracks(List<TrackInfo> tracks) {
-		this.tracks = tracks;
-		Collections.sort(this.tracks);
-	}
+            tracks.add(new TrackInfo(fPath, metadata));
 
-	@Override
-	public String getId() {
-		return id;
-	}
+        } else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") && (fPath.getFile().getName().toLowerCase().contains("folder") || fPath.getFile().getName().toLowerCase().contains("cover"))) {
+            LOG.debug("cover image found " + fPath.getFile().getName());
+            folderImagePath = fPath.getFile().getAbsolutePath();
+        } else {
+            LOG.debug("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
+        }
+    }
 
-	@Override
-	public void setId(String id) {
-		this.id=id;
+    @Override
+    public String toString() {
 
-	}
+        return "AlbumVo [title=" + title + ", artist=" + artist /* + ", tracks=" + tracks + "]"*/;
+    }
 
-	/* (non-Javadoc)
-	 * @see diskong.IAlbumVo#getTitle()
-	 */
-	@Override
-	public String getTitle() {
-		return title;
-	}
+    public List<TrackInfo> getTracks() {
+        return tracks;
+    }
 
-	/* (non-Javadoc)
-	 * @see diskong.IAlbumVo#setTitle(java.lang.String)
-	 */
-	@Override
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setTracks(List<TrackInfo> tracks) {
+        this.tracks = tracks;
+        Collections.sort(this.tracks);
+    }
 
-	/* (non-Javadoc)
-	 * @see diskong.IAlbumVo#getArtist()
-	 */
-	@Override
-	public String getArtist() {
-		return artist;
-	}
+    @Override
+    public String getId() {
+        return id;
+    }
 
-	/* (non-Javadoc)
-	 * @see diskong.IAlbumVo#setArtist(java.lang.String)
-	 */
-	@Override
-	public void setArtist(String artist) {
-		this.artist = artist;
-	}
+    @Override
+    public void setId(String id) {
+        this.id = id;
 
-	@Override
-	public void setGenre(String genre) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public String getStyle() {
-		if (styles!=null && !styles.isEmpty()){
-			return styles.get(0);
-		}
-		return null;
-	}
+    /* (non-Javadoc)
+     * @see diskong.IAlbumVo#getTitle()
+     */
+    @Override
+    public String getTitle() {
+        return title;
+    }
 
-	@Override
-	public void setStyle(String style) {
-		styles = new ArrayList<>();
-		styles.add(style);
-		
-	}
+    /* (non-Javadoc)
+     * @see diskong.IAlbumVo#setTitle(java.lang.String)
+     */
+    @Override
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	@Override
-	public String getGenre() {
-		if (genres!=null){
-			return genres.get(0);
-		}
-		return null;
-	}
-	@Override
-	public void setStyles(JSONArray jsonArray) {
-		styles = new ArrayList<>();
-		for (int i=0; i<jsonArray.length(); i++) {
-			try {
-				styles.add( jsonArray.getString(i) );
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-	}
+    /* (non-Javadoc)
+     * @see diskong.IAlbumVo#getArtist()
+     */
+    @Override
+    public String getArtist() {
+        return artist;
+    }
 
-	@Override
-	public void setStyles(List<String> styles) {
-		this.styles = styles;
+    /* (non-Javadoc)
+     * @see diskong.IAlbumVo#setArtist(java.lang.String)
+     */
+    @Override
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
 
-	}
+    @Override
+    public void setGenre(String genre) {
+        // TODO Auto-generated method stub
 
-	@Override
-		public void setGenres(JSONArray jsonArray) {
-			genres = new ArrayList<>();
-			for (int i=0; i<jsonArray.length(); i++) {
-				try {
-					genres.add( jsonArray.getString(i) );
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			
-		}
+    }
+
+    @Override
+    public String getStyle() {
+        if (styles != null && !styles.isEmpty()) {
+            return styles.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public void setStyle(String style) {
+        styles = new ArrayList<>();
+        styles.add(style);
+
+    }
+
+    @Override
+    public String getGenre() {
+        if (genres != null) {
+            return genres.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public void setStyles(JSONArray jsonArray) {
+        styles = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                styles.add(jsonArray.getString(i));
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    @Override
+    public void setStyles(List<String> styles) {
+        this.styles = styles;
+
+    }
+
+    @Override
+    public void setGenres(JSONArray jsonArray) {
+        genres = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                genres.add(jsonArray.getString(i));
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+    }
 
     @Override
     public void setTracks(JSONArray jsonArray) {
         tracks = new ArrayList<>();
-        for (int i=0; i<jsonArray.length(); i++) {
+        for (int i = 0; i < jsonArray.length(); i++) {
             try {
-                JSONObject result=jsonArray.getJSONObject(i);
+                JSONObject result = jsonArray.getJSONObject(i);
                 Metadata metadata = new Metadata();
-				metadata.set(TikaCoreProperties.TITLE, (String) result.get("title"));
-				 metadata.set(XMPDM.TRACK_NUMBER, (String) result.get("position"));
-				metadata.set(XMPDM.DURATION, (String) result.get("duration"));
+                metadata.set(TikaCoreProperties.TITLE, (String) result.get("title"));
+                metadata.set(XMPDM.TRACK_NUMBER, (String) result.get("position"));
+                metadata.set(XMPDM.DURATION, (String) result.get("duration"));
                 TrackInfo track = new TrackInfo(metadata);
-				tracks.add(track);
+                tracks.add(track);
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -267,29 +293,31 @@ public class AlbumVo implements IAlbumVo, Cloneable {
         Collections.sort(tracks);
     }
 
-	@Override
-	public void setImages(JSONArray jsonArray) {
-		images = new ArrayList<>();
-		for (int i=0; i<jsonArray.length(); i++) {
-			try {
-				images.add( jsonArray.getString(i) );
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+    @Override
+    public void setImages(JSONArray jsonArray) {
+        images = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                images.add(jsonArray.getString(i));
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
-	}
-		@Override
-		public List<String> getStyles() {
-			// TODO Auto-generated method stub
-			return styles;
-		}
-		@Override
-		public List<String> getGenres() {
-			// TODO Auto-generated method stub
-			return genres;
-		}
+    }
+
+    @Override
+    public List<String> getStyles() {
+        // TODO Auto-generated method stub
+        return styles;
+    }
+
+    @Override
+    public List<String> getGenres() {
+        // TODO Auto-generated method stub
+        return genres;
+    }
 
     @Override
     public List<String> getImages() {
@@ -297,33 +325,40 @@ public class AlbumVo implements IAlbumVo, Cloneable {
     }
 
     public TagState getState() {
-			if (tagState==null)
-				return  TagState.UNKNOWN;
-			return tagState;
-			
-		}
-		
-		public void setState(TagState state) {
-			tagState=state;
-			
-		}
-		public void add(TrackInfo trackInfo) throws WrongTrackAlbumException {
-			add(trackInfo.getfPath(), trackInfo.getMetadata());
-			
-		}
+        if (tagState == null)
+            return TagState.UNKNOWN;
+        return tagState;
 
-	public AlbumVo clone() {
+    }
+
+    public void setState(TagState state) {
+        tagState = state;
+
+    }
+
+    public void addTrack(TrackInfo trackInfo) throws WrongTrackAlbumException {
+        addTrack(trackInfo.getfPath(), trackInfo.getMetadata());
+
+    }
+
+    public AlbumVo clone() {
         AlbumVo o = null;
-		try {
-			// On récupère l'instance à renvoyer par l'appel de la
-			// méthode super.clone()
-			o = (AlbumVo) super.clone();
-		} catch(CloneNotSupportedException cnse) {
-			// Ne devrait jamais arriver car nous implémentons
-			// l'interface Cloneable
-			cnse.printStackTrace(System.err);
-		}
-		// on renvoie le clone
-		return o;
-	}
+        try {
+            // On récupère l'instance à renvoyer par l'appel de la
+            // méthode super.clone()
+            o = (AlbumVo) super.clone();
+        } catch (CloneNotSupportedException cnse) {
+            // Ne devrait jamais arriver car nous implémentons
+            // l'interface Cloneable
+            cnse.printStackTrace(System.err);
+        }
+        // on renvoie le clone
+        return o;
+    }
+
+    @Override
+    public String getYear() {
+        return (releaseDate == null ? "" : String.valueOf(releaseDate.getYear()));
+
+    }
 }

@@ -122,7 +122,7 @@ class MassFlac {
 				for (Future<diskong.core.TrackInfo> future : list) {
 					try {
 						diskong.core.TrackInfo tinf = future.get();
-						album.add(tinf); // (metafile)
+						album.addTrack(tinf); // (metafile)
 					} catch (InterruptedException |ExecutionException e) {
 						e.printStackTrace();
 					} catch (WrongTrackAlbumException e) {
