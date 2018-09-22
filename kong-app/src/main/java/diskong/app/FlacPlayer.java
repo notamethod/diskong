@@ -311,6 +311,8 @@ public class FlacPlayer implements Player {
         }
     }
 
+    //TODO volume control
+    //FloatControl volume= (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
 
 }
 

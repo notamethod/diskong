@@ -17,76 +17,65 @@
 package diskong.gui;
 
 import diskong.app.detail.DetailForm;
-import diskong.app.tagger.TaggerException;
 import diskong.core.AlbumVo;
 import diskong.core.FilePath;
-import diskong.core.IAlbumVo;
-import diskong.Utils;
-import diskong.api.ApiConfigurationException;
-import diskong.app.cdrip.GuiPreferences;
-import diskong.app.cdrip.RipForm;
 import diskong.core.TagState;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
-import diskong.parser.MetaUtils;
 import diskong.parser.NioDirectoryParser;
 import diskong.services.AlbumService;
 import diskong.services.AudioService;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.XMPDM;
 import org.dpr.swingtools.components.JDropText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
-class MainForm {
-
+public class FileExplorer {
     private final static Logger LOG = LoggerFactory.getLogger(MainForm.class);
     protected AlbumService albumService = new AlbumService();
     private TableModelListener tListener;
+
+    public JPanel getMainPanel() {
+        return mainPanel;
+    }
+
     private AlbumModel model = new AlbumModel();
     private AudioService service = new AudioService();
     private Map<Path, List<FilePath>> map;
     private List<AlbumVo> albums = new ArrayList<>();
 
     private RetrieveAlbumsTasks worker;
-    private JPanel Panel1;
-    private JTable table1;
-    private JButton analyzeDirButton;
-    private JButton getImageButton;
-    private JLabel nbFiles;
-    private JProgressBar progressBar1;
-    private JScrollPane scrollPane1;
     private JDropText pathField;
+    private JButton analyzeDirButton;
     private JButton stopButton;
-    private JButton retagButton;
-    private JButton ripButton;
-    private JButton settingsButton;
-    private IAlbumVo originalInfo;
-    private IAlbumVo correctedInfo;
+    private JLabel nbFiles;
+    private JScrollPane scrollPane1;
+    private JPanel mainPanel;
+    private JTable table1;
+    private JProgressBar progressBar1;
 
 
-    public MainForm() {
+    public FileExplorer() {
 
-        
         analyzeDirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -108,92 +97,12 @@ class MainForm {
                 worker.cancel(true);
             }
         });
-
-
-        getImageButton.addActionListener(new ActionListener() {
+        pathField.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (table1.getSelectedRow() > -1) {
-                    AlbumVo album = model.getRow(table1.getSelectedRow());
-                    if (album.getFolderImagePath() == null || album.getFolderImagePath().isEmpty()) {
-                        IAlbumVo a2 = null;
-                        try {
-                            a2 = albumService.searchAlbum(album);
-                        } catch (ApiConfigurationException e) {
-                            LOG.error("oauth error", e);
-                            JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        if (a2.getCoverImageUrl() != null) {
-                            Path target = album.getTracks().get(0).getfPath().getPath().getParent();
-
-                            try {
-                                Utils.downloadFile(a2.getCoverImageUrl(), target.resolve("folder.jpg"));
-                                JOptionPane.showMessageDialog(null, "image recovered");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.out.println("xxx");
             }
         });
-        retagButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                RetagSelectionDialog dialog = new RetagSelectionDialog();
-                dialog.pack();
-                dialog.setVisible(true);
-               Map<String, Boolean> map =  dialog.getretagElements();
-                Metadata data = checkRetagNeeded(originalInfo, correctedInfo);
-                if (map.get("style")!=null) {
-                    MetaUtils.setStyle(correctedInfo, data);
-                    MetaUtils.setGenre(correctedInfo, data);
-                }
-
-                albumService.setSimulate(false);
-                try {
-                    try {
-                        albumService.searchAlbumByID(correctedInfo);
-                    } catch (ApiConfigurationException e) {
-                        e.printStackTrace();
-                    }
-                    albumService.retagAlbum(data, originalInfo);
-                } catch (TaggerException e) {
-                    LOG.error("error", e);
-                    JOptionPane.showMessageDialog(null,
-                            e.getMessage(), "information", JOptionPane.ERROR_MESSAGE);
-
-                }
-
-            }
-        });
-        ripButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                JFrame frame = new JFrame("RipForm");
-                frame.setContentPane(new RipForm().getJPanelOne());
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//                try {
-//                    frame.setIconImage(ImageIO.read(new FileInputStream("images/dk114.png")));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-                frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icon110.png"));
-
-                frame.pack();
-                frame.setVisible(true);
-            }
-        });
-        settingsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                GuiPreferences gui = new GuiPreferences();
-                gui.pack();
-                gui.setVisible(true);
-            }
-        });
-
         table1.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent mouseEvent) {
                 JTable table =(JTable) mouseEvent.getSource();
@@ -211,36 +120,9 @@ class MainForm {
                 }
             }
         });
-
     }
-
 
     public static void main(String[] args) {
-        MainForm mf = new MainForm();
-        mf.init();
-    }
-
-    private Metadata checkRetagNeeded(IAlbumVo source, IAlbumVo dest) {
-        Metadata data = null;
-        if (dest != null) {
-            data = new Metadata();
-            if ((dest.getTitle() != null) && !Objects.equals(dest.getTitle(), source.getTitle())) {
-                data.set(XMPDM.ALBUM, dest.getTitle());
-            }
-            if ((dest.getArtist() != null) && !Objects.equals(dest.getArtist(), source.getArtist())) {
-                data.set(XMPDM.ARTIST, dest.getArtist());
-            }
-
-//TODO /masters/{master_id}
-        }
-        //TODO must return null if metadata empty
-        return data;
-    }
-
-
-
-    public void init() {
-
         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
             if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
                 try {
@@ -251,29 +133,16 @@ class MainForm {
                 break;
             }
         }
-        JFrame frame = new JFrame("MainForm");
-        frame.setContentPane(new MainForm().Panel1);
+        JFrame frame = new JFrame("FileExplorer");
+        frame.setContentPane(new FileExplorer().mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        Image img = Toolkit.getDefaultToolkit().getImage("images/icon110.png");
 
-        try {
-            img = ImageIO.read(getClass().getResource("/images/icon110.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        frame.setIconImage(img);
-        pathField.setEditable(false);
         frame.pack();
         frame.setVisible(true);
-
     }
 
     private void createUIComponents() {
-
-
-        table1 = new JTable(model);
+        table1 = new JTable(null);
         scrollPane1 = new JScrollPane(table1);
         scrollPane1.setOpaque(false);
         scrollPane1.getViewport().setOpaque(false);
@@ -284,7 +153,6 @@ class MainForm {
         pathField.setEditable(true);
         pathField.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }
-
     private void parseDir(File file) {
         DirectoryParser dirParser = new NioDirectoryParser();
         map = dirParser.parse(file.getAbsolutePath());

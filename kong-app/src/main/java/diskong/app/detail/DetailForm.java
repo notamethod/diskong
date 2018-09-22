@@ -270,6 +270,15 @@ public class DetailForm extends JDialog implements EventListener {
         tca.setColumnHeaderIncluded(false);
         tca.adjustColumns();
 
+        jlImg.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                ImageOnlyDialog dialog = new ImageOnlyDialog(albumOri);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        });
     }
 
     /**
