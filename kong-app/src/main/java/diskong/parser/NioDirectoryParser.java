@@ -17,6 +17,7 @@
 package diskong.parser;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import diskong.core.FilePath;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,11 +48,15 @@ public class NioDirectoryParser implements DirectoryParser {
 	private Map<Path, List<FilePath>> map = new HashMap<>();
 
 
-	public Map<Path, List<FilePath>> parse(String dirName) {
-		Path dirPath = FileSystems.getDefault().getPath(dirName);
+	public Map<Path, List<FilePath>> parse(@NotNull File file) throws FileNotFoundException {
+		//Path dirPath = FileSystems.getDefault().getPath(dirName);
+        if (!file.exists()){
+            throw  new FileNotFoundException(file.getAbsolutePath());
+        }
+		Path dirPath = file.toPath();
 		long startTime = System.currentTimeMillis();
 
-		LOG.debug("parsing..." + dirName);
+		LOG.debug("parsing..." + file.getAbsolutePath());
 		parsePath(dirPath);
 		long endTime = System.currentTimeMillis();
 		LOG.info(cpt + " files parsed in " + (endTime - startTime) + " ms");

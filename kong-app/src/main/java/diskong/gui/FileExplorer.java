@@ -41,6 +41,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -155,7 +156,12 @@ public class FileExplorer {
     }
     private void parseDir(File file) {
         DirectoryParser dirParser = new NioDirectoryParser();
-        map = dirParser.parse(file.getAbsolutePath());
+        try {
+            map = dirParser.parse(file);
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "File not found: " + e.getLocalizedMessage(), "error", JOptionPane.ERROR_MESSAGE);
+
+        }
         if (!map.isEmpty())
             analyzeDirButton.setEnabled(true);
         nbFiles.setText(String.valueOf(map.size()));

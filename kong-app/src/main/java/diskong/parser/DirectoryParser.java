@@ -18,6 +18,8 @@ package diskong.parser;
 
 import diskong.core.FilePath;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,6 @@ import java.util.Map;
 
 public interface DirectoryParser {
 
-	Map<Path, List<FilePath>> parse(String absolutePath);
+	Map<Path, List<FilePath>> parse(File file) throws FileNotFoundException;
 
 }

@@ -16,10 +16,7 @@
 
 package diskong;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
@@ -48,6 +45,8 @@ import diskong.parser.DirectoryParser;
 import diskong.parser.MetaUtils;
 import diskong.parser.CallTrackInfo;
 import diskong.parser.NioDirectoryParser;
+
+import javax.swing.*;
 
 
 //
@@ -84,7 +83,13 @@ class MassFlac {
 		checkTagged = 0;
 		taggedTrack = 0;
 		DirectoryParser dirParser = new NioDirectoryParser();
-		Map<Path, List<FilePath>> map = dirParser.parse(file.getAbsolutePath());
+		Map<Path, List<FilePath>> map = null;
+		try {
+			map = dirParser.parse(file);
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File not found: " + e.getLocalizedMessage(), "error", JOptionPane.ERROR_MESSAGE);
+
+		}
 		traiterDir(map);
 		System.out.println("END...tagged tracks:" + taggedTrack);
 	}
