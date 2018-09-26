@@ -46,6 +46,8 @@ public class DkMainWindow implements ListAlbumListener {
     private JButton settingsButton;
     private PlayerForm playerForm;
     private JPanel playerPanel;
+    private JSplitPane verticalSplit;
+    private JSplitPane hzSplit;
     private JFrame frame;
 
 
@@ -88,7 +90,7 @@ public class DkMainWindow implements ListAlbumListener {
     }
 
     public void init() {
-
+        System.out.println("xxxxxxxxxxxxxxxxxxxxx");
         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
             if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
                 try {
@@ -100,6 +102,7 @@ public class DkMainWindow implements ListAlbumListener {
             }
         }
         frame = new JFrame("Diskong");
+        System.out.println("frame "+frame);
         frame.setContentPane(new DkMainWindow().mainPanel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Image img = Toolkit.getDefaultToolkit().getImage("images/icon110.png");
@@ -124,8 +127,12 @@ public class DkMainWindow implements ListAlbumListener {
 
     @Override
     public void actionRequested(AlbumVo album) {
+        System.out.println("frame2 "+frame);
         try {
             playerForm = new PlayerForm(album);
+            Dimension dim=playerForm.getMainPanel().getSize();
+            playerPanel.setPreferredSize(dim);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -144,13 +151,22 @@ public class DkMainWindow implements ListAlbumListener {
 
         playerPanel.revalidate();
         playerPanel.repaint();
-        playerPanel.add(playerForm.getMainPanel(), "FORM_ONE");
+
 
         final CardLayout cl = (CardLayout) playerPanel.getLayout();
         playerPanel.add(playerForm.getMainPanel(), BorderLayout.SOUTH);
         playerForm.getMainPanel().setVisible(true);
 
-        playerPanel.revalidate();
-        playerPanel.repaint();
+
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this.mainPanel);
+        if (frame!=null){
+            System.out.println("pack");
+            frame.pack();
+        }
+        if (topFrame!=null){
+            System.out.println("pack");
+            topFrame.pack();
+        }
+
     }
 }
