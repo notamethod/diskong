@@ -22,10 +22,11 @@ import diskong.api.GuiListener;
 import diskong.app.FlacPlayer;
 import diskong.app.tagger.TaggerForm;
 import diskong.core.AlbumVo;
-
 import diskong.core.IAlbumVo;
 import diskong.core.TrackInfo;
-import diskong.gui.*;
+import diskong.gui.GenericForm;
+import diskong.gui.TableColumnAdjuster;
+import diskong.gui.TrackModel;
 import diskong.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,70 +44,44 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailForm extends JDialog implements EventListener {
+import static javax.swing.UIManager.setLookAndFeel;
 
-    private final static Logger LOG = LoggerFactory.getLogger(DetailForm.class);
-    private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+public class PlayerForm implements EventListener {
+    public JPanel getMainPanel() {
+        return mainPanel;
+    }
+
+    private final static Logger LOG = LoggerFactory.getLogger(PlayerForm.class);
+    private JPanel mainPanel;
     private JScrollPane scrollPane1;
-    private TrackModel model;
     private JTable table1;
-    private JButton analyseButton;
-    private JLabel pageTitle;
+    private JButton prevBtn;
+    private JToggleButton togglePlayButton;
+    private JButton button1;
     private JLabel styles;
     private JLabel genres;
     private JLabel jlImg;
-    private JSlider musicSlider;
-    private JToggleButton togglePlayButton;
-    private JButton prevBtn;
-    private JButton button1;
+    private JLabel pageTitle;
     private JLabel year;
+    private JButton analyseButton;
+    private JSlider musicSlider;
+    private TrackModel model;
     private BasicSliderUI sliderUi;
-    private MySwingWorker worker;
+    private PlayerForm.MySwingWorker worker;
     private List<GuiListener> listeners;
-
     AlbumVo albumOri;
 
-    public DetailForm(AlbumVo albumOri) throws IOException {
+
+    public PlayerForm(AlbumVo albumOri) throws IOException {
         //Test txo test 3
         this.albumOri = albumOri;
-        setContentPane(contentPane);
-        setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
+
         sliderUi = new MetalSliderUI();
         listeners = new ArrayList<>();
         // musicSlider.setUI(sliderUi);
         musicSlider.setPaintTrack(true);
-        musicSlider.setUI(new ColoredThumbSliderUIx(musicSlider, Color.red));
+        musicSlider.setUI(new PlayerForm.ColoredThumbSliderUI(musicSlider, Color.red));
         //setPaintTrack(
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
 
         analyseButton.addActionListener(new ActionListener() {
             @Override
@@ -176,6 +151,7 @@ public class DetailForm extends JDialog implements EventListener {
 
             public void mouseReleased(MouseEvent ev) {
                 moveSlider(ev);
+                //request seek to player
                 for (GuiListener listener : listeners) {
                     listener.seekRequested((double) musicSlider.getValue() / musicSlider.getMaximum());
                 }
@@ -195,7 +171,7 @@ public class DetailForm extends JDialog implements EventListener {
                 if (selected && worker == null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            worker = new MySwingWorker(albumOri, 0);
+                            worker = new PlayerForm.MySwingWorker(albumOri, 0);
                             worker.execute();
 
                         }
@@ -243,7 +219,7 @@ public class DetailForm extends JDialog implements EventListener {
             public void mousePressed(MouseEvent mouseEvent) {
                 JTable table = (JTable) mouseEvent.getSource();
                 Point point = mouseEvent.getPoint();
-               final int row = table.rowAtPoint(point);
+                final int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
                     togglePlayButton.setSelected(true);
                     //worker not null: a track is playing
@@ -255,7 +231,7 @@ public class DetailForm extends JDialog implements EventListener {
                     }else{
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                worker = new MySwingWorker(albumOri, row);
+                                worker = new PlayerForm.MySwingWorker(albumOri, row);
                                 worker.execute();
 
                             }
@@ -310,22 +286,23 @@ public class DetailForm extends JDialog implements EventListener {
     private void moveSlider(MouseEvent ev) {
 //        musicSlider.setValue(sliderUi.valueForXPosition(ev.getX()));
     }
-
-    private void onOK() {
-        // addTrack your code here
-        dispose();
-    }
-
-    private void onCancel() {
-        // addTrack your code here if necessary
-        dispose();
-    }
-
     public static void main(String[] args) throws IOException {
-        DetailForm dialog = new DetailForm(new AlbumVo());
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
+        for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+            if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
+                try {
+                    setLookAndFeel(info.getClassName());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+        JFrame frame = new JFrame("FileExplorer");
+        frame.setContentPane(new PlayerForm(null).mainPanel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        frame.pack();
+        frame.setVisible(true);
     }
 
     private void createUIComponents() {
@@ -347,7 +324,6 @@ public class DetailForm extends JDialog implements EventListener {
 
 
     }
-
     @Override
     public void componentUpdateRequested(double v) {
         setPosition(v);
@@ -359,7 +335,7 @@ public class DetailForm extends JDialog implements EventListener {
 
     }
 
-
+    //FIXME: needed ?
     public void addListener(GuiListener listener) {
         listeners.add(listener);
     }
@@ -376,7 +352,7 @@ public class DetailForm extends JDialog implements EventListener {
         protected AlbumVo doInBackground() {
             FlacPlayer player = new FlacPlayer(albumOri);
             addListener(player.getListener());
-            player.addListener(DetailForm.this);
+            player.addListener(PlayerForm.this);
             player.playAlbum(row);
             return null;
         }
@@ -394,11 +370,11 @@ public class DetailForm extends JDialog implements EventListener {
      * UIManager.put("Slider.shadow", Color.red);
      * UIManager.put("Slider.background", Color.red);
      */
-    class ColoredThumbSliderUIx extends BasicSliderUI {
+    class ColoredThumbSliderUI extends BasicSliderUI {
 
         Color thumbColor;
 
-        ColoredThumbSliderUIx(JSlider s, Color tColor) {
+        ColoredThumbSliderUI(JSlider s, Color tColor) {
             super(s);
             thumbColor = tColor;
         }

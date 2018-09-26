@@ -18,9 +18,11 @@ package diskong.app;
 
 
 
+import diskong.api.ListAlbumListener;
 import diskong.app.cdrip.GuiPreferences;
 import diskong.app.cdrip.RipForm;
-import diskong.app.detail.DetailForm;
+import diskong.app.detail.PlayerForm;
+import diskong.core.AlbumVo;
 import diskong.gui.AlbumModel;
 import diskong.gui.FileExplorer;
 
@@ -36,12 +38,16 @@ import java.io.IOException;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
-public class DkMainWindow {
+public class DkMainWindow implements ListAlbumListener {
     private JPanel mainPanel;
     private JTree tree1;
     private FileExplorer fileExplorerPane;
     private JButton ripButton;
     private JButton settingsButton;
+    private PlayerForm playerForm;
+    private JPanel playerPanel;
+    private JFrame frame;
+
 
     public static void main(String[] args) {
         DkMainWindow dkmw= new DkMainWindow();
@@ -51,6 +57,7 @@ public class DkMainWindow {
     public DkMainWindow() {
         Dimension minimumSize = new Dimension(800, 100);
         fileExplorerPane.getMainPanel().setMinimumSize(minimumSize);
+        fileExplorerPane.addListener(this);
         ripButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -92,7 +99,7 @@ public class DkMainWindow {
                 break;
             }
         }
-        JFrame frame = new JFrame("Diskong");
+        frame = new JFrame("Diskong");
         frame.setContentPane(new DkMainWindow().mainPanel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Image img = Toolkit.getDefaultToolkit().getImage("images/icon110.png");
@@ -108,5 +115,42 @@ public class DkMainWindow {
         frame.pack();
         frame.setVisible(true);
 
+    }
+
+    private void createUIComponents() throws IOException {
+//       playerForm = new PlayerForm(new AlbumVo());
+//        playerForm.getMainPanel().setVisible(false);
+    }
+
+    @Override
+    public void actionRequested(AlbumVo album) {
+        try {
+            playerForm = new PlayerForm(album);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Get the components in the panel
+        Component[] componentList = playerPanel.getComponents();
+
+//Loop through the components
+        for(Component c : componentList){
+
+                //Remove it
+                playerPanel.remove(c);
+            }
+
+
+
+        playerPanel.revalidate();
+        playerPanel.repaint();
+        playerPanel.add(playerForm.getMainPanel(), "FORM_ONE");
+
+        final CardLayout cl = (CardLayout) playerPanel.getLayout();
+        playerPanel.add(playerForm.getMainPanel(), BorderLayout.SOUTH);
+        playerForm.getMainPanel().setVisible(true);
+
+        playerPanel.revalidate();
+        playerPanel.repaint();
     }
 }

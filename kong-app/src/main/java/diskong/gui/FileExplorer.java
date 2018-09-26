@@ -16,7 +16,8 @@
 
 package diskong.gui;
 
-import diskong.app.detail.DetailForm;
+import diskong.api.ListAlbumListener;
+import diskong.app.DkMainWindow;
 import diskong.core.AlbumVo;
 import diskong.core.FilePath;
 import diskong.core.TagState;
@@ -45,6 +46,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 
@@ -73,10 +75,13 @@ public class FileExplorer {
     private JPanel mainPanel;
     private JTable table1;
     private JProgressBar progressBar1;
+    private List<ListAlbumListener> listenToTableAlbum;
 
 
     public FileExplorer() {
 
+
+        listenToTableAlbum = new ArrayList<>();
         analyzeDirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -101,7 +106,7 @@ public class FileExplorer {
         pathField.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                System.out.println("xxx");
+                //dunno
             }
         });
         table1.addMouseListener(new MouseAdapter() {
@@ -110,14 +115,9 @@ public class FileExplorer {
                 Point point = mouseEvent.getPoint();
                 int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
-                    DetailForm gui = null;
-                    try {
-                        gui = new DetailForm(((AlbumModel)table.getModel()).getRow(table.getSelectedRow()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    for (ListAlbumListener listener : listenToTableAlbum) {
+                        listener.actionRequested(((AlbumModel)table.getModel()).getRow(table.getSelectedRow()));
                     }
-                    gui.pack();
-                    gui.setVisible(true);
                 }
             }
         });
@@ -166,6 +166,10 @@ public class FileExplorer {
             analyzeDirButton.setEnabled(true);
         nbFiles.setText(String.valueOf(map.size()));
         progressBar1.setMaximum(map.size());
+    }
+
+    public void addListener(DkMainWindow dkMainWindow) {
+        listenToTableAlbum.add(dkMainWindow);
     }
 
 

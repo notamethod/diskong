@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="515" height="409"/>
+      <xy x="20" y="20" width="639" height="705"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -46,13 +46,13 @@
             </constraints>
             <properties>
               <continuousLayout value="false"/>
-              <dividerLocation value="336"/>
+              <dividerLocation value="326"/>
               <orientation value="0"/>
+              <resizeWeight value="0.6"/>
             </properties>
             <border type="none"/>
             <children>
-              <grid id="aa72b" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                <margin top="0" left="0" bottom="0" right="0"/>
+              <grid id="aa72b" binding="playerPanel" layout-manager="CardLayout" hgap="0" vgap="0">
                 <constraints>
                   <splitpane position="right"/>
                 </constraints>
@@ -70,7 +70,7 @@
                 <children>
                   <nested-form id="77342" form-file="diskong/gui/FileExplorer.form" binding="fileExplorerPane">
                     <constraints>
-                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="1" use-parent-layout="false"/>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
                     </constraints>
                   </nested-form>
                 </children>

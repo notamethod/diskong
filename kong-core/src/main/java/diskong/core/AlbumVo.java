@@ -67,9 +67,9 @@ public class AlbumVo implements IAlbumVo, Cloneable {
 
     private String folderImagePath;
 
-    private List<String> styles;
-    private List<String> genres;
-    private List<String> images;
+    private List<String> styles = new ArrayList<>();
+    private List<String> genres = new ArrayList<>();
+    private List<String> images = new ArrayList<>();
 
     private LocalDate releaseDate;
 

@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package diskong.app;
+package diskong.api;
 
-import diskong.api.EventListener;
-import diskong.api.GuiListener;
+import diskong.core.AlbumVo;
 
+public interface ListAlbumListener {
+    void actionRequested(AlbumVo album);
 
-public interface Player {
-    void addListener(EventListener myListener);
-
-    GuiListener getListener();
 }
