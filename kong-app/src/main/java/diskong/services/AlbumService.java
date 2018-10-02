@@ -91,7 +91,7 @@ public class AlbumService {
             alInfos = ds.searchRelease(album);
             if (alInfos.getStyles() != null && alInfos.getStyles().isEmpty())
                 alInfos.setStyle(UNKNOWN);
-            LOG.debug(alInfos.getStyle() + " " + alInfos.getGenre());
+            LOG.debug("style "+alInfos.getStyle() + " genre " + alInfos.getGenre());
             if (null == alInfos.getArtist() || alInfos.getArtist().isEmpty())
                 alInfos.setArtist(album.getArtist());
             if (null == alInfos.getArtist() || alInfos.getArtist().isEmpty() || !alInfos.getTitle().equals(album.getTitle()))

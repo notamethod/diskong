@@ -28,6 +28,7 @@ import diskong.gui.FileExplorer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -35,6 +36,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
@@ -117,12 +119,18 @@ public class DkMainWindow implements ListAlbumListener {
 
         frame.pack();
         frame.setVisible(true);
-
     }
 
     private void createUIComponents() throws IOException {
-//       playerForm = new PlayerForm(new AlbumVo());
-//        playerForm.getMainPanel().setVisible(false);
+        ResourceBundle rb = ResourceBundle.getBundle("Messages");
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(rb.getString("explorer.root"));
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(rb.getString("explorer.local"));
+        root.add(node);
+
+
+        //create the tree by passing in the root node
+        tree1 = new JTree(root);
+
     }
 
     @Override

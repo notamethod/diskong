@@ -301,44 +301,17 @@ class MainForm {
     }
 
 
-    private class MonSwingWorker extends SwingWorker {
-
-        public MonSwingWorker() {
-
-        }
-
-        public MonSwingWorker(AlbumModel model, int i) {
-        }
-
-        @Override
-        public Integer doInBackground() {
-
-            File f = new File(pathField.getText());
-            parseDir(f);
-            if (tListener != null)
-                table1.getModel().removeTableModelListener(tListener);
-            table1.setModel(model);
-            tListener = e -> progressBar1.setValue(table1.getModel().getRowCount());
-            table1.getModel().addTableModelListener(tListener);
-
-            albums = service.traiterDir(map, model);
-
-            //model.setAlbums(albums);
-
-            return 0;
-        }
-
-
-        @Override
-        protected void done() {
-
-        }
-    }
 
     class RetrieveAlbumsTasks extends
             SwingWorker<List<AlbumVo>, AlbumVo> {
         RetrieveAlbumsTasks(TableModel model, int numbersToFind) {
             //initialize
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+            progressBar1.setValue(progressBar1.getMaximum());
         }
 
         @Override

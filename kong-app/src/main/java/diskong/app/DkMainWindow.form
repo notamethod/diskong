@@ -3,9 +3,12 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="639" height="705"/>
+      <xy x="20" y="20" width="700" height="705"/>
     </constraints>
-    <properties/>
+    <properties>
+      <minimumSize width="-1" height="-1"/>
+      <preferredSize width="900" height="800"/>
+    </properties>
     <border type="none"/>
     <children>
       <toolbar id="84570">
@@ -33,10 +36,12 @@
       </toolbar>
       <splitpane id="28f08" binding="hzSplit">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="1" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <dividerLocation value="100"/>
+          <dividerLocation value="140"/>
+          <dividerSize value="0"/>
+          <oneTouchExpandable value="true"/>
         </properties>
         <border type="none"/>
         <children>
@@ -65,27 +70,63 @@
                 <constraints>
                   <splitpane position="left"/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <minimumSize width="0" height="0"/>
+                  <preferredSize width="0" height="0"/>
+                </properties>
                 <border type="none"/>
                 <children>
                   <nested-form id="77342" form-file="diskong/gui/FileExplorer.form" binding="fileExplorerPane">
                     <constraints>
-                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="1" use-parent-layout="false"/>
                     </constraints>
                   </nested-form>
                 </children>
               </grid>
             </children>
           </splitpane>
-          <component id="235b7" class="javax.swing.JTree" binding="tree1" default-binding="true">
+          <grid id="af752" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <splitpane position="left"/>
             </constraints>
-            <properties/>
-            <clientProperties>
-              <JTree.lineStyle class="java.lang.String" value=""/>
-            </clientProperties>
-          </component>
+            <properties>
+              <minimumSize width="120" height="143"/>
+              <preferredSize width="120" height="483"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <scrollpane id="67a5b">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="235b7" class="javax.swing.JTree" binding="tree1" custom-create="true" default-binding="true">
+                    <constraints/>
+                    <properties>
+                      <font name="DejaVu Sans" size="14" style="1"/>
+                      <maximumSize width="-1" height="-1"/>
+                      <minimumSize width="120" height="0"/>
+                    </properties>
+                    <clientProperties>
+                      <JTree.lineStyle class="java.lang.String" value=""/>
+                    </clientProperties>
+                  </component>
+                </children>
+              </scrollpane>
+              <component id="4e115" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <icon value="images/dk114.png"/>
+                  <text value=""/>
+                </properties>
+              </component>
+            </children>
+          </grid>
         </children>
       </splitpane>
     </children>

@@ -26,6 +26,7 @@ import diskong.parser.DirectoryParser;
 import diskong.parser.NioDirectoryParser;
 import diskong.services.AlbumService;
 import diskong.services.AudioService;
+import org.dpr.swingtools.TextEventListener;
 import org.dpr.swingtools.components.JDropText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ import java.util.Map;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
-public class FileExplorer {
+public class FileExplorer implements TextEventListener {
     private final static Logger LOG = LoggerFactory.getLogger(MainForm.class);
     protected AlbumService albumService = new AlbumService();
     private TableModelListener tListener;
@@ -78,9 +79,22 @@ public class FileExplorer {
     private List<ListAlbumListener> listenToTableAlbum;
 
 
-    public FileExplorer() {
+    @Override
+    public void textChanged(String text) {
+        SwingUtilities.invokeLater(new Runnable() {
 
+            public void run() {
+                /* Démarrage de l'interface graphique et du SwingWorker. */
 
+                worker = new RetrieveAlbumsTasks(model, 2);
+                worker.execute();
+            }
+        });
+    }
+
+    public FileExplorer()
+
+    {
         listenToTableAlbum = new ArrayList<>();
         analyzeDirButton.addActionListener(new ActionListener() {
             @Override
@@ -121,6 +135,7 @@ public class FileExplorer {
                 }
             }
         });
+        pathField.addListener(this);
     }
 
     public static void main(String[] args) {
@@ -134,6 +149,10 @@ public class FileExplorer {
                 break;
             }
         }
+        UIManager.put("ProgressBar.background", Color.ORANGE);
+        UIManager.put("ProgressBar.foreground", Color.BLUE);
+        UIManager.put("ProgressBar.selectionBackground", Color.RED);
+        UIManager.put("ProgressBar.selectionForeground", Color.GREEN);
         JFrame frame = new JFrame("FileExplorer");
         frame.setContentPane(new FileExplorer().mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -149,12 +168,14 @@ public class FileExplorer {
         scrollPane1.getViewport().setOpaque(false);
         table1.setRowHeight(48);
         table1.setOpaque(false);
+       // table1.setTableHeader(null);
         analyzeDirButton  = new JButton();
         pathField = new JDropText();
         pathField.setEditable(true);
         pathField.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }
     private void parseDir(File file) {
+        progressBar1.setVisible(true);
         DirectoryParser dirParser = new NioDirectoryParser();
         try {
             map = dirParser.parse(file);
@@ -166,6 +187,7 @@ public class FileExplorer {
             analyzeDirButton.setEnabled(true);
         nbFiles.setText(String.valueOf(map.size()));
         progressBar1.setMaximum(map.size());
+
     }
 
     public void addListener(DkMainWindow dkMainWindow) {
@@ -173,44 +195,19 @@ public class FileExplorer {
     }
 
 
-    private class MonSwingWorker extends SwingWorker {
 
-        public MonSwingWorker() {
-
-        }
-
-        public MonSwingWorker(AlbumModel model, int i) {
-        }
-
-        @Override
-        public Integer doInBackground() {
-
-            File f = new File(pathField.getText());
-            parseDir(f);
-            if (tListener != null)
-                table1.getModel().removeTableModelListener(tListener);
-            table1.setModel(model);
-            tListener = e -> progressBar1.setValue(table1.getModel().getRowCount());
-            table1.getModel().addTableModelListener(tListener);
-
-            albums = service.traiterDir(map, model);
-
-            //model.setAlbums(albums);
-
-            return 0;
-        }
-
-
-        @Override
-        protected void done() {
-
-        }
-    }
 
     class RetrieveAlbumsTasks extends
             SwingWorker<List<AlbumVo>, AlbumVo> {
         RetrieveAlbumsTasks(TableModel model, int numbersToFind) {
             //initialize
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+                progressBar1.setValue(progressBar1.getMaximum());
+
         }
 
         @Override

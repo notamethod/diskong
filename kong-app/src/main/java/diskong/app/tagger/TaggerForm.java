@@ -173,10 +173,10 @@ public class TaggerForm extends JDialog {
             }
         });
 
-        pageTitle.setText(albumOri.getArtist() + " - " + albumOri.getTitle());
-        styles.setText(String.join(", ", albumOri.getStyles()));
+        pageTitle.setText(albumOri.getArtist() + " - " + albumNew.getTitle());
+        styles.setText(String.join(", ", albumNew.getStyles()));
 
-        genres.setText(String.join(", ", albumOri.getGenres()));
+        genres.setText(String.join(", ", albumNew.getGenres()));
 
 
         if (albumNew.getCoverImageUrl() != null) {

@@ -26,6 +26,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.AttributeList;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -44,6 +45,7 @@ public class AlbumVo implements IAlbumVo, Cloneable {
     private String title;
     private String artist;
     private String id;
+    private List arts = new ArrayList();
 
     @Override
     public String getCoverImageUrl() {
@@ -119,34 +121,49 @@ public class AlbumVo implements IAlbumVo, Cloneable {
             }
             if (genres == null) {
                 genres = MetaUtils.getGenre(metadata);
-
+            }
+            if (genres.isEmpty()){
+                genres.addAll(MetaUtils.getGenre(metadata));
             }
 
             if (styles == null) {
                 styles = MetaUtils.getStyle(metadata);
             }
 
+            if (styles.isEmpty()){
+                styles.addAll(MetaUtils.getStyle(metadata));
+            }
+
             if (releaseDate == null) {
                 //may be a date or a year (afaik)
                 String dateInString = metadata.get(XMPDM.RELEASE_DATE);
                 final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                try {
-                    releaseDate = LocalDate.parse(dateInString, dtf);
-                } catch (DateTimeParseException e) {
+                if (dateInString != null) {
+
                     try {
-                        int a = Integer.parseInt(dateInString);
-                        releaseDate = LocalDate.parse(dateInString + "-01-01", dtf);
-                    } catch (DateTimeParseException | NumberFormatException e1) {
-                        System.out.println("date error " + dateInString);
+                        releaseDate = LocalDate.parse(dateInString, dtf);
+                    } catch (DateTimeParseException e) {
+                        try {
+                            int a = Integer.parseInt(dateInString);
+                            releaseDate = LocalDate.parse(dateInString + "-01-01", dtf);
+                        } catch (DateTimeParseException | NumberFormatException e1) {
+                            System.out.println("date error " + dateInString);
+                        }
                     }
                 }
             }
 
             tracks.add(new TrackInfo(fPath, metadata));
 
-        } else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") && (fPath.getFile().getName().toLowerCase().contains("folder") || fPath.getFile().getName().toLowerCase().contains("cover"))) {
-            LOG.debug("cover image found " + fPath.getFile().getName());
-            folderImagePath = fPath.getFile().getAbsolutePath();
+        } else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") ){
+            if (fPath.getFile().getName().toLowerCase().contains("folder") || fPath.getFile().getName().toLowerCase().contains("cover"))
+            {
+                LOG.debug("cover image found " + fPath.getFile().getName());
+                folderImagePath = fPath.getFile().getAbsolutePath();
+            }
+            else{
+                arts.add(fPath);
+            }
         } else {
             LOG.debug("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
         }
