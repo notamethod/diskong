@@ -38,24 +38,17 @@ package diskong.app;
  */
 
 
+import io.nayuki.flac.common.StreamInfo;
+import io.nayuki.flac.decode.FlacDecoder;
 
-import java.awt.Dimension;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Map;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
 import javax.swing.plaf.metal.MetalSliderUI;
-
-import io.nayuki.flac.common.StreamInfo;
-import io.nayuki.flac.decode.FlacDecoder;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 
 
 /**

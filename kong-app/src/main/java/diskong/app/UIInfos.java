@@ -20,7 +20,6 @@ import javax.swing.*;
 import java.util.Map;
 import java.util.Set;
 
-import static javax.swing.UIManager.addAuxiliaryLookAndFeel;
 import static javax.swing.UIManager.setLookAndFeel;
 
 public class UIInfos {

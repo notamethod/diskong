@@ -39,9 +39,7 @@ public class Slider extends JDialog {
                 break;
             }
         }
-        for (Window window : Window.getWindows())
-
-        {
+        for (Window window : Window.getWindows()) {
             SwingUtilities.updateComponentTreeUI(window);
         }
         setContentPane(contentPane);
@@ -95,4 +93,5 @@ public class Slider extends JDialog {
         dialog.setVisible(true);
         System.exit(0);
     }
+
 }

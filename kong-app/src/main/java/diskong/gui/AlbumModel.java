@@ -23,25 +23,23 @@ import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class AlbumModel extends AbstractTableModel{
 
-    private List<AlbumVo> albums;
+    private List<AlbumVo> albums = new ArrayList<>();
 
     public AlbumModel() {
         super();
         //albums= new ArrayList<>();
     }
 
-    private String[] colName=new String[]{"Title","Artist","style", "image"};
-    public AlbumModel(List<AlbumVo> albums) {
-        this.albums = albums;
-    }
+    private String[] colName=new String[]{"Title","Artist","style", "year", "image"};
 
     public void setAlbums(List<AlbumVo> albums) {
-        this.albums = albums;
+        this.albums.addAll(albums);
         fireTableDataChanged();
     }
 
@@ -65,7 +63,7 @@ public class AlbumModel extends AbstractTableModel{
     @Override
     public Class<?> getColumnClass(int column) {
         switch (column) {
-            case 3:
+            case 4:
                 return ImageIcon.class;
             default:
                 return super.getColumnClass(column);
@@ -86,6 +84,8 @@ public class AlbumModel extends AbstractTableModel{
             case 2:
                 return album.getStyle();
             case 3:
+                return album.getYear();
+            case 4:
                 if (album.getFolderImagePath()!=null){
                     ImageIcon imgi;
                     try {
@@ -106,5 +106,9 @@ public class AlbumModel extends AbstractTableModel{
 
     public AlbumVo getRow(int row){
         return albums.get(row);
+    }
+
+    public void clear() {
+        this.albums.clear();
     }
 }

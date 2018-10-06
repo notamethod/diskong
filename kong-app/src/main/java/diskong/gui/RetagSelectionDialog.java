@@ -82,7 +82,7 @@ public class RetagSelectionDialog extends JDialog {
     }
 
     public Map getretagElements() {
-       return retagElements;
+        return retagElements;
     }
 
     public static void main(String[] args) {
@@ -91,4 +91,5 @@ public class RetagSelectionDialog extends JDialog {
         dialog.setVisible(true);
         System.exit(0);
     }
+
 }

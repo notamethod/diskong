@@ -17,17 +17,15 @@
 package diskong;
 
 import diskong.api.ApiConfigurationException;
-import diskong.core.AlbumVo;
 import diskong.core.EmptyResultException;
 import diskong.core.IAlbumVo;
 import diskong.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import javax.swing.*;
-
 import java.awt.event.*;
+import java.util.List;
 
 public class SearchDialog extends JDialog {
     private final static Logger LOG = LoggerFactory.getLogger(SearchDialog.class);
@@ -73,7 +71,7 @@ public class SearchDialog extends JDialog {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                 AlbumService albumService = new AlbumService();
+                AlbumService albumService = new AlbumService();
                 try {
                     List<IAlbumVo> values = albumService.searchArtist(tfArtist.getText(), tfTitle.getText());
                     nbCount.setText(String.valueOf(values.size()));
@@ -133,4 +131,5 @@ public class SearchDialog extends JDialog {
         dialog.setVisible(true);
         System.exit(0);
     }
+
 }

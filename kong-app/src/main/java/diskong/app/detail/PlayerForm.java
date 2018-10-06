@@ -79,6 +79,7 @@ public class PlayerForm implements EventListener {
         sliderUi = new MetalSliderUI();
         listeners = new ArrayList<>();
         // musicSlider.setUI(sliderUi);
+
         musicSlider.setPaintTrack(true);
         musicSlider.setUI(new PlayerForm.ColoredThumbSliderUI(musicSlider, Color.red));
         //setPaintTrack(
@@ -228,7 +229,7 @@ public class PlayerForm implements EventListener {
                         for (GuiListener listener : listeners) {
                             listener.selectTrackRequested(row);
                         }
-                    }else{
+                    } else {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 worker = new PlayerForm.MySwingWorker(albumOri, row);
@@ -273,6 +274,7 @@ public class PlayerForm implements EventListener {
             }
         });
     }
+
     //select a row in the table (the row being payed)
     public void selectRow(int t) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -286,6 +288,7 @@ public class PlayerForm implements EventListener {
     private void moveSlider(MouseEvent ev) {
 //        musicSlider.setValue(sliderUi.valueForXPosition(ev.getX()));
     }
+
     public static void main(String[] args) throws IOException {
         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
             if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
@@ -318,12 +321,13 @@ public class PlayerForm implements EventListener {
         //table1.setTableHeader(null);
         //don't show header
         table1.getTableHeader().setUI(null);
-        ((DefaultTableCellRenderer)table1.getDefaultRenderer(Object.class)).setOpaque(false);
+        ((DefaultTableCellRenderer) table1.getDefaultRenderer(Object.class)).setOpaque(false);
         //autoresize columns
         table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // this is obvius part
 
 
     }
+
     @Override
     public void componentUpdateRequested(double v) {
         setPosition(v);
@@ -344,8 +348,9 @@ public class PlayerForm implements EventListener {
     private class MySwingWorker extends
             SwingWorker<AlbumVo, Integer> {
         Integer row;
+
         public MySwingWorker(AlbumVo albumOri, Integer intValue) {
-            row=intValue;
+            row = intValue;
         }
 
         @Override

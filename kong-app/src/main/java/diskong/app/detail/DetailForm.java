@@ -22,10 +22,11 @@ import diskong.api.GuiListener;
 import diskong.app.FlacPlayer;
 import diskong.app.tagger.TaggerForm;
 import diskong.core.AlbumVo;
-
 import diskong.core.IAlbumVo;
 import diskong.core.TrackInfo;
-import diskong.gui.*;
+import diskong.gui.GenericForm;
+import diskong.gui.TableColumnAdjuster;
+import diskong.gui.TrackModel;
 import diskong.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,7 @@ public class DetailForm extends JDialog implements EventListener {
     public DetailForm(AlbumVo albumOri) throws IOException {
         //Test txo test 3
         this.albumOri = albumOri;
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -243,7 +245,7 @@ public class DetailForm extends JDialog implements EventListener {
             public void mousePressed(MouseEvent mouseEvent) {
                 JTable table = (JTable) mouseEvent.getSource();
                 Point point = mouseEvent.getPoint();
-               final int row = table.rowAtPoint(point);
+                final int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
                     togglePlayButton.setSelected(true);
                     //worker not null: a track is playing
@@ -252,7 +254,7 @@ public class DetailForm extends JDialog implements EventListener {
                         for (GuiListener listener : listeners) {
                             listener.selectTrackRequested(row);
                         }
-                    }else{
+                    } else {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 worker = new MySwingWorker(albumOri, row);
@@ -297,6 +299,7 @@ public class DetailForm extends JDialog implements EventListener {
             }
         });
     }
+
     //select a row in the table (the row being payed)
     public void selectRow(int t) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -341,7 +344,7 @@ public class DetailForm extends JDialog implements EventListener {
         //table1.setTableHeader(null);
         //don't show header
         table1.getTableHeader().setUI(null);
-        ((DefaultTableCellRenderer)table1.getDefaultRenderer(Object.class)).setOpaque(false);
+        ((DefaultTableCellRenderer) table1.getDefaultRenderer(Object.class)).setOpaque(false);
         //autoresize columns
         table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // this is obvius part
 
@@ -368,8 +371,9 @@ public class DetailForm extends JDialog implements EventListener {
     private class MySwingWorker extends
             SwingWorker<AlbumVo, Integer> {
         Integer row;
+
         public MySwingWorker(AlbumVo albumOri, Integer intValue) {
-            row=intValue;
+            row = intValue;
         }
 
         @Override

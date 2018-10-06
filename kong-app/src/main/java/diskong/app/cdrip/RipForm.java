@@ -18,7 +18,6 @@ package diskong.app.cdrip;
 
 import diskong.core.TrackInfo;
 import diskong.gui.TrackModel;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

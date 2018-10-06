@@ -16,15 +16,15 @@
 
 package diskong.gui;
 
+import diskong.Utils;
+import diskong.api.ApiConfigurationException;
+import diskong.app.cdrip.GuiPreferences;
+import diskong.app.cdrip.RipForm;
 import diskong.app.detail.DetailForm;
 import diskong.app.tagger.TaggerException;
 import diskong.core.AlbumVo;
 import diskong.core.FilePath;
 import diskong.core.IAlbumVo;
-import diskong.Utils;
-import diskong.api.ApiConfigurationException;
-import diskong.app.cdrip.GuiPreferences;
-import diskong.app.cdrip.RipForm;
 import diskong.core.TagState;
 import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
@@ -87,7 +87,8 @@ class MainForm {
 
     public MainForm() {
 
-        
+
+
         analyzeDirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -145,9 +146,9 @@ class MainForm {
                 RetagSelectionDialog dialog = new RetagSelectionDialog();
                 dialog.pack();
                 dialog.setVisible(true);
-               Map<String, Boolean> map =  dialog.getretagElements();
+                Map<String, Boolean> map = dialog.getretagElements();
                 Metadata data = checkRetagNeeded(originalInfo, correctedInfo);
-                if (map.get("style")!=null) {
+                if (map.get("style") != null) {
                     MetaUtils.setStyle(correctedInfo, data);
                     MetaUtils.setGenre(correctedInfo, data);
                 }
@@ -197,13 +198,13 @@ class MainForm {
 
         table1.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent mouseEvent) {
-                JTable table =(JTable) mouseEvent.getSource();
+                JTable table = (JTable) mouseEvent.getSource();
                 Point point = mouseEvent.getPoint();
                 int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
                     DetailForm gui = null;
                     try {
-                        gui = new DetailForm(((AlbumModel)table.getModel()).getRow(table.getSelectedRow()));
+                        gui = new DetailForm(((AlbumModel) table.getModel()).getRow(table.getSelectedRow()));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -237,7 +238,6 @@ class MainForm {
         //TODO must return null if metadata empty
         return data;
     }
-
 
 
     public void init() {
@@ -280,7 +280,7 @@ class MainForm {
         scrollPane1.getViewport().setOpaque(false);
         table1.setRowHeight(48);
         table1.setOpaque(false);
-        analyzeDirButton  = new JButton();
+        analyzeDirButton = new JButton();
         pathField = new JDropText();
         pathField.setEditable(true);
         pathField.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -299,7 +299,6 @@ class MainForm {
         nbFiles.setText(String.valueOf(map.size()));
         progressBar1.setMaximum(map.size());
     }
-
 
 
     class RetrieveAlbumsTasks extends
@@ -341,7 +340,6 @@ class MainForm {
                 if (!avo.getState().equals(TagState.NOTRACKS)) {
                     publish(avo);
                 }
-
 
 
 //                while (!enough && !isCancelled()) {

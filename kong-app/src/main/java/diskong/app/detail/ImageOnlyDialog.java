@@ -19,7 +19,6 @@ package diskong.app.detail;
 import diskong.core.IAlbumVo;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.net.MalformedURLException;
 
@@ -48,4 +47,5 @@ public class ImageOnlyDialog extends JDialog {
         dialog.setVisible(true);
         System.exit(0);
     }
+
 }

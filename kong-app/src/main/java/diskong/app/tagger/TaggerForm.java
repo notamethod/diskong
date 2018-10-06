@@ -17,11 +17,8 @@
 package diskong.app.tagger;
 
 import diskong.Utils;
-import diskong.api.ApiConfigurationException;
 import diskong.core.AlbumVo;
 import diskong.core.IAlbumVo;
-import diskong.gui.GenericForm;
-
 import diskong.gui.RetagSelectionDialog;
 import diskong.gui.TrackTagModel;
 import diskong.parser.MetaUtils;
@@ -63,8 +60,10 @@ public class TaggerForm extends JDialog {
 
         this(albumOri, null);
     }
+
     public TaggerForm(AlbumVo albumOri, IAlbumVo albumNew) {
         this.albumOri = albumOri;
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -182,7 +181,7 @@ public class TaggerForm extends JDialog {
         if (albumNew.getCoverImageUrl() != null) {
             Path target = Paths.get(System.getProperty("java.io.tmpdir"));
 
-            Path fullTarget = target.resolve(albumNew.getId()+".jpg");
+            Path fullTarget = target.resolve(albumNew.getId() + ".jpg");
             try {
                 Utils.downloadFile(albumNew.getCoverImageUrl(), fullTarget);
                 albumNew.setFolderImagePath(fullTarget.toString());

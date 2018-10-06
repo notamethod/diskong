@@ -16,12 +16,8 @@
 
 package diskong.parser;
 
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.concurrent.Callable;
-
 import diskong.core.FilePath;
+import diskong.core.TrackInfo;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
@@ -32,7 +28,10 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import diskong.core.TrackInfo;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.concurrent.Callable;
 
 public class CallTrackInfo implements Callable<TrackInfo> {
 	private final static Logger LOG = LoggerFactory.getLogger(CallTrackInfo.class);

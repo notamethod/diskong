@@ -17,24 +17,19 @@
 package diskong.app;
 
 
-
 import diskong.api.ListAlbumListener;
 import diskong.app.cdrip.GuiPreferences;
 import diskong.app.cdrip.RipForm;
 import diskong.app.detail.PlayerForm;
 import diskong.core.AlbumVo;
-import diskong.gui.AlbumModel;
 import diskong.gui.FileExplorer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
@@ -54,7 +49,7 @@ public class DkMainWindow implements ListAlbumListener {
 
 
     public static void main(String[] args) {
-        DkMainWindow dkmw= new DkMainWindow();
+        DkMainWindow dkmw = new DkMainWindow();
         dkmw.init();
     }
 
@@ -104,7 +99,7 @@ public class DkMainWindow implements ListAlbumListener {
             }
         }
         frame = new JFrame("Diskong");
-        System.out.println("frame "+frame);
+        System.out.println("frame " + frame);
         frame.setContentPane(new DkMainWindow().mainPanel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Image img = Toolkit.getDefaultToolkit().getImage("images/icon110.png");
@@ -121,7 +116,7 @@ public class DkMainWindow implements ListAlbumListener {
         frame.setVisible(true);
     }
 
-    private void createUIComponents() throws IOException {
+    private void createUIComponents() {
         ResourceBundle rb = ResourceBundle.getBundle("Messages");
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rb.getString("explorer.root"));
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(rb.getString("explorer.local"));
@@ -135,10 +130,10 @@ public class DkMainWindow implements ListAlbumListener {
 
     @Override
     public void actionRequested(AlbumVo album) {
-        System.out.println("frame2 "+frame);
+        System.out.println("frame2 " + frame);
         try {
             playerForm = new PlayerForm(album);
-            Dimension dim=playerForm.getMainPanel().getSize();
+            Dimension dim = playerForm.getMainPanel().getSize();
             playerPanel.setPreferredSize(dim);
 
         } catch (IOException e) {
@@ -149,12 +144,11 @@ public class DkMainWindow implements ListAlbumListener {
         Component[] componentList = playerPanel.getComponents();
 
 //Loop through the components
-        for(Component c : componentList){
+        for (Component c : componentList) {
 
-                //Remove it
-                playerPanel.remove(c);
-            }
-
+            //Remove it
+            playerPanel.remove(c);
+        }
 
 
         playerPanel.revalidate();
@@ -167,14 +161,15 @@ public class DkMainWindow implements ListAlbumListener {
 
 
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this.mainPanel);
-        if (frame!=null){
+        if (frame != null) {
             System.out.println("pack");
             frame.pack();
         }
-        if (topFrame!=null){
+        if (topFrame != null) {
             System.out.println("pack");
             topFrame.pack();
         }
 
     }
+
 }

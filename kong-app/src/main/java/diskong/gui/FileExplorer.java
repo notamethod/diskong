@@ -17,7 +17,6 @@
 package diskong.gui;
 
 import diskong.api.ListAlbumListener;
-import diskong.app.DkMainWindow;
 import diskong.core.AlbumVo;
 import diskong.core.FilePath;
 import diskong.core.TagState;
@@ -34,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,10 +42,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 
@@ -96,21 +92,7 @@ public class FileExplorer implements TextEventListener {
 
     {
         listenToTableAlbum = new ArrayList<>();
-        analyzeDirButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                SwingUtilities.invokeLater(new Runnable() {
 
-                    public void run() {
-                        /* Démarrage de l'interface graphique et du SwingWorker. */
-
-                        worker = new RetrieveAlbumsTasks(model, 2);
-                        worker.execute();
-                    }
-                });
-
-            }
-        });
         stopButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -136,6 +118,26 @@ public class FileExplorer implements TextEventListener {
             }
         });
         pathField.addListener(this);
+        table1.setModel(model);
+                table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        table1.getColumnModel().getColumn(0).setMinWidth(300);
+        table1.getColumnModel().getColumn(0).setPreferredWidth(500);
+        table1.getColumnModel().getColumn(0).setMaxWidth(500);
+        table1.getColumnModel().getColumn(1).setMinWidth(200);
+        table1.getColumnModel().getColumn(1).setPreferredWidth(300);
+        table1.getColumnModel().getColumn(1).setMaxWidth(300);
+        table1.getColumnModel().getColumn(2).setMinWidth(150);
+        table1.getColumnModel().getColumn(2).setPreferredWidth(300);
+        table1.getColumnModel().getColumn(2).setMaxWidth(300);
+        //year
+        table1.getColumnModel().getColumn(3).setMinWidth(50);
+        table1.getColumnModel().getColumn(3).setPreferredWidth(50);
+        table1.getColumnModel().getColumn(3).setMaxWidth(50);
+        table1.getColumnModel().getColumn(4).setMinWidth(50);
+        table1.getColumnModel().getColumn(4).setPreferredWidth(100);
+        table1.getColumnModel().getColumn(4).setMaxWidth(100);
+        table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
     }
 
     public static void main(String[] args) {
@@ -149,12 +151,9 @@ public class FileExplorer implements TextEventListener {
                 break;
             }
         }
-        UIManager.put("ProgressBar.background", Color.ORANGE);
-        UIManager.put("ProgressBar.foreground", Color.BLUE);
-        UIManager.put("ProgressBar.selectionBackground", Color.RED);
-        UIManager.put("ProgressBar.selectionForeground", Color.GREEN);
+        FileExplorer fe = new FileExplorer();
         JFrame frame = new JFrame("FileExplorer");
-        frame.setContentPane(new FileExplorer().mainPanel);
+        frame.setContentPane(fe.mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.pack();
@@ -162,17 +161,28 @@ public class FileExplorer implements TextEventListener {
     }
 
     private void createUIComponents() {
-        table1 = new JTable(null);
+        initializeAlbumTable();
         scrollPane1 = new JScrollPane(table1);
         scrollPane1.setOpaque(false);
         scrollPane1.getViewport().setOpaque(false);
-        table1.setRowHeight(48);
-        table1.setOpaque(false);
+//        scrollPane1.setMinimumSize(new Dimension(-1,250));
+//        scrollPane1.setPreferredSize(new Dimension(-1,250));
        // table1.setTableHeader(null);
         analyzeDirButton  = new JButton();
         pathField = new JDropText();
         pathField.setEditable(true);
         pathField.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    }
+
+    private void initializeAlbumTable(){
+        table1 = new JTable(null);
+
+        //topTopicsTable.setTableHeader(null);
+        Font topTopicsFont = new Font("Verdana",Font.PLAIN,12);
+        table1.setFont(topTopicsFont);
+        table1.setRowHeight(48);
+        table1.setOpaque(false);
+
     }
     private void parseDir(File file) {
         progressBar1.setVisible(true);
@@ -190,11 +200,9 @@ public class FileExplorer implements TextEventListener {
 
     }
 
-    public void addListener(DkMainWindow dkMainWindow) {
+    public void addListener(ListAlbumListener dkMainWindow) {
         listenToTableAlbum.add(dkMainWindow);
     }
-
-
 
 
     class RetrieveAlbumsTasks extends
@@ -213,11 +221,12 @@ public class FileExplorer implements TextEventListener {
         @Override
         public List<AlbumVo> doInBackground() {
             albums.clear();
+            model.clear();
             File f = new File(pathField.getText());
             parseDir(f);
             if (tListener != null)
                 table1.getModel().removeTableModelListener(tListener);
-            table1.setModel(model);
+            //table1.setModel(model);
             tListener = e -> progressBar1.setValue(table1.getModel().getRowCount());
             table1.getModel().addTableModelListener(tListener);
 

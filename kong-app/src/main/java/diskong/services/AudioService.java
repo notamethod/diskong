@@ -16,10 +16,9 @@
 
 package diskong.services;
 
-import diskong.*;
+import diskong.AlbumFactory;
+import diskong.Statistics;
 import diskong.core.*;
-import diskong.core.TagState;
-import diskong.core.TrackInfo;
 import diskong.gui.AlbumModel;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;

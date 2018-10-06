@@ -18,8 +18,6 @@ package diskong.app.experiment;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
-import javax.swing.plaf.metal.MetalSliderUI;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -36,6 +34,7 @@ public class Slider2 {
     private BasicSliderUI sliderUi;
 
     public Slider2() {
+
         slider1.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent ev) {
                 moveSlider(ev);
@@ -55,9 +54,9 @@ public class Slider2 {
 
     private void moveSlider(MouseEvent ev) {
 
-        System.out.println("x"+slider1.getValue());
+        System.out.println("x" + slider1.getValue());
         slider1.setValue(sliderUi.valueForXPosition(ev.getX()));
-        System.out.println("y"+slider1.getValue());
+        System.out.println("y" + slider1.getValue());
     }
 
     public static void main(String[] args) {
@@ -87,4 +86,5 @@ public class Slider2 {
         sliderUi = (BasicSliderUI) slider1.getUI();
 //        slider1.setUI(sliderUi);
     }
+
 }
