@@ -12,23 +12,6 @@
     </properties>
     <border type="none"/>
     <children>
-      <component id="3453f" class="javax.swing.JTable" binding="table1" custom-create="true" default-binding="true">
-        <constraints>
-          <grid row="3" column="0" row-span="1" col-span="14" vsize-policy="3" hsize-policy="7" anchor="0" fill="3" indent="3" use-parent-layout="false">
-            <minimum-size width="-1" height="200"/>
-            <preferred-size width="-1" height="200"/>
-          </grid>
-        </constraints>
-        <properties>
-          <autoResizeMode value="2"/>
-          <fillsViewportHeight value="false"/>
-          <minimumSize width="-1" height="200"/>
-          <preferredScrollableViewportSize width="-1" height="-1"/>
-          <preferredSize width="-1" height="200"/>
-          <showHorizontalLines value="false"/>
-          <showVerticalLines value="false"/>
-        </properties>
-      </component>
       <component id="95e1" class="javax.swing.JLabel" binding="nbFiles">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
@@ -99,6 +82,33 @@
         </constraints>
         <properties/>
       </component>
+      <scrollpane id="2505" binding="scrollPane1">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="14" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <autoscrolls value="true"/>
+          <opaque value="false"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="3453f" class="javax.swing.JTable" binding="table1" custom-create="true" default-binding="true">
+            <constraints/>
+            <properties>
+              <autoCreateColumnsFromModel value="true"/>
+              <autoResizeMode value="2"/>
+              <fillsViewportHeight value="false"/>
+              <maximumSize width="2147483647" height="2147483647"/>
+              <minimumSize width="300" height="200"/>
+              <opaque value="true"/>
+              <preferredScrollableViewportSize width="-1" height="-1"/>
+              <preferredSize width="-1" height="200"/>
+              <showHorizontalLines value="false"/>
+              <showVerticalLines value="false"/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
     </children>
   </grid>
 </form>

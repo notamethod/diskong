@@ -16,6 +16,7 @@
 
 package diskong.app.cdrip;
 
+import diskong.app.JOptionScrollPane;
 import diskong.core.TrackInfo;
 import diskong.gui.TrackModel;
 import org.slf4j.Logger;
@@ -93,8 +94,12 @@ public class RipForm {
 
                     System.out.println(ah.process(liste));
                 } catch (RipperException e) {
-                    JOptionPane.showMessageDialog(null,
-                            e.getMessage(), "information", JOptionPane.ERROR_MESSAGE);
+
+                    JOptionScrollPane.showMessageDialog(
+                            e.getMessage(),
+                            "Information",
+                            JOptionPane.INFORMATION_MESSAGE);
+
                     e.printStackTrace();
                 }
 

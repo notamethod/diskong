@@ -29,6 +29,11 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Handler for abcde command line
+ * in order to use musicbrainz you have to install this:
+ * sudo apt-get install libmusicbrainz-discid-perl libwebservice-musicbrainz-perl
+ */
 public class AbcdeHandler {
     public String getArtist() {
         return artist;

@@ -39,6 +39,7 @@ public class AlbumModel extends AbstractTableModel{
     private String[] colName=new String[]{"Title","Artist","style", "year", "image"};
 
     public void setAlbums(List<AlbumVo> albums) {
+        this.albums.clear();
         this.albums.addAll(albums);
         fireTableDataChanged();
     }

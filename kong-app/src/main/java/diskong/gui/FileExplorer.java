@@ -58,7 +58,7 @@ public class FileExplorer implements TextEventListener {
         return mainPanel;
     }
 
-    private AlbumModel model = new AlbumModel();
+    private AlbumModel model;
     private AudioService service = new AudioService();
     private Map<Path, List<FilePath>> map;
     private List<AlbumVo> albums = new ArrayList<>();
@@ -92,7 +92,6 @@ public class FileExplorer implements TextEventListener {
 
     {
         listenToTableAlbum = new ArrayList<>();
-
         stopButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -118,26 +117,28 @@ public class FileExplorer implements TextEventListener {
             }
         });
         pathField.addListener(this);
-        table1.setModel(model);
-                table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//        table1.setModel(model);
+//                table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        table1.getColumnModel().getColumn(0).setMinWidth(300);
-        table1.getColumnModel().getColumn(0).setPreferredWidth(500);
-        table1.getColumnModel().getColumn(0).setMaxWidth(500);
-        table1.getColumnModel().getColumn(1).setMinWidth(200);
-        table1.getColumnModel().getColumn(1).setPreferredWidth(300);
-        table1.getColumnModel().getColumn(1).setMaxWidth(300);
-        table1.getColumnModel().getColumn(2).setMinWidth(150);
-        table1.getColumnModel().getColumn(2).setPreferredWidth(300);
-        table1.getColumnModel().getColumn(2).setMaxWidth(300);
-        //year
-        table1.getColumnModel().getColumn(3).setMinWidth(50);
-        table1.getColumnModel().getColumn(3).setPreferredWidth(50);
-        table1.getColumnModel().getColumn(3).setMaxWidth(50);
-        table1.getColumnModel().getColumn(4).setMinWidth(50);
-        table1.getColumnModel().getColumn(4).setPreferredWidth(100);
-        table1.getColumnModel().getColumn(4).setMaxWidth(100);
-        table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
+//        table1.getColumnModel().getColumn(0).setMinWidth(300);
+//        table1.getColumnModel().getColumn(0).setPreferredWidth(500);
+//        table1.getColumnModel().getColumn(0).setMaxWidth(500);
+//        table1.getColumnModel().getColumn(1).setMinWidth(200);
+//        table1.getColumnModel().getColumn(1).setPreferredWidth(300);
+//        table1.getColumnModel().getColumn(1).setMaxWidth(300);
+//        table1.getColumnModel().getColumn(2).setMinWidth(150);
+//        table1.getColumnModel().getColumn(2).setPreferredWidth(300);
+//        table1.getColumnModel().getColumn(2).setMaxWidth(300);
+//        //year
+//        table1.getColumnModel().getColumn(3).setMinWidth(50);
+//        table1.getColumnModel().getColumn(3).setPreferredWidth(50);
+//        table1.getColumnModel().getColumn(3).setMaxWidth(50);
+//        table1.getColumnModel().getColumn(4).setMinWidth(50);
+//        table1.getColumnModel().getColumn(4).setPreferredWidth(100);
+//        table1.getColumnModel().getColumn(4).setMaxWidth(100);
+//        table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
+//        scrollPane1.getViewport().setPreferredSize(table1.getPreferredSize());
+//        scrollPane1.setPreferredSize(new Dimension(300,300));
     }
 
     public static void main(String[] args) {
@@ -162,12 +163,12 @@ public class FileExplorer implements TextEventListener {
 
     private void createUIComponents() {
         initializeAlbumTable();
-        scrollPane1 = new JScrollPane(table1);
-        scrollPane1.setOpaque(false);
-        scrollPane1.getViewport().setOpaque(false);
+   //     scrollPane1 = new JScrollPane(table1);
+       // scrollPane1.setOpaque(false);
+      //  scrollPane1.getViewport().setOpaque(false);
 //        scrollPane1.setMinimumSize(new Dimension(-1,250));
 //        scrollPane1.setPreferredSize(new Dimension(-1,250));
-       // table1.setTableHeader(null);
+
         analyzeDirButton  = new JButton();
         pathField = new JDropText();
         pathField.setEditable(true);
@@ -175,9 +176,8 @@ public class FileExplorer implements TextEventListener {
     }
 
     private void initializeAlbumTable(){
-        table1 = new JTable(null);
-
-        //topTopicsTable.setTableHeader(null);
+        model = new AlbumModel();
+        table1 = new JTable(model);
         Font topTopicsFont = new Font("Verdana",Font.PLAIN,12);
         table1.setFont(topTopicsFont);
         table1.setRowHeight(48);
@@ -191,7 +191,6 @@ public class FileExplorer implements TextEventListener {
             map = dirParser.parse(file);
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "File not found: " + e.getLocalizedMessage(), "error", JOptionPane.ERROR_MESSAGE);
-
         }
         if (!map.isEmpty())
             analyzeDirButton.setEnabled(true);
@@ -216,6 +215,7 @@ public class FileExplorer implements TextEventListener {
             super.done();
                 progressBar1.setValue(progressBar1.getMaximum());
 
+
         }
 
         @Override
@@ -224,8 +224,8 @@ public class FileExplorer implements TextEventListener {
             model.clear();
             File f = new File(pathField.getText());
             parseDir(f);
-            if (tListener != null)
-                table1.getModel().removeTableModelListener(tListener);
+//            if (tListener != null)
+//                table1.getModel().removeTableModelListener(tListener);
             //table1.setModel(model);
             tListener = e -> progressBar1.setValue(table1.getModel().getRowCount());
             table1.getModel().addTableModelListener(tListener);
@@ -244,6 +244,7 @@ public class FileExplorer implements TextEventListener {
                 //FIXME:check parser creation
                 AlbumVo avo = service.parseDirectory(entry);
                 if (!avo.getState().equals(TagState.NOTRACKS)) {
+                    LOG.info("PUBLISH"+avo.getTitle());
                     publish(avo);
                 }
 
@@ -261,7 +262,9 @@ public class FileExplorer implements TextEventListener {
 
         @Override
         protected void process(List<AlbumVo> chunks) {
+            LOG.info("PROCESS" + chunks);
             albums.addAll(chunks);
+            LOG.info("PROCESS" + albums);
             model.setAlbums(albums);
 //            for (AlbumVo avo : chunks) {
 //                textArea.append(number + "\n");
