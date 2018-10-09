@@ -6,6 +6,9 @@
 
 FLAC files manager
 
+<div align="left">
+        <img width="70%" src="/info/2018-10-09.png" alt="Diskong main window" title="Diskong main window"</img>
+</div>
 
 ## current release
 not released yet
@@ -33,6 +36,3 @@ not released yet
 
 
 
-<div align="left">
-        <img width="20%" src="/info/2018-10-09.png" alt="Diskong main window" title="Diskong main window"</img>
-</div>
