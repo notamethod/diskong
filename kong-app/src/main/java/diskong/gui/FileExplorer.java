@@ -72,6 +72,7 @@ public class FileExplorer implements TextEventListener {
     private JPanel mainPanel;
     private JTable table1;
     private JProgressBar progressBar1;
+    private JPanel albumPanel;
     private List<ListAlbumListener> listenToTableAlbum;
 
 
@@ -119,7 +120,7 @@ public class FileExplorer implements TextEventListener {
         pathField.addListener(this);
 //        table1.setModel(model);
 //                table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
+//
 //        table1.getColumnModel().getColumn(0).setMinWidth(300);
 //        table1.getColumnModel().getColumn(0).setPreferredWidth(500);
 //        table1.getColumnModel().getColumn(0).setMaxWidth(500);
@@ -134,11 +135,11 @@ public class FileExplorer implements TextEventListener {
 //        table1.getColumnModel().getColumn(3).setPreferredWidth(50);
 //        table1.getColumnModel().getColumn(3).setMaxWidth(50);
 //        table1.getColumnModel().getColumn(4).setMinWidth(50);
-//        table1.getColumnModel().getColumn(4).setPreferredWidth(100);
-//        table1.getColumnModel().getColumn(4).setMaxWidth(100);
-//        table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
-//        scrollPane1.getViewport().setPreferredSize(table1.getPreferredSize());
-//        scrollPane1.setPreferredSize(new Dimension(300,300));
+//        table1.getColumnModel().getColumn(4).setPreferredWidth(150);
+//        table1.getColumnModel().getColumn(4).setMaxWidth(150);
+        albumPanel.add(scrollPane1);
+     // table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
+        scrollPane1.setPreferredSize(new Dimension(780,300));
     }
 
     public static void main(String[] args) {
@@ -178,10 +179,17 @@ public class FileExplorer implements TextEventListener {
     private void initializeAlbumTable(){
         model = new AlbumModel();
         table1 = new JTable(model);
+
+
+        scrollPane1 = new JScrollPane(table1);
+
         Font topTopicsFont = new Font("Verdana",Font.PLAIN,12);
         table1.setFont(topTopicsFont);
         table1.setRowHeight(48);
         table1.setOpaque(false);
+
+
+
 
     }
     private void parseDir(File file) {

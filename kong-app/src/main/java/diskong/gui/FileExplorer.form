@@ -82,33 +82,14 @@
         </constraints>
         <properties/>
       </component>
-      <scrollpane id="2505" binding="scrollPane1">
+      <grid id="1c5b6" binding="albumPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
         <constraints>
-          <grid row="3" column="0" row-span="1" col-span="14" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="0" row-span="1" col-span="14" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="2" use-parent-layout="false"/>
         </constraints>
-        <properties>
-          <autoscrolls value="true"/>
-          <opaque value="false"/>
-        </properties>
+        <properties/>
         <border type="none"/>
-        <children>
-          <component id="3453f" class="javax.swing.JTable" binding="table1" custom-create="true" default-binding="true">
-            <constraints/>
-            <properties>
-              <autoCreateColumnsFromModel value="true"/>
-              <autoResizeMode value="2"/>
-              <fillsViewportHeight value="false"/>
-              <maximumSize width="2147483647" height="2147483647"/>
-              <minimumSize width="300" height="200"/>
-              <opaque value="true"/>
-              <preferredScrollableViewportSize width="-1" height="-1"/>
-              <preferredSize width="-1" height="200"/>
-              <showHorizontalLines value="false"/>
-              <showVerticalLines value="false"/>
-            </properties>
-          </component>
-        </children>
-      </scrollpane>
+        <children/>
+      </grid>
     </children>
   </grid>
 </form>

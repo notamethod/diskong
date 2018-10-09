@@ -1,5 +1,9 @@
 # Diskong
 
+<div align="left">
+        <img width="20%" src="/info/dk114.png" alt="Diskong logo" title="first logo"</img>
+</div>
+
 FLAC files manager
 
 
@@ -27,6 +31,8 @@ not released yet
 ### Next main features
 * Indexing collection with Apache Solr
 
+
+
 <div align="left">
-        <img width="20%" src="/info/dk114.png" alt="Diskong logo" title="first logo"</img>
+        <img width="20%" src="/info/2018-10-09.png" alt="Diskong main window" title="Diskong main window"</img>
 </div>

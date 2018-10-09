@@ -44,6 +44,12 @@ public class AlbumModel extends AbstractTableModel{
         fireTableDataChanged();
     }
 
+    public void addAlbum(AlbumVo album) {
+
+        this.albums.add(album);
+        fireTableDataChanged();
+    }
+
     @Override
     public String getColumnName(int i) {
         return colName[i];
