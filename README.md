@@ -1,7 +1,7 @@
 # Diskong
 
 <div align="left">
-        <img width="20%" src="/info/dk114.png" alt="Diskong logo" title="first logo"</img>
+        <img width="20%" src="/info/dk115.png" alt="Diskong logo" title="first logo"</img>
 </div>
 
 FLAC files manager
