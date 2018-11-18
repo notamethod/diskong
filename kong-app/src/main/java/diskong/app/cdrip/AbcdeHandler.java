@@ -113,6 +113,7 @@ public class AbcdeHandler {
             StringBuilder builder = new StringBuilder();
             String line = null;
             while ((line = reader.readLine()) != null) {
+                LOG.debug(line);
                 builder.append(line);
                 builder.append(System.getProperty("line.separator"));
             }
@@ -184,7 +185,6 @@ public class AbcdeHandler {
 
     private String parseHeader(String line) {
         String trimedString = line.replaceAll("----", "");
-
         String[] split = trimedString.split("/");
         if (split.length==2){
             artist=split[0].trim();

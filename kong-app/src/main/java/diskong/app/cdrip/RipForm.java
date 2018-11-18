@@ -54,8 +54,13 @@ public class RipForm {
     private JLabel jlArtist;
     private JScrollPane scrollPane1;
     private JTable table1;
+    private JLabel jYear;
+    private JLabel jOutput;
     private boolean albumArt = true;
 
+    //TODO: use swingworker while ripping
+    //TODO: show progress while ripping
+    //TODO: add cancel button to stop ripping
     public RipForm() {
 
 
@@ -105,6 +110,8 @@ public class RipForm {
 
             }
         });
+        jOutput.setText(ah.getRipProperties().getProperty(ah.OUTPUT_DIR));
+
     }
 
     public static void main(String[] args) {
@@ -147,7 +154,7 @@ public class RipForm {
             jlTitle.setVisible(true);
             jlArtist.setText(ah.getArtist());
             jlTitle.setText(ah.getAlbum());
-
+//            jYear.setText(ah.get);
             if (ah.getCoverImage() == null) {
                 jCoverImage.setText("No cover image found");
             } else {
