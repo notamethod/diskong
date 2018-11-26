@@ -19,18 +19,13 @@
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <!-- encoders are assigned the type
          ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-      <filter class="ch.qos.logback.classic.filter.LevelFilter">
-          <level>INFO</level>
-          <onMatch>ACCEPT</onMatch>
-          <onMismatch>DENY</onMismatch>
-      </filter>
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
 
  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-      <file>log/log-${byDay}.txt </file>
+      <file>log/log-core.log</file>
       <append>true</append>
       <encoder>
        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
@@ -40,6 +35,6 @@
 
   <root level="debug">
     <appender-ref ref="STDOUT" />
-     <appender-ref ref="FILE" />
+
   </root>
 </configuration>

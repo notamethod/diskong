@@ -19,6 +19,7 @@ package diskong.app.cdrip;
 
 import diskong.core.TrackInfo;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +102,8 @@ public class AbcdeHandler {
         liste.addAll(actionList);
         System.out.println(liste.toString());
         ProcessBuilder pb = new ProcessBuilder(liste);
+        pb.inheritIO();
+      //  pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         try {
             Process p = pb.start();
             if (!p.waitFor(30, TimeUnit.SECONDS)) {
@@ -236,7 +239,7 @@ public class AbcdeHandler {
 
     public String getCoverImage() {
         String dir = ripProperties.getProperty(OUTPUT_DIR);
-        File f = new File(dir, artist.replaceAll(" ", "_")+"-"+album.replaceAll(" ", "_"));
+        File f = new File(dir, artist==null?"":artist.replaceAll(" ", "_")+"-"+album==null?"":album.replaceAll(" ", "_"));
         File image = new File(f, "cover.jpg");
         return image.getAbsolutePath();
     }

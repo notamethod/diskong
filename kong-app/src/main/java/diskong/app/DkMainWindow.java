@@ -23,6 +23,8 @@ import diskong.app.cdrip.RipForm;
 import diskong.app.detail.PlayerForm;
 import diskong.core.AlbumVo;
 import diskong.gui.FileExplorer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -36,6 +38,7 @@ import java.util.ResourceBundle;
 import static javax.swing.UIManager.setLookAndFeel;
 
 public class DkMainWindow implements ListAlbumListener {
+    private final static Logger LOG = LoggerFactory.getLogger(DkMainWindow.class);
     private JPanel mainPanel;
     private JTree tree1;
     private FileExplorer fileExplorerPane;
@@ -87,7 +90,7 @@ public class DkMainWindow implements ListAlbumListener {
     }
 
     public void init() {
-        System.out.println("xxxxxxxxxxxxxxxxxxxxx");
+        LOG.info("starting dk app...");
         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
             if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
                 try {
