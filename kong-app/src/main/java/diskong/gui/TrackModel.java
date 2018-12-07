@@ -32,7 +32,8 @@ public class TrackModel extends AbstractTableModel{
         //albums= new ArrayList<>();
     }
 
-    private String[] colName=new String[]{"Num.", "Title","Artist"};
+    protected String[] colName=new String[]{"Num.", "Title","Artist"};
+    protected int[] prefSize=new int[]{10,150,80};
     public TrackModel(List<TrackInfo> tracks) {
         this.tracks = tracks;
         Collections.sort(this.tracks);
@@ -57,6 +58,7 @@ public class TrackModel extends AbstractTableModel{
 
     @Override
     public int getColumnCount() {
+        System.out.println(colName.length);
         return colName.length;
     }
 
@@ -76,12 +78,22 @@ public class TrackModel extends AbstractTableModel{
 
             default :
 
-                return "";
+                return getSpecValue(row, column);
         }
 
     }
 
+    protected Object getSpecValue(int row, int column) {
+        return "";
+    }
+
     public TrackInfo getRow(int row){
         return tracks.get(row);
+    }
+
+    public int getPrefSize(int i) {
+        if (prefSize.length<(i+1))
+            return 50;
+        return prefSize[i];
     }
 }

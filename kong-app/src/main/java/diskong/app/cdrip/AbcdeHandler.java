@@ -19,7 +19,6 @@ package diskong.app.cdrip;
 
 import diskong.core.TrackInfo;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +39,8 @@ public class AbcdeHandler {
         return artist;
     }
 
+    private Process p;
+
     public String getAlbum() {
         return album;
     }
@@ -58,6 +59,7 @@ public class AbcdeHandler {
     private String configurationFileName;
     private String artist;
     private String album;
+    BufferedReader reader;
 
     public AbcdeHandler() throws URISyntaxException {
         InputStream is = null;
@@ -89,6 +91,37 @@ public class AbcdeHandler {
         return ripProperties;
     }
 
+    public void stop() {
+        InputStream is = p.getInputStream();
+
+        p.destroy();
+        if (reader !=null){
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (is !=null){
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            Thread.sleep(1000);
+            String cdProcess = getCDProcess();
+            if (cdProcess!=null){
+                killProcess(cdProcess);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public List<String> process(List<String> actionList) throws RipperException {
         List<String> actionResult = null;
 
@@ -102,16 +135,17 @@ public class AbcdeHandler {
         liste.addAll(actionList);
         System.out.println(liste.toString());
         ProcessBuilder pb = new ProcessBuilder(liste);
-        pb.inheritIO();
-      //  pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        //TODO: can't parse if redirect !
+        // pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        //  pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         try {
-            Process p = pb.start();
+            p = pb.start();
             if (!p.waitFor(30, TimeUnit.SECONDS)) {
                 exitCode = 88;
             } else {
                 exitCode = p.exitValue();
             }
-            BufferedReader reader =
+             reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
             StringBuilder builder = new StringBuilder();
             String line = null;
@@ -132,11 +166,11 @@ public class AbcdeHandler {
             e.printStackTrace();
             exitCode = 98;
             throw new RipperException("exit code is " + exitCode);
-        } catch (IOException  e) {
+        } catch (IOException e) {
             exitCode = 99;
             throw new RipperException("abcde error", exitCode, e);
         } finally {
-            if (exitCode == 88){
+            if (exitCode == 88) {
 
             }
             //OK
@@ -146,11 +180,31 @@ public class AbcdeHandler {
         return actionResult;
     }
 
+    public ProcessBuilder processCb(List<String> actionList) throws RipperException {
+        List<String> actionResult = null;
+
+        int exitCode = 0;
+
+        List<String> liste = new ArrayList<>();
+        liste.add(COMMAND_NAME);
+        liste.add("-c" + configurationFileName);
+
+        String actions = "-a " + String.join(",", actionList);
+        liste.addAll(actionList);
+        System.out.println(liste.toString());
+        ProcessBuilder pb = new ProcessBuilder(liste);
+        //pb.inheritIO();
+        //  pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+
+        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        return pb;
+    }
+
     public List<TrackInfo> parseTrack(List<String> actionResult) throws analyseException {
         List<TrackInfo> tracks = new ArrayList<>();
-        for (String line:actionResult){
+        for (String line : actionResult) {
             String[] splitted = line.split(":");
-            if(splitted.length>1) {
+            if (splitted.length > 1) {
                 TrackInfo track = new TrackInfo(Integer.valueOf(splitted[0]), splitted[1], artist);
                 tracks.add(track);
             }
@@ -158,6 +212,64 @@ public class AbcdeHandler {
         if (tracks.isEmpty())
             throw new analyseException("no tracks found");
         return tracks;
+    }
+
+    public void parseState(List<String> actionResult, Map<Integer, String> state, List<String> filteredList, int start) throws analyseException {
+        final String grab = "Grabbing track";
+        for (String line : actionResult) {
+            String[] splitted = line.split(":");
+            if (splitted.length > 1) {
+                if (splitted[0].contains(grab)) {
+                    filteredList.add(line);
+                    String numTrack = splitted[0].replace(grab, "").trim();
+                    System.out.println("numtrack " + numTrack);
+                    Integer num = null;
+                    try {
+                        num = Integer.parseInt(numTrack);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        num = null;
+                    }
+                    if (num != null) {
+                        System.out.println("num "+num);
+                        state.put(num - start, "...");
+                    }
+                }
+
+            }
+            if (line.contains("Done")) {
+                for (Map.Entry<Integer, String> cursor : state.entrySet()) {
+                    if ("...".equals(cursor.getValue())) {
+                        cursor.setValue("OK");
+                    }
+                }
+            }
+            //if first parsing fails
+            Integer splitRip = splitRip(line);
+            if (splitRip != null) {
+                filteredList.add(line);
+                if (state.get(splitRip) == null) {
+                    state.put(splitRip-start, "...");
+                }
+            }
+
+        }
+
+    }
+
+    public Integer splitRip(String line) {
+        String ret = "";
+        if (line.contains("Ripping from sector")) {
+            String[] splitted2 = line.split("(track)");
+            if (splitted2.length > 1) {
+                String[] splitted3 = splitted2[1].split("\\[");
+                ret = splitted3[0];
+            }
+        }
+        if (ret != null && !ret.isEmpty()) {
+            return Integer.valueOf(ret.trim());
+        }
+        return null;
     }
 
     private List<String> parseInfo(String result, List<String> actionList) throws IOException {
@@ -189,8 +301,8 @@ public class AbcdeHandler {
     private String parseHeader(String line) {
         String trimedString = line.replaceAll("----", "");
         String[] split = trimedString.split("/");
-        if (split.length==2){
-            artist=split[0].trim();
+        if (split.length == 2) {
+            artist = split[0].trim();
             album = split[1].trim();
         }
         return trimedString;
@@ -239,11 +351,44 @@ public class AbcdeHandler {
 
     public String getCoverImage() {
         String dir = ripProperties.getProperty(OUTPUT_DIR);
-        File f = new File(dir, artist==null?"":artist.replaceAll(" ", "_")+"-"+album==null?"":album.replaceAll(" ", "_"));
+        File f = new File(dir, artist.replaceAll(" ", "_") + "-" + album.replaceAll(" ", "_"));
+
+        //   File f = new File(dir, artist==null?"":artist.replaceAll(" ", "_")+"-"+album==null?"":album.replaceAll(" ", "_"));
         File image = new File(f, "cover.jpg");
         return image.getAbsolutePath();
     }
-   // /tmp/Dinosaur Jr.-I Bet on Sky/cover.jpg
-   //  /tmp/Dinosaur_Jr.-I_Bet_on_Sky
+
+    public String getCDProcess() throws IOException {
+        Process process = Runtime.getRuntime().exec(new String[] { "pgrep", "-lf", "cdparanoia" });
+        StringBuilder sb = null;
+
+        InputStream is = null;
+        BufferedReader br = null;
+        try {
+            is = process.getInputStream();
+            br = new BufferedReader(new InputStreamReader(is));
+            sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+        } finally {
+            br.close();
+            is.close();
+        }
+        if (sb!=null) {
+            String[] split = sb.toString().split(" ");
+            if (split.length > 1)
+                System.out.println(split[0]);
+            return split[0];
+        }
+        return null;
+    }
+
+    public void killProcess(String pid) throws IOException {
+        Process process = Runtime.getRuntime().exec(new String[] { "kill", "-9", pid });
+    }
+    // /tmp/Dinosaur Jr.-I Bet on Sky/cover.jpg
+    //  /tmp/Dinosaur_Jr.-I_Bet_on_Sky
     //sudo apt-get install libmusicbrainz-discid-perl libwebservice-musicbrainz-perl
 }
