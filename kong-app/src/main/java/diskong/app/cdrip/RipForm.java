@@ -18,7 +18,6 @@ package diskong.app.cdrip;
 
 import diskong.app.JOptionScrollPane;
 import diskong.core.TrackInfo;
-import diskong.gui.TrackModel;
 import diskong.gui.TrackRipModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,6 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class RipForm {
 

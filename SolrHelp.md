@@ -30,3 +30,6 @@ https://lucene.apache.org/solr/guide/7_5/solr-control-script-reference.html#solr
 
  bin/post -c localMusicb  /media/syno/music-b/**/*.flac
 
+id:*.flac
+xmpdm_album:"*Blonde" AND content_type:audio
+style:"*Pop Rock" AND content_type:audio

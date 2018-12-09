@@ -31,7 +31,7 @@ public class AbcdeHandlerTest {
     public void splitRipOne() {
         String line = "Ripping from sector   42246 (track  3 [0:00.00])";
         try {
-            AbcdeHandler handler = new AbcdeHandler();
+            RipHandler handler = new AbcdeHandler();
             assertEquals(handler.splitRip(line), Integer.valueOf(3));
 
         } catch (URISyntaxException e) {
@@ -45,7 +45,7 @@ public class AbcdeHandlerTest {
     public void testParse() {
         Map<Integer, String> state = new HashMap<>();
         try {
-            AbcdeHandler handler = new AbcdeHandler();
+            RipHandler handler = new AbcdeHandler();
             handler.parseState(Arrays.asList(testLists), state, new ArrayList<String>(),1);
             int nbOk = 0;
             for (Map.Entry<Integer, String> cursor : state.entrySet()) {
