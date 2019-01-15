@@ -59,7 +59,7 @@ public class FileExplorer implements TextEventListener {
     }
 
     private AlbumModel model;
-    private AudioService service = new AudioService();
+    private AudioService service = null;
     private Map<Path, List<FilePath>> map;
     private List<AlbumVo> albums = new ArrayList<>();
 
@@ -89,9 +89,8 @@ public class FileExplorer implements TextEventListener {
         });
     }
 
-    public FileExplorer()
-
-    {
+    public FileExplorer() throws Exception {
+        service = new AudioService();
         listenToTableAlbum = new ArrayList<>();
         stopButton.addActionListener(new ActionListener() {
             @Override
@@ -142,7 +141,7 @@ public class FileExplorer implements TextEventListener {
         scrollPane1.setPreferredSize(new Dimension(780,300));
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
             if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
                 try {
@@ -240,7 +239,12 @@ public class FileExplorer implements TextEventListener {
 
             int checkTagged = 0;
             int taggedTrack = 0;
-            AudioParser ap = new AudioParser();
+//            try {
+//                AudioParser ap = new AudioParser();
+//            } catch (Exception e) {
+//                //FIXME
+//                e.printStackTrace();
+//            }
             for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
                 if (this.isCancelled()) {
                     progressBar1.setMaximum(map.size());
@@ -250,7 +254,13 @@ public class FileExplorer implements TextEventListener {
                 long startTime = System.currentTimeMillis();
 
                 //FIXME:check parser creation
-                AlbumVo avo = service.parseDirectory(entry);
+                AlbumVo avo = null;
+                try {
+                    avo = service.parseDirectory(entry);
+                } catch (Exception e) {
+                    //FIXME
+                    e.printStackTrace();
+                }
                 if (!avo.getState().equals(TagState.NOTRACKS)) {
                     LOG.info("PUBLISH"+avo.getTitle());
                     publish(avo);

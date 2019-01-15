@@ -24,6 +24,7 @@ import diskong.core.*;
 import diskong.core.TagState;
 import diskong.parser.*;
 import diskong.parser.MetaUtils;
+import diskong.services.AudioService;
 import diskong.tag.metatag.ArgAction;
 import diskong.tag.metatag.Arguments;
 import org.apache.tika.metadata.XMPDM;
@@ -53,8 +54,14 @@ class MassFlac {
 	private int taggedTrack;
 	private static int NBCHECK = 200;
 	private boolean IsSimulate=true;
+	private AudioService audioService = null;
 
-	public static void main(String[] args) {
+	public MassFlac() throws Exception {
+		super();
+		audioService = new AudioService();
+	}
+
+	public static void main(String[] args) throws Exception {
 		MassFlac mf = new MassFlac();
 
 		if (args == null || args.length < 1) {
@@ -96,7 +103,12 @@ class MassFlac {
 				}
 			}
 			//FIXME:check parser creation
-			diskong.parser.AudioParser ap = new AudioParser();
+			try {
+				AudioParser ap = new AudioParser();
+			} catch (Exception e) {
+				//FIXME
+				e.printStackTrace();
+			}
 			diskong.core.AlbumVo album = AlbumFactory.getAlbum();
 			try {
 				// parsedir
@@ -116,7 +128,7 @@ class MassFlac {
 				for (Future<diskong.core.TrackInfo> future : list) {
 					try {
 						diskong.core.TrackInfo tinf = future.get();
-						album.addTrack(tinf); // (metafile)
+						audioService.addTrack(album, tinf);// (metafile)
 					} catch (InterruptedException |ExecutionException e) {
 						e.printStackTrace();
 					} catch (WrongTrackAlbumException e) {

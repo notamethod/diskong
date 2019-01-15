@@ -17,7 +17,7 @@
 package diskong.gui;
 
 class Diskong {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         MainForm mf = new MainForm();
         mf.init();
     }

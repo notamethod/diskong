@@ -22,11 +22,17 @@ import diskong.core.*;
 import diskong.gui.AlbumModel;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
+import diskong.parser.MetaUtils;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.XMPDM;
 import org.apache.tika.parser.AutoDetectParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +43,22 @@ public class AudioService {
     private final static Logger LOG = LoggerFactory.getLogger(AudioService.class);
     private static int NBCHECK = 200;
     AlbumService albumService = new AlbumService();
+    AudioParser autoParser=new AudioParser();
+
+    public AudioService() throws Exception {
+    }
 
 
-    public List<diskong.core.AlbumVo> traiterDir(Map<Path, List<FilePath>> map, AlbumModel model) {
+    public List<diskong.core.AlbumVo> traiterDir(Map<Path, List<FilePath>> map, AlbumModel model) throws Exception {
         List<diskong.core.AlbumVo> albums = new ArrayList<>();
         int checkTagged = 0;
         int taggedTrack = 0;
-        diskong.parser.AudioParser ap = new AudioParser();
+        try {
+            AudioParser ap = new AudioParser();
+        } catch (Exception e) {
+            //FIXME
+            e.printStackTrace();
+        }
         for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
             long startTime = System.currentTimeMillis();
 
@@ -73,10 +88,10 @@ public class AudioService {
         return albums;
     }
 
-    public diskong.core.AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry) {
+    public diskong.core.AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry) throws Exception {
 
         diskong.core.AlbumVo album = AlbumFactory.getAlbum();
-        AutoDetectParser autoParser=new AutoDetectParser();
+
 
         try {
             // parsedir
@@ -96,7 +111,7 @@ public class AudioService {
             for (Future<diskong.core.TrackInfo> future : list) {
                 try {
                     TrackInfo tinf = future.get();
-                    album.addTrack(tinf); // (metafile)
+                    addTrack(album,tinf); // (metafile)
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 } catch (WrongTrackAlbumException e) {
@@ -132,6 +147,77 @@ public class AudioService {
             e.printStackTrace();
         }
         return album;
+    }
+
+    public void addTrack(AlbumVo album, TrackInfo trackInfo) throws WrongTrackAlbumException {
+        addTrack(album, trackInfo.getfPath(), trackInfo.getMetadata());
+
+    }
+
+    private void addTrack(AlbumVo album, FilePath fPath, Metadata metadata) throws WrongTrackAlbumException {
+        // check if all tracks in folder belong to same album
+        if (metadata.get(Metadata.CONTENT_TYPE).contains("flac") || metadata.get(Metadata.CONTENT_TYPE).contains("vorbis")) {
+            if (album.getTitle() == null) {
+                album.setTitle(metadata.get(XMPDM.ALBUM));
+            } else if (!album.getTitle().equals(metadata.get(XMPDM.ALBUM))) {
+                // wrong album ?
+                throw new WrongTrackAlbumException(metadata);
+            }
+            if (album.getArtist() == null) {
+                album.setArtist(metadata.get(XMPDM.ARTIST));
+            } else if (!album.getArtist().equals(metadata.get(XMPDM.ARTIST))) {
+                // wrong artist or various ?
+                album.setArtist(AlbumVo.VARIOUS);
+                //throw new WrongTrackArtistException(metadata);
+            }
+            if (album.getGenres() == null) {
+                album.setGenres(MetaUtils.getGenre(metadata));
+            }
+            if (album.getGenres().isEmpty()){
+                album.getGenres().addAll(MetaUtils.getGenre(metadata));
+            }
+
+            if (album.getStyles() == null) {
+                album.setStyles(MetaUtils.getStyle(metadata));
+            }
+
+            if (album.getStyles().isEmpty()){
+                album.getStyles().addAll(MetaUtils.getStyle(metadata));
+            }
+
+            if (album.getReleaseDate() == null) {
+                //may be a date or a year (afaik)
+                String dateInString = metadata.get(XMPDM.RELEASE_DATE);
+                final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                if (dateInString != null) {
+
+                    try {
+                        album.setReleaseDate(LocalDate.parse(dateInString, dtf));
+                    } catch (DateTimeParseException e) {
+                        try {
+                            int a = Integer.parseInt(dateInString);
+                            album.setReleaseDate(LocalDate.parse(dateInString + "-01-01", dtf));
+                        } catch (DateTimeParseException | NumberFormatException e1) {
+                            System.out.println("date error " + dateInString);
+                        }
+                    }
+                }
+            }
+
+            album.getTracks().add(new TrackInfo(fPath, metadata));
+
+        } else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") ){
+            if (fPath.getFile().getName().toLowerCase().contains("folder") || fPath.getFile().getName().toLowerCase().contains("cover"))
+            {
+                LOG.debug("cover image found " + fPath.getFile().getName());
+                album.setFolderImagePath(fPath.getFile().getAbsolutePath());
+            }
+            else{
+                album.getArts().add(fPath);
+            }
+        } else {
+            LOG.debug("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
+        }
     }
 
     private boolean contineParse() {

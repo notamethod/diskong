@@ -64,7 +64,7 @@ class MainForm {
     protected AlbumService albumService = new AlbumService();
     private TableModelListener tListener;
     private AlbumModel model = new AlbumModel();
-    private AudioService service = new AudioService();
+    private AudioService service = null;
     private Map<Path, List<FilePath>> map;
     private List<AlbumVo> albums = new ArrayList<>();
 
@@ -85,10 +85,10 @@ class MainForm {
     private IAlbumVo correctedInfo;
 
 
-    public MainForm() {
+    public MainForm() throws Exception {
 
 
-
+        service =  new AudioService();
         analyzeDirButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -217,7 +217,7 @@ class MainForm {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         MainForm mf = new MainForm();
         mf.init();
     }
@@ -240,7 +240,7 @@ class MainForm {
     }
 
 
-    public void init() {
+    public void init() throws Exception {
 
         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
             if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
@@ -326,7 +326,12 @@ class MainForm {
 
             int checkTagged = 0;
             int taggedTrack = 0;
-            AudioParser ap = new AudioParser();
+            try {
+                AudioParser ap = new AudioParser();
+            } catch (Exception e) {
+                //FIXME
+                e.printStackTrace();
+            }
             for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
                 if (this.isCancelled()) {
                     progressBar1.setMaximum(map.size());
@@ -336,7 +341,13 @@ class MainForm {
                 long startTime = System.currentTimeMillis();
 
                 //FIXME:check parser creation
-                AlbumVo avo = service.parseDirectory(entry);
+                AlbumVo avo = null;
+                try {
+                    avo = service.parseDirectory(entry);
+                } catch (Exception e) {
+                    //FIXME
+                    e.printStackTrace();
+                }
                 if (!avo.getState().equals(TagState.NOTRACKS)) {
                     publish(avo);
                 }

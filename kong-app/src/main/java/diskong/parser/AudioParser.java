@@ -18,12 +18,15 @@ package diskong.parser;
 
 import diskong.core.FilePath;
 import org.apache.tika.Tika;
+import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.parser.pdf.PDFParser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,17 +49,27 @@ import java.nio.file.StandardOpenOption;
 public class AudioParser {
 
 	private Tika tika;
-	private AutoDetectParser autoParser;
 
-	public AudioParser() {
+    public Parser getParser() {
+        return parser;
+    }
+
+    private Parser parser;
+
+	public AudioParser() throws Exception {
 		super();
 		this.tika = new Tika();
-		this.autoParser= new AutoDetectParser();
+		try {
+			this.parser = createParser();
+		} catch (Exception e ) {
+		    throw new Exception("can't instantiate parser", e);
+
+		}
 	}
 
 	private final static Logger LOG = LoggerFactory.getLogger(AudioParser.class);
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		String fic = "/mnt/media1/music/Collective Soul/Dosage/02. Heavy.flac";
 
 		AudioParser ap = new AudioParser();
@@ -71,16 +84,30 @@ public class AudioParser {
 		}
 	}
 
+	public Parser createParser() throws TikaException, IOException, SAXException {
+
+		LOG.info("Init Tika parser");
+        ClassLoader classLoader = getClass().getClassLoader();
+        Parser autoDetectParser = null;
+        try(  InputStream is = classLoader.getResourceAsStream("tika-config.xml")){
+            TikaConfig config = new TikaConfig(is);
+             autoDetectParser = new AutoDetectParser(config);
+
+        }
+
+		//Detector detector = config.getDetector();
+
+		return autoDetectParser;
+	}
 	private void parse(File f) throws IOException, SAXException, TikaException {
 
 		Metadata metadata = new Metadata();
 		BodyContentHandler ch = new BodyContentHandler();
-		//AutoDetectParser parser = new AutoDetectParser();
 
 		String mimeType = tika.detect(f);
 		metadata.set(Metadata.CONTENT_TYPE, mimeType);
 		FileInputStream is = new FileInputStream(f);
-		autoParser.parse(is, ch, metadata, new ParseContext());
+		parser.parse(is, ch, metadata, new ParseContext());
 		is.close();
 
 		for (int i = 0; i < metadata.names().length; i++) {

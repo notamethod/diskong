@@ -39,12 +39,21 @@ import java.util.List;
 
 public class AlbumVo implements IAlbumVo, Cloneable {
     private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
-    private final static String VARIOUS = "Various";
+    public final static String VARIOUS = "Various";
 
     private List<TrackInfo> tracks = new ArrayList<>();
     private String title;
     private String artist;
     private String id;
+
+    public List getArts() {
+        return arts;
+    }
+
+    public void setArts(List arts) {
+        this.arts = arts;
+    }
+
     private List arts = new ArrayList();
 
     @Override
@@ -73,6 +82,14 @@ public class AlbumVo implements IAlbumVo, Cloneable {
     private List<String> genres = new ArrayList<>();
     private List<String> images = new ArrayList<>();
 
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
     private LocalDate releaseDate;
 
     private boolean exactMatch = true;
@@ -93,81 +110,7 @@ public class AlbumVo implements IAlbumVo, Cloneable {
 
     private TagState tagState;
 
-    public void addTrack(Metadata metadata) {
 
-    }
-
-    /**
-     * Add track to album
-     * @param fPath
-     * @param metadata
-     * @throws WrongTrackAlbumException
-     */
-    private void addTrack(FilePath fPath, Metadata metadata) throws WrongTrackAlbumException {
-        // check if all tracks in folder belong to same album
-        if (metadata.get(Metadata.CONTENT_TYPE).contains("flac") || metadata.get(Metadata.CONTENT_TYPE).contains("vorbis")) {
-            if (title == null) {
-                title = metadata.get(XMPDM.ALBUM);
-            } else if (!title.equals(metadata.get(XMPDM.ALBUM))) {
-                // wrong album ?
-                throw new WrongTrackAlbumException(metadata);
-            }
-            if (artist == null) {
-                artist = metadata.get(XMPDM.ARTIST);
-            } else if (!artist.equals(metadata.get(XMPDM.ARTIST))) {
-                // wrong artist or various ?
-                artist = VARIOUS;
-                //throw new WrongTrackArtistException(metadata);
-            }
-            if (genres == null) {
-                genres = MetaUtils.getGenre(metadata);
-            }
-            if (genres.isEmpty()){
-                genres.addAll(MetaUtils.getGenre(metadata));
-            }
-
-            if (styles == null) {
-                styles = MetaUtils.getStyle(metadata);
-            }
-
-            if (styles.isEmpty()){
-                styles.addAll(MetaUtils.getStyle(metadata));
-            }
-
-            if (releaseDate == null) {
-                //may be a date or a year (afaik)
-                String dateInString = metadata.get(XMPDM.RELEASE_DATE);
-                final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                if (dateInString != null) {
-
-                    try {
-                        releaseDate = LocalDate.parse(dateInString, dtf);
-                    } catch (DateTimeParseException e) {
-                        try {
-                            int a = Integer.parseInt(dateInString);
-                            releaseDate = LocalDate.parse(dateInString + "-01-01", dtf);
-                        } catch (DateTimeParseException | NumberFormatException e1) {
-                            System.out.println("date error " + dateInString);
-                        }
-                    }
-                }
-            }
-
-            tracks.add(new TrackInfo(fPath, metadata));
-
-        } else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") ){
-            if (fPath.getFile().getName().toLowerCase().contains("folder") || fPath.getFile().getName().toLowerCase().contains("cover"))
-            {
-                LOG.debug("cover image found " + fPath.getFile().getName());
-                folderImagePath = fPath.getFile().getAbsolutePath();
-            }
-            else{
-                arts.add(fPath);
-            }
-        } else {
-            LOG.debug("type de fichier non géré:" + metadata.get(Metadata.CONTENT_TYPE));
-        }
-    }
 
     @Override
     public String toString() {
@@ -353,10 +296,7 @@ public class AlbumVo implements IAlbumVo, Cloneable {
 
     }
 
-    public void addTrack(TrackInfo trackInfo) throws WrongTrackAlbumException {
-        addTrack(trackInfo.getfPath(), trackInfo.getMetadata());
 
-    }
 
     public AlbumVo clone() {
         AlbumVo o = null;
