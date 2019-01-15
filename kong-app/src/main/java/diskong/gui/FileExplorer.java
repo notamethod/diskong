@@ -20,7 +20,6 @@ import diskong.api.ListAlbumListener;
 import diskong.core.AlbumVo;
 import diskong.core.FilePath;
 import diskong.core.TagState;
-import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
 import diskong.parser.NioDirectoryParser;
 import diskong.services.AlbumService;
@@ -60,7 +59,7 @@ public class FileExplorer implements TextEventListener {
 
     private AlbumModel model;
     private AudioService service = null;
-    private Map<Path, List<FilePath>> map;
+    private Map<Path, List<FilePath>> fileMap;
     private List<AlbumVo> albums = new ArrayList<>();
 
     private RetrieveAlbumsTasks worker;
@@ -195,14 +194,14 @@ public class FileExplorer implements TextEventListener {
         progressBar1.setVisible(true);
         DirectoryParser dirParser = new NioDirectoryParser();
         try {
-            map = dirParser.parse(file);
+            fileMap = dirParser.parse(file);
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, "File not found: " + e.getLocalizedMessage(), "error", JOptionPane.ERROR_MESSAGE);
         }
-        if (!map.isEmpty())
+        if (!fileMap.isEmpty())
             analyzeDirButton.setEnabled(true);
-        nbFiles.setText(String.valueOf(map.size()));
-        progressBar1.setMaximum(map.size());
+        nbFiles.setText(String.valueOf(fileMap.size()));
+        progressBar1.setMaximum(fileMap.size());
 
     }
 
@@ -239,27 +238,20 @@ public class FileExplorer implements TextEventListener {
 
             int checkTagged = 0;
             int taggedTrack = 0;
-//            try {
-//                AudioParser ap = new AudioParser();
-//            } catch (Exception e) {
-//                //FIXME
-//                e.printStackTrace();
-//            }
-            for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
+//
+            for (Map.Entry<Path, List<FilePath>> entry : fileMap.entrySet()) {
                 if (this.isCancelled()) {
-                    progressBar1.setMaximum(map.size());
+                    progressBar1.setMaximum(fileMap.size());
                     JOptionPane.showMessageDialog(null, "Analyse stopped");
                     return albums;
                 }
                 long startTime = System.currentTimeMillis();
 
-                //FIXME:check parser creation
                 AlbumVo avo = null;
                 try {
                     avo = service.parseDirectory(entry);
                 } catch (Exception e) {
-                    //FIXME
-                    e.printStackTrace();
+                    LOG.error(e.getLocalizedMessage(), e);
                 }
                 if (!avo.getState().equals(TagState.NOTRACKS)) {
                     LOG.info("PUBLISH"+avo.getTitle());

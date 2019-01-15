@@ -326,12 +326,7 @@ class MainForm {
 
             int checkTagged = 0;
             int taggedTrack = 0;
-            try {
-                AudioParser ap = new AudioParser();
-            } catch (Exception e) {
-                //FIXME
-                e.printStackTrace();
-            }
+
             for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
                 if (this.isCancelled()) {
                     progressBar1.setMaximum(map.size());
@@ -339,14 +334,11 @@ class MainForm {
                     return albums;
                 }
                 long startTime = System.currentTimeMillis();
-
-                //FIXME:check parser creation
                 AlbumVo avo = null;
                 try {
                     avo = service.parseDirectory(entry);
                 } catch (Exception e) {
-                    //FIXME
-                    e.printStackTrace();
+                    LOG.error(e.getLocalizedMessage(), e);
                 }
                 if (!avo.getState().equals(TagState.NOTRACKS)) {
                     publish(avo);

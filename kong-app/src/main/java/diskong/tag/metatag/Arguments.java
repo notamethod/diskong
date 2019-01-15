@@ -55,12 +55,10 @@ public class Arguments {
 
 	}
 	public String flatten() {
-		// TODO Auto-generated method stub
 		return buf.toString();
 	}
 	
 	public List<String> getList() {
-		// TODO Auto-generated method stub
 		return liste;
 	}
 	

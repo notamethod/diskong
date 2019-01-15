@@ -49,51 +49,15 @@ public class AudioService {
     }
 
 
-    public List<diskong.core.AlbumVo> traiterDir(Map<Path, List<FilePath>> map, AlbumModel model) throws Exception {
-        List<diskong.core.AlbumVo> albums = new ArrayList<>();
-        int checkTagged = 0;
-        int taggedTrack = 0;
-        try {
-            AudioParser ap = new AudioParser();
-        } catch (Exception e) {
-            //FIXME
-            e.printStackTrace();
-        }
-        for (Map.Entry<Path, List<FilePath>> entry : map.entrySet()) {
-            long startTime = System.currentTimeMillis();
-
-            //continue or stop asked every NBCHECK parsed files
-            if (checkTagged >= NBCHECK) {
-                if (contineParse()) {
-                    checkTagged = 0;
-                } else {
-                    return albums;
-                }
-            }
-            //FIXME:check parser creation
-            diskong.core.AlbumVo avo =  parseDirectory(entry);
-            if (!avo.getState().equals(TagState.NOTRACKS)) {
-                albums.add(avo);
-                model.setAlbums(albums);
-            }
-
-
-            long endTime = System.currentTimeMillis();
-            LOG.debug(" files metaparsed in " + (endTime - startTime) + " ms");
-            if (Thread.interrupted()) {
-                System.out.println("xxxxxxxxxxxxxxxxxx");
-            }
-
-        }
-        return albums;
-    }
-
-    public diskong.core.AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry) throws Exception {
+    /**
+     * Parse files with audio content in directory
+     * @param entry
+     * @return
+     */
+    public diskong.core.AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry)  {
 
         diskong.core.AlbumVo album = AlbumFactory.getAlbum();
 
-
-        try {
             // parsedir
             LOG.debug("iteration");
 
@@ -113,7 +77,7 @@ public class AudioService {
                     TrackInfo tinf = future.get();
                     addTrack(album,tinf); // (metafile)
                 } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                    LOG.error("fail to add track",e);
                 } catch (WrongTrackAlbumException e) {
                     // put track in right album
                     AlbumFactory.orderingTrack(e.getTrack());
@@ -130,22 +94,7 @@ public class AudioService {
                 LOG.info("Album parsed:" + album.toString() + album.getTracks().size());
             //model.setAlbums(albums);
             Statistics.getInstance().addStats(album);
-//                if (checkAction(album)) {
-//                    IAlbumVo alInfos = albumService.searchAlbum(album);
-//                    checkTagged += albumService.actionOnAlbum(album, alInfos);
-//                    taggedTrack += checkTagged;
-//                }
 
-//				1 <
-//						{"pagination": {"per_page": 50, "items": 1, "page": 1, "urls": {}, "pages": 1}, "results": [{"style": ["Alternative Rock", "Power Pop"], "thumb": "https://img.discogs.com/h--kMjRx67LHlr9H2DCiaGhQ6zc=/fit-in/150x150/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/R-6167017-1412736726-5831.jpeg.jpg", "format": ["CD", "Album"], "country": "US", "barcode": ["602537990726"], "uri": "/Weezer-Everything-Will-Be-Alright-In-The-End/master/741903", "community": {"have": 2744, "want": 712}, "label": ["Republic Records", "Republic Records", "Republic Records", "The Village Recorder", "South Beach Studios", "Sterling Sound"], "cover_image": "https://img.discogs.com/gpekxrOlT4AVW9-ykuOKsNQwpEQ=/fit-in/500x500/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-6167017-1412736726-5831.jpeg.jpg", "catno": "B0021619-02", "year": "2014", "genre": ["Rock"], "title": "Weezer - Everything Will Be Alright In The End", "resource_url": "https://api.discogs.com/masters/741903", "type": "master", "id": 741903}]}
-//				22:58:47.641 [main] DEBUG discogs.DiscogSearch - {"pagination":{"per_page":50,"items":1,"page":1,"urls":{},"pages":1},"results":[{"style":["Alternative Rock","Power Pop"],"thumb":"https:\/\/img.discogs.com\/h--kMjRx67LHlr9H2DCiaGhQ6zc=\/fit-in\/150x150\/filters:strip_icc():format(jpeg):mode_rgb():quality(40)\/discogs-images\/R-6167017-1412736726-5831.jpeg.jpg","format":["CD","Album"],"country":"US","barcode":["602537990726"],"uri":"\/Weezer-Everything-Will-Be-Alright-In-The-End\/master\/741903","community":{"have":2744,"want":712},"label":["Republic Records","Republic Records","Republic Records","The Village Recorder","South Beach Studios","Sterling Sound"],"cover_image":"https:\/\/img.discogs.com\/gpekxrOlT4AVW9-ykuOKsNQwpEQ=\/fit-in\/500x500\/filters:strip_icc():format(jpeg):mode_rgb():quality(90)\/discogs-images\/R-6167017-1412736726-5831.jpeg.jpg","catno":"B0021619-02","year":"2014","genre":["Rock"],"title":"Weezer - Everything Will Be Alright In The End","resource_url":"https:\/\/diskong.api.discogs.com\/masters\/741903","type":"master","id":741903}]}
-//				22:58:47.649 [main] DEBUG diskong.MassFlac - Alternative Rock Rock
-
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         return album;
     }
 

@@ -102,13 +102,7 @@ class MassFlac {
 					break;
 				}
 			}
-			//FIXME:check parser creation
-			try {
-				AudioParser ap = new AudioParser();
-			} catch (Exception e) {
-				//FIXME
-				e.printStackTrace();
-			}
+
 			diskong.core.AlbumVo album = AlbumFactory.getAlbum();
 			try {
 				// parsedir
@@ -352,24 +346,9 @@ class MassFlac {
 			}
 
 		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("retag error", e);
 			exitCode = 99;
 		}
-
-		// Map<String, String> env = pb.environment();
-		// env.put("VAR1", "myValue");
-		// env.remove("OTHERVAR");
-		// env.put("VAR2", env.get("VAR1") + "suffix");
-		// pb.directory("myDir");
-
-		// metaflac --show-tag=style /mnt/media1/music/Amen/Death\ Before\
-		// Musick/01.\ Liberation\ For....flac
-		// metaflac --set-tag=GENRE=Rock /mnt/media1/music/Weezer/Everything\
-		// Will\ Be\ Alright\ in\ the\ End/01.\ Ain’t\ Got\ Nobody.flac
-		// $ metaflac --show-tag=genre /mnt/media1/music/Weezer/Everything\
-		// Will\ Be\ Alright\ in\ the\ End/01.\ Ain’t\ Got\ Nobody.flac
-		//
 
 		return exitCode;
 	}
