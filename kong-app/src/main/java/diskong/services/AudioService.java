@@ -19,13 +19,12 @@ package diskong.services;
 import diskong.AlbumFactory;
 import diskong.Statistics;
 import diskong.core.*;
-import diskong.gui.AlbumModel;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
 import diskong.parser.MetaUtils;
+import diskong.parser.TikaAudioParser;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
-import org.apache.tika.parser.AutoDetectParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,7 @@ public class AudioService {
     private final static Logger LOG = LoggerFactory.getLogger(AudioService.class);
     private static int NBCHECK = 200;
     AlbumService albumService = new AlbumService();
-    AudioParser autoParser=new AudioParser();
+    AudioParser autoParser=new TikaAudioParser();
 
     public AudioService() throws Exception {
     }

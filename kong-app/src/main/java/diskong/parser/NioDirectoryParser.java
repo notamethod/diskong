@@ -74,7 +74,7 @@ public class NioDirectoryParser implements DirectoryParser {
 
 	private void parsePath(Path dir) {
 
-		DirectoryStream<Path> stream;
+		DirectoryStream<Path> stream = null;
 
 		try {
 
@@ -98,11 +98,18 @@ public class NioDirectoryParser implements DirectoryParser {
 					cpt++;
 				}
 			}
-			stream.close();
+		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 	}
 
 	// private void traiterFichier(Path path) {

@@ -22,9 +22,7 @@ import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;
-import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,14 +50,17 @@ public class CallTrackInfo implements Callable<TrackInfo> {
 	public TrackInfo call() throws Exception {
 		Metadata metadata = new Metadata();
 		BodyContentHandler ch = new BodyContentHandler();
-		AudioParser callParser = parser==null?new AudioParser():parser;
+		AudioParser callParser = parser==null?new TikaAudioParser():parser;
 
 		String mimeType = new Tika().detect(fPath.getFile());
 		metadata.set(Metadata.CONTENT_TYPE, mimeType);
-		InputStream is = Files.newInputStream(fPath.getPath(), StandardOpenOption.READ);
 
-		callParser.getParser().parse(is, ch, metadata, new ParseContext());
-		is.close();
+		try(InputStream is = Files.newInputStream(fPath.getPath(), StandardOpenOption.READ);) {
+			callParser.parse(is, ch, metadata);
+		} catch (ParserException e) {
+			e.printStackTrace();
+		}
+
 		if (LOG.isTraceEnabled()) {
 			LOG.trace("artist:" + metadata.get(XMPDM.ARTIST) + " album:" + metadata.get(XMPDM.ALBUM) + " track:no:"
 					+ metadata.get(XMPDM.TRACK_NUMBER) + " title:" + metadata.get(TikaCoreProperties.TITLE) );

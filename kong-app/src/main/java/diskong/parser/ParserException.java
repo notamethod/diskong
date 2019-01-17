@@ -16,17 +16,8 @@
 
 package diskong.parser;
 
-import diskong.core.FilePath;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.sax.BodyContentHandler;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-public interface AudioParser {
-    Metadata parse(FilePath fPath) throws IOException, SAXException, TikaException;
-
-    void parse(InputStream is, BodyContentHandler ch, Metadata metadata) throws ParserException;
+public class ParserException extends Throwable {
+    public ParserException(Exception e) {
+        super(e);
+    }
 }
