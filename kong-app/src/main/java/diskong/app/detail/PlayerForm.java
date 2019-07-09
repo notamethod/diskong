@@ -392,20 +392,20 @@ public class PlayerForm implements EventListener {
             if (slider.getPaintTrack() && clip.intersects(trackRect)) {
                 paintTrack(g);
             }
-            if (slider.getPaintTicks() && clip.intersects(tickRect)) {
-                paintTicks(g);
-            }
-            if (slider.getPaintLabels() && clip.intersects(labelRect)) {
-                paintLabels(g);
-            }
+//            if (slider.getPaintTicks() && clip.intersects(tickRect)) {
+//                paintTicks(g);
+//            }
+//            if (slider.getPaintLabels() && clip.intersects(labelRect)) {
+//                paintLabels(g);
+//            }
             if (slider.hasFocus() && clip.intersects(focusRect)) {
                 paintFocus(g);
             }
             if (clip.intersects(thumbRect)) {
-                Color savedColor = slider.getBackground();
-                slider.setBackground(thumbColor);
+//                Color savedColor = slider.getBackground();
+//                slider.setBackground(thumbColor);
                 paintThumb(g);
-                slider.setBackground(savedColor);
+//                slider.setBackground(savedColor);
             }
         }
     }
