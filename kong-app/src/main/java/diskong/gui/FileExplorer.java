@@ -191,6 +191,7 @@ public class FileExplorer implements TextEventListener {
 
     }
     private void parseDir(File file) {
+        //FIXME if it is a file
         progressBar1.setVisible(true);
         DirectoryParser dirParser = new NioDirectoryParser();
         try {

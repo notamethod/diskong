@@ -65,6 +65,8 @@ public class PlayerForm implements EventListener {
     private JLabel year;
     private JButton analyseButton;
     private JSlider musicSlider;
+    private JLabel jlArtist;
+    private JLabel jlTitle;
     private TrackModel model;
     private BasicSliderUI sliderUi;
     private PlayerForm.MySwingWorker worker;
@@ -82,7 +84,7 @@ public class PlayerForm implements EventListener {
 
         musicSlider.setPaintTrack(true);
         musicSlider.setUI(new PlayerForm.ColoredThumbSliderUI(musicSlider, Color.red));
-        //setPaintTrack(
+        musicSlider.setForeground(Color.red);
 
         analyseButton.addActionListener(new ActionListener() {
             @Override
@@ -225,7 +227,6 @@ public class PlayerForm implements EventListener {
                     togglePlayButton.setSelected(true);
                     //worker not null: a track is playing
                     if (worker != null) {
-                        TrackInfo tm = ((TrackModel) table.getModel()).getRow(table.getSelectedRow());
                         for (GuiListener listener : listeners) {
                             listener.selectTrackRequested(row);
                         }
@@ -280,9 +281,19 @@ public class PlayerForm implements EventListener {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 table1.setRowSelectionInterval(t, t);
+                updateComponents(t);
 
             }
         });
+    }
+
+    private void updateComponents(int t) {
+        System.out.println("update co");
+        if (albumOri != null && albumOri.getTracks() != null){
+            TrackInfo track = albumOri.getTracks().get(t);
+            jlArtist.setText((String) track.getArtist() + " ("+albumOri.getTitle()+")");
+            jlTitle.setText(track.getTitle());
+        }
     }
 
     private void moveSlider(MouseEvent ev) {
@@ -382,6 +393,7 @@ public class PlayerForm implements EventListener {
         ColoredThumbSliderUI(JSlider s, Color tColor) {
             super(s);
             thumbColor = tColor;
+
         }
 
         public void paint(Graphics g, JComponent c) {

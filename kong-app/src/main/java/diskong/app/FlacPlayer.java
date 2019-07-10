@@ -79,17 +79,6 @@ public class FlacPlayer implements Player {
             e.printStackTrace();
         }
         System.out.println(firstToPlay+"fin");
-//        for (TrackInfo track : album.getTracks()) {
-//            try {
-//                play(track.getfPath().getFile(), true);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } catch (LineUnavailableException e) {
-//                e.printStackTrace();
-//            }
-//        }
 
     }
 

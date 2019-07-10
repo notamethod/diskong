@@ -32,7 +32,9 @@ not released yet
 * metatag
 
 ### Next main features
-* Indexing collection with Apache Solr
+* Indexing collection with Apache Solr: well, not a good idea...
+* indexing with lightweight database
+* adding playlist feature
 
 
 
