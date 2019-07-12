@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package diskong.services;
+package diskong.app.services;
 
-import diskong.core.IAlbumVo;
-import diskong.core.TrackInfo;
+import diskong.core.bean.IAlbumVo;
+import diskong.core.bean.TrackInfo;
 import diskong.parser.MetaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

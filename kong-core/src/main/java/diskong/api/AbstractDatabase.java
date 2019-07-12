@@ -16,10 +16,7 @@
 
 package diskong.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import diskong.core.IAlbumVo;
+import diskong.core.bean.IAlbumVo;
 import diskong.core.EmptyResultException;
 
 public abstract class AbstractDatabase {

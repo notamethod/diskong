@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package diskong.services;
+package diskong.app.services;
 
 import diskong.AlbumFactory;
 import diskong.Statistics;
 import diskong.core.*;
+import diskong.core.bean.AlbumVo;
+import diskong.core.bean.TrackInfo;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
 import diskong.parser.MetaUtils;
@@ -53,9 +55,9 @@ public class AudioService {
      * @param entry
      * @return
      */
-    public diskong.core.AlbumVo parseDirectory(Map.Entry<Path, List<FilePath>> entry)  {
-
-        diskong.core.AlbumVo album = AlbumFactory.getAlbum();
+    public AlbumVo parseDirectoryForAlbum(Map.Entry<Path, List<FilePath>> entry)  {
+        //FIXME multi albums in one directory
+        AlbumVo album = AlbumFactory.getAlbum();
 
             // parsedir
             LOG.debug("iteration");
@@ -63,15 +65,15 @@ public class AudioService {
             album.setState(diskong.core.TagState.TOTAG);
             LOG.debug("**************START******************************");
             ExecutorService executor = Executors.newFixedThreadPool(10);
-            List<Future<diskong.core.TrackInfo>> list = new ArrayList<>();
+            List<Future<TrackInfo>> list = new ArrayList<>();
             for (FilePath fPath : entry.getValue()) {
                 LOG.debug(fPath.getFile().getAbsolutePath());
-                Callable<diskong.core.TrackInfo> worker = new CallTrackInfo(fPath, autoParser);
-                Future<diskong.core.TrackInfo> submit = executor.submit(worker);
+                Callable<TrackInfo> worker = new CallTrackInfo(fPath, autoParser);
+                Future<TrackInfo> submit = executor.submit(worker);
                 list.add(submit);
             }
 
-            for (Future<diskong.core.TrackInfo> future : list) {
+            for (Future<TrackInfo> future : list) {
                 try {
                     TrackInfo tinf = future.get();
                     addTrack(album,tinf); // (metafile)

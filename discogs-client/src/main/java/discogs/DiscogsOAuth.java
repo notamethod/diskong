@@ -24,7 +24,7 @@ import diskong.api.ApiConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.net.HttpHeaders;
+//import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
@@ -35,6 +35,8 @@ import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
+
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * Hello world!

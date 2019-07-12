@@ -16,7 +16,7 @@
 
 package diskong.app.detail;
 
-import diskong.core.IAlbumVo;
+import diskong.core.bean.IAlbumVo;
 
 import javax.swing.*;
 import java.io.File;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package diskong.api;
+package diskong.app.track;
 
-import diskong.core.bean.AlbumVo;
+import diskong.app.track.TrackEntity;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ListAlbumListener {
-    void actionRequested(AlbumVo album);
-
+@Repository
+public interface TrackRepository
+        extends CrudRepository<TrackEntity, String> {
 }

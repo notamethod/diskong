@@ -16,7 +16,7 @@
 
 package diskong.gui;
 
-import diskong.core.TrackInfo;
+import diskong.core.bean.TrackInfo;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
@@ -29,7 +29,6 @@ public class TrackModel extends AbstractTableModel{
 
     public TrackModel() {
         super();
-        //albums= new ArrayList<>();
     }
 
     protected String[] colName=new String[]{"Num.", "Title","Artist"};

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package diskong.api;
+package diskong.app.track;
 
-import diskong.core.bean.AlbumVo;
+import java.util.Collection;
 
-public interface ListAlbumListener {
-    void actionRequested(AlbumVo album);
+public interface TrackService {
 
+    Collection<TrackEntity> findAll();
+    TrackEntity findOne(Long id);
+    TrackEntity create(TrackEntity greeting);
 }

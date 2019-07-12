@@ -22,16 +22,15 @@ import diskong.app.cdrip.GuiPreferences;
 import diskong.app.cdrip.RipForm;
 import diskong.app.detail.DetailForm;
 import diskong.app.tagger.TaggerException;
-import diskong.core.AlbumVo;
+import diskong.core.bean.AlbumVo;
 import diskong.core.FilePath;
-import diskong.core.IAlbumVo;
+import diskong.core.bean.IAlbumVo;
 import diskong.core.TagState;
-import diskong.parser.AudioParser;
 import diskong.parser.DirectoryParser;
 import diskong.parser.MetaUtils;
 import diskong.parser.NioDirectoryParser;
-import diskong.services.AlbumService;
-import diskong.services.AudioService;
+import diskong.app.services.AlbumService;
+import diskong.app.services.AudioService;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 import org.dpr.swingtools.components.JDropText;
@@ -336,7 +335,7 @@ class MainForm {
                 long startTime = System.currentTimeMillis();
                 AlbumVo avo = null;
                 try {
-                    avo = service.parseDirectory(entry);
+                    avo = service.parseDirectoryForAlbum(entry);
                 } catch (Exception e) {
                     LOG.error(e.getLocalizedMessage(), e);
                 }

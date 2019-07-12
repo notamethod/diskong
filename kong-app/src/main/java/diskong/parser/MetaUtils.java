@@ -16,7 +16,7 @@
 
 package diskong.parser;
 
-import diskong.core.IAlbumVo;
+import diskong.core.bean.IAlbumVo;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.Property;
 import org.apache.tika.metadata.XMPDM;

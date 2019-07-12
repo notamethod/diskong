@@ -17,12 +17,11 @@
 package diskong.parser;
 
 import diskong.core.FilePath;
-import diskong.core.TrackInfo;
+import diskong.core.bean.TrackInfo;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;
-import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

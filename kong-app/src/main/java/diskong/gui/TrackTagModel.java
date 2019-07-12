@@ -16,8 +16,8 @@
 
 package diskong.gui;
 
-import diskong.core.IAlbumVo;
-import diskong.core.TrackInfo;
+import diskong.core.bean.IAlbumVo;
+import diskong.core.bean.TrackInfo;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.Collections;

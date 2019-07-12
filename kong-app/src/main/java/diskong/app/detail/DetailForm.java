@@ -21,13 +21,13 @@ import diskong.api.EventListener;
 import diskong.api.GuiListener;
 import diskong.app.FlacPlayer;
 import diskong.app.tagger.TaggerForm;
-import diskong.core.AlbumVo;
-import diskong.core.IAlbumVo;
-import diskong.core.TrackInfo;
+import diskong.core.bean.AlbumVo;
+import diskong.core.bean.IAlbumVo;
+import diskong.core.bean.TrackInfo;
 import diskong.gui.GenericForm;
 import diskong.gui.TableColumnAdjuster;
 import diskong.gui.TrackModel;
-import diskong.services.AlbumService;
+import diskong.app.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package diskong.core;
+package diskong.core.bean;
 
 import java.util.List;
 
-import diskong.core.TrackInfo;
 import org.codehaus.jettison.json.JSONArray;
 
 public interface IAlbumVo {

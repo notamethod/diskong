@@ -17,7 +17,7 @@
 package diskong.app.cdrip;
 
 
-import diskong.core.TrackInfo;
+import diskong.core.bean.TrackInfo;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

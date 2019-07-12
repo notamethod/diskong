@@ -16,10 +16,9 @@
 
 package diskong.api;
 
-import diskong.core.IAlbumVo;
+import diskong.core.bean.IAlbumVo;
 import diskong.core.EmptyResultException;
 
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.List;
 
 public interface DatabaseSearch {

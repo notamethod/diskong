@@ -16,7 +16,7 @@
 
 package diskong;
 
-import diskong.core.AlbumVo;
+import diskong.core.bean.AlbumVo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.List;
 public class Statistics {
 
 
-    private List<diskong.core.AlbumVo> missingImages = new ArrayList<>();
+    private List<AlbumVo> missingImages = new ArrayList<>();
 
     /** Constructeur privé */
     private Statistics()

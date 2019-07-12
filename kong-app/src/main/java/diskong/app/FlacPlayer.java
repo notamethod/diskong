@@ -19,8 +19,8 @@ package diskong.app;
 
 import diskong.api.EventListener;
 import diskong.api.GuiListener;
-import diskong.core.IAlbumVo;
-import diskong.core.TrackInfo;
+import diskong.core.bean.IAlbumVo;
+import diskong.core.bean.TrackInfo;
 import io.nayuki.flac.common.StreamInfo;
 import io.nayuki.flac.decode.FlacDecoder;
 

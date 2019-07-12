@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package diskong.core;
+package diskong.core.bean;
 
+import diskong.core.FilePath;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;

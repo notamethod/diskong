@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.net.URISyntaxException;
 import java.util.*;
+import diskong.app.cdrip.RipHandler;
 
 import static org.junit.Assert.*;
 
@@ -32,6 +33,7 @@ public class AbcdeHandlerTest {
         String line = "Ripping from sector   42246 (track  3 [0:00.00])";
         try {
             RipHandler handler = new AbcdeHandler();
+
             assertEquals(handler.splitRip(line), Integer.valueOf(3));
 
         } catch (URISyntaxException e) {

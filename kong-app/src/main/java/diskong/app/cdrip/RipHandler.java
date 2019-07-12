@@ -16,7 +16,7 @@
 
 package diskong.app.cdrip;
 
-import diskong.core.TrackInfo;
+import diskong.core.bean.TrackInfo;
 
 import java.io.IOException;
 import java.util.List;

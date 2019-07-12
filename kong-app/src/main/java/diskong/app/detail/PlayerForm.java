@@ -20,16 +20,21 @@ import diskong.api.ApiConfigurationException;
 import diskong.api.EventListener;
 import diskong.api.GuiListener;
 import diskong.app.FlacPlayer;
+import diskong.app.track.TrackServiceImpl;
 import diskong.app.tagger.TaggerForm;
-import diskong.core.AlbumVo;
-import diskong.core.IAlbumVo;
-import diskong.core.TrackInfo;
+import diskong.core.bean.AlbumVo;
+import diskong.core.bean.IAlbumVo;
+import diskong.core.bean.TrackInfo;
+import diskong.app.track.TrackEntity;
 import diskong.gui.GenericForm;
 import diskong.gui.TableColumnAdjuster;
 import diskong.gui.TrackModel;
-import diskong.services.AlbumService;
+import diskong.app.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -46,13 +51,20 @@ import java.util.List;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
+@Component
+@Configurable
 public class PlayerForm implements EventListener {
-    public JPanel getMainPanel() {
-        return mainPanel;
-    }
 
     private final static Logger LOG = LoggerFactory.getLogger(PlayerForm.class);
-    private JPanel mainPanel;
+
+    @Autowired
+    private TrackServiceImpl trackService;
+
+    public JPanel getMainPanel1() {
+        return mainPanel1;
+    }
+
+    private JPanel mainPanel1;
     private JScrollPane scrollPane1;
     private JTable table1;
     private JButton prevBtn;
@@ -73,11 +85,10 @@ public class PlayerForm implements EventListener {
     private List<GuiListener> listeners;
     AlbumVo albumOri;
 
-
-    public PlayerForm(AlbumVo albumOri) throws IOException {
+    public PlayerForm() throws IOException {
         //Test txo test 3
-        this.albumOri = albumOri;
 
+        LOG.info("CREATE PLAYERFORM");
         sliderUi = new MetalSliderUI();
         listeners = new ArrayList<>();
         // musicSlider.setUI(sliderUi);
@@ -85,62 +96,6 @@ public class PlayerForm implements EventListener {
         musicSlider.setPaintTrack(true);
         musicSlider.setUI(new PlayerForm.ColoredThumbSliderUI(musicSlider, Color.red));
         musicSlider.setForeground(Color.red);
-
-        analyseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                AlbumService albumService = new AlbumService();
-                IAlbumVo a2 = null;
-                try {
-                    a2 = albumService.searchAlbum(albumOri);
-                } catch (ApiConfigurationException e) {
-                    LOG.error("oauth error", e);
-                    JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                if (a2 != null)
-                    //found: ok
-                    LOG.info(albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
-                    //JOptionPane.showMessageDialog(null, albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
-                else {
-                    GenericForm gf = new GenericForm();
-                    a2 = gf.manualSearch(albumOri);
-
-                }
-                if (a2 != null) {
-                    IAlbumVo albumNew = a2;
-                    if (a2.getTracks().size() == albumOri.getTracks().size()) {
-                        TaggerForm tf = new TaggerForm(albumOri, albumNew);
-                        tf.pack();
-
-                        tf.setVisible(true);
-                    } else
-                        JOptionPane.showMessageDialog(null, "nombre de pistes ne correspond pas " + albumService.getSearchAPI());
-                    styles.setText(String.join(", ", a2.getStyles()));
-
-                    genres.setText(String.join(", ", a2.getGenres()));
-                    year.setText(a2.getYear());
-                }
-
-            }
-        });
-
-
-        pageTitle.setText(albumOri.getArtist() + " - " + albumOri.getTitle());
-        styles.setText(String.join(", ", albumOri.getStyles()));
-        genres.setText(String.join(", ", albumOri.getGenres()));
-        year.setText(albumOri.getYear());
-
-        // setting (if any) image from folder
-        if (albumOri.getFolderImagePath() != null) {
-            ImageIcon imgi;
-            try {
-                imgi = new ImageIcon(new File(albumOri.getFolderImagePath()).toURI().toURL());
-                jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
 
         musicSlider.addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseDragged(MouseEvent ev) {
@@ -166,6 +121,58 @@ public class PlayerForm implements EventListener {
         togglePlayButton.setPressedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
         togglePlayButton.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
         togglePlayButton.setSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_pause.svg.png"))));
+
+        button1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (worker != null) {
+                    for (GuiListener listener : listeners) {
+                        listener.nextRequested();
+                    }
+
+                }
+            }
+        });
+        prevBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (worker != null) {
+                    for (GuiListener listener : listeners) {
+                        listener.previousRequested();
+                    }
+
+                }
+            }
+        });
+
+
+
+        TableColumnAdjuster tca = new TableColumnAdjuster(table1);
+        tca.setColumnHeaderIncluded(false);
+        tca.adjustColumns();
+
+    }
+
+    public void init(AlbumVo albumIn){
+        this.albumOri = albumIn;
+        model.setElements(albumOri.getTracks());
+        pageTitle.setText(albumOri.getArtist() + " - " + albumOri.getTitle());
+        styles.setText(String.join(", ", albumOri.getStyles()));
+        genres.setText(String.join(", ", albumOri.getGenres()));
+        year.setText(albumOri.getYear());
+
+        analyseButton.addActionListener(event -> analyze());
+
+        // setting (if any) image from folder
+        if (albumOri.getFolderImagePath() != null) {
+            ImageIcon imgi;
+            try {
+                imgi = new ImageIcon(new File(albumOri.getFolderImagePath()).toURI().toURL());
+                jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
         togglePlayButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -194,29 +201,6 @@ public class PlayerForm implements EventListener {
                 }
             }
         });
-        button1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (worker != null) {
-                    for (GuiListener listener : listeners) {
-                        listener.nextRequested();
-                    }
-
-                }
-            }
-        });
-        prevBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (worker != null) {
-                    for (GuiListener listener : listeners) {
-                        listener.previousRequested();
-                    }
-
-                }
-            }
-        });
-
         table1.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
@@ -243,11 +227,6 @@ public class PlayerForm implements EventListener {
                 }
             }
         });
-
-        TableColumnAdjuster tca = new TableColumnAdjuster(table1);
-        tca.setColumnHeaderIncluded(false);
-        tca.adjustColumns();
-
         jlImg.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -257,6 +236,41 @@ public class PlayerForm implements EventListener {
                 dialog.setVisible(true);
             }
         });
+    }
+    private void analyze() {
+        AlbumService albumService = new AlbumService();
+        IAlbumVo a2 = null;
+        try {
+            a2 = albumService.searchAlbum(albumOri);
+        } catch (ApiConfigurationException e) {
+            LOG.error("oauth error", e);
+            JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (a2 != null)
+            //found: ok
+            LOG.info(albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
+            //JOptionPane.showMessageDialog(null, albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
+        else {
+            GenericForm gf = new GenericForm();
+            a2 = gf.manualSearch(albumOri);
+
+        }
+        if (a2 != null) {
+            IAlbumVo albumNew = a2;
+            if (a2.getTracks().size() == albumOri.getTracks().size()) {
+                TaggerForm tf = new TaggerForm(albumOri, albumNew);
+                tf.pack();
+
+                tf.setVisible(true);
+            } else
+                JOptionPane.showMessageDialog(null, "nombre de pistes ne correspond pas " + albumService.getSearchAPI());
+            styles.setText(String.join(", ", a2.getStyles()));
+
+            genres.setText(String.join(", ", a2.getGenres()));
+            year.setText(a2.getYear());
+        }
+
     }
 
     /**
@@ -293,6 +307,8 @@ public class PlayerForm implements EventListener {
             TrackInfo track = albumOri.getTracks().get(t);
             jlArtist.setText((String) track.getArtist() + " ("+albumOri.getTitle()+")");
             jlTitle.setText(track.getTitle());
+            TrackEntity savedGreeting = trackService.create(new TrackEntity(track));
+
         }
     }
 
@@ -312,7 +328,8 @@ public class PlayerForm implements EventListener {
             }
         }
         JFrame frame = new JFrame("FileExplorer");
-        frame.setContentPane(new PlayerForm(null).mainPanel);
+        PlayerForm pf = new PlayerForm();
+        frame.setContentPane(pf.mainPanel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.pack();
@@ -320,7 +337,7 @@ public class PlayerForm implements EventListener {
     }
 
     private void createUIComponents() {
-        model = new TrackModel(albumOri.getTracks());
+        model = new TrackModel();
         table1 = new JTable(model);
         //make transparent background
         scrollPane1 = new JScrollPane(table1);
@@ -335,8 +352,6 @@ public class PlayerForm implements EventListener {
         ((DefaultTableCellRenderer) table1.getDefaultRenderer(Object.class)).setOpaque(false);
         //autoresize columns
         table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // this is obvius part
-
-
     }
 
     @Override

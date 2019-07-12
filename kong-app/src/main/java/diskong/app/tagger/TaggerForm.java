@@ -17,12 +17,12 @@
 package diskong.app.tagger;
 
 import diskong.Utils;
-import diskong.core.AlbumVo;
-import diskong.core.IAlbumVo;
+import diskong.core.bean.AlbumVo;
+import diskong.core.bean.IAlbumVo;
 import diskong.gui.RetagSelectionDialog;
 import diskong.gui.TrackTagModel;
 import diskong.parser.MetaUtils;
-import diskong.services.AlbumService;
+import diskong.app.services.AlbumService;
 import org.apache.tika.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

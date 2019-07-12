@@ -16,7 +16,7 @@
 
 package diskong.gui;
 
-import diskong.core.AlbumVo;
+import diskong.core.bean.AlbumVo;
 
 import javax.swing.*;
 import java.awt.event.*;

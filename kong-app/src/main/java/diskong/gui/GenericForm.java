@@ -17,9 +17,9 @@
 package diskong.gui;
 
 import diskong.api.ApiConfigurationException;
-import diskong.core.AlbumVo;
-import diskong.core.IAlbumVo;
-import diskong.services.AlbumService;
+import diskong.core.bean.AlbumVo;
+import diskong.core.bean.IAlbumVo;
+import diskong.app.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

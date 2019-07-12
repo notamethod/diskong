@@ -17,7 +17,7 @@
 package diskong.app.cdrip;
 
 import diskong.app.JOptionScrollPane;
-import diskong.core.TrackInfo;
+import diskong.core.bean.TrackInfo;
 import diskong.gui.TrackRipModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

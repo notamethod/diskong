@@ -17,13 +17,13 @@
 package diskong.gui;
 
 import diskong.api.ListAlbumListener;
-import diskong.core.AlbumVo;
+import diskong.core.bean.AlbumVo;
 import diskong.core.FilePath;
 import diskong.core.TagState;
 import diskong.parser.DirectoryParser;
 import diskong.parser.NioDirectoryParser;
-import diskong.services.AlbumService;
-import diskong.services.AudioService;
+import diskong.app.services.AlbumService;
+import diskong.app.services.AudioService;
 import org.dpr.swingtools.TextEventListener;
 import org.dpr.swingtools.components.JDropText;
 import org.slf4j.Logger;
@@ -33,12 +33,8 @@ import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -53,8 +49,8 @@ public class FileExplorer implements TextEventListener {
     protected AlbumService albumService = new AlbumService();
     private TableModelListener tListener;
 
-    public JPanel getMainPanel() {
-        return mainPanel;
+    public JPanel getMainPanel1() {
+        return mainPanel1;
     }
 
     private AlbumModel model;
@@ -68,7 +64,7 @@ public class FileExplorer implements TextEventListener {
     private JButton stopButton;
     private JLabel nbFiles;
     private JScrollPane scrollPane1;
-    private JPanel mainPanel;
+    private JPanel mainPanel1;
     private JTable table1;
     private JProgressBar progressBar1;
     private JPanel albumPanel;
@@ -77,31 +73,19 @@ public class FileExplorer implements TextEventListener {
 
     @Override
     public void textChanged(String text) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                /* Démarrage de l'interface graphique et du SwingWorker. */
-
-                worker = new RetrieveAlbumsTasks(model, 2);
-                worker.execute();
-            }
+        SwingUtilities.invokeLater(() -> {
+            /* Démarrage de l'interface graphique et du SwingWorker. */
+            worker = new RetrieveAlbumsTasks(model, 2);
+            worker.execute();
         });
     }
 
     public FileExplorer() throws Exception {
         service = new AudioService();
         listenToTableAlbum = new ArrayList<>();
-        stopButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                worker.cancel(true);
-            }
-        });
-        pathField.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                //dunno
-            }
+        stopButton.addActionListener(actionEvent -> worker.cancel(true));
+        pathField.addPropertyChangeListener(evt -> {
+            //dunno
         });
         table1.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent mouseEvent) {
@@ -116,25 +100,6 @@ public class FileExplorer implements TextEventListener {
             }
         });
         pathField.addListener(this);
-//        table1.setModel(model);
-//                table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//
-//        table1.getColumnModel().getColumn(0).setMinWidth(300);
-//        table1.getColumnModel().getColumn(0).setPreferredWidth(500);
-//        table1.getColumnModel().getColumn(0).setMaxWidth(500);
-//        table1.getColumnModel().getColumn(1).setMinWidth(200);
-//        table1.getColumnModel().getColumn(1).setPreferredWidth(300);
-//        table1.getColumnModel().getColumn(1).setMaxWidth(300);
-//        table1.getColumnModel().getColumn(2).setMinWidth(150);
-//        table1.getColumnModel().getColumn(2).setPreferredWidth(300);
-//        table1.getColumnModel().getColumn(2).setMaxWidth(300);
-//        //year
-//        table1.getColumnModel().getColumn(3).setMinWidth(50);
-//        table1.getColumnModel().getColumn(3).setPreferredWidth(50);
-//        table1.getColumnModel().getColumn(3).setMaxWidth(50);
-//        table1.getColumnModel().getColumn(4).setMinWidth(50);
-//        table1.getColumnModel().getColumn(4).setPreferredWidth(150);
-//        table1.getColumnModel().getColumn(4).setMaxWidth(150);
         albumPanel.add(scrollPane1);
      // table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
         scrollPane1.setPreferredSize(new Dimension(780,300));
@@ -153,7 +118,7 @@ public class FileExplorer implements TextEventListener {
         }
         FileExplorer fe = new FileExplorer();
         JFrame frame = new JFrame("FileExplorer");
-        frame.setContentPane(fe.mainPanel);
+        frame.setContentPane(fe.mainPanel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.pack();
@@ -250,7 +215,7 @@ public class FileExplorer implements TextEventListener {
 
                 AlbumVo avo = null;
                 try {
-                    avo = service.parseDirectory(entry);
+                    avo = service.parseDirectoryForAlbum(entry);
                 } catch (Exception e) {
                     LOG.error(e.getLocalizedMessage(), e);
                 }

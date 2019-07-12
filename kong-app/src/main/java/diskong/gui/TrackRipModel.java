@@ -16,8 +16,6 @@
 
 package diskong.gui;
 
-import diskong.core.TrackInfo;
-
 import java.util.HashMap;
 import java.util.Map;
 

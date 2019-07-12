@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package diskong.core;
+package diskong.core.bean;
 
 
+import diskong.core.TagState;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;
@@ -25,18 +26,14 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-import javax.management.AttributeList;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
+@Component
 public class AlbumVo implements IAlbumVo, Cloneable {
     private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
     public final static String VARIOUS = "Various";
