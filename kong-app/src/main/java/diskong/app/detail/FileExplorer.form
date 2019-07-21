@@ -74,6 +74,12 @@
               <text value="Stop"/>
             </properties>
           </component>
+          <component id="ebc74" class="javax.swing.JButton" binding="closeButton" default-binding="true">
+            <constraints/>
+            <properties>
+              <text value="Close"/>
+            </properties>
+          </component>
         </children>
       </grid>
       <component id="a528d" class="org.dpr.swingtools.components.JDropText" binding="pathField" custom-create="true">

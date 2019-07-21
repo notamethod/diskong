@@ -36,6 +36,8 @@ import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -45,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static diskong.app.DkMainApp.TOP_PANEL;
 import static javax.swing.UIManager.setLookAndFeel;
 
 @Component
@@ -75,6 +78,7 @@ public class FileExplorer implements TextEventListener {
     private JTable table1;
     private JProgressBar progressBar1;
     private JPanel albumPanel;
+    private JButton closeButton;
     private List<ListAlbumListener> listenToTableAlbum;
 
 
@@ -111,6 +115,17 @@ public class FileExplorer implements TextEventListener {
         albumPanel.add(scrollPane1);
      // table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
         scrollPane1.setPreferredSize(new Dimension(780,300));
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JButton button = (JButton)e.getSource();
+                JPanel buttonPanel = (JPanel)button.getParent();
+                JPanel exPanel = (JPanel)buttonPanel.getParent();
+                JPanel cardLayoutPanel = (JPanel)exPanel.getParent();
+                CardLayout layout = (CardLayout)cardLayoutPanel.getLayout();
+                layout.show(cardLayoutPanel, TOP_PANEL);
+            }
+        });
     }
 
     public static void main(String[] args) throws Exception {

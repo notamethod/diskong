@@ -20,6 +20,13 @@
         <properties/>
         <border type="none"/>
         <children>
+          <component id="e8ac0" class="javax.swing.JButton" binding="addButton">
+            <constraints/>
+            <properties>
+              <actionCommand value="Add"/>
+              <text value="Button"/>
+            </properties>
+          </component>
           <component id="51f4e" class="javax.swing.JButton" binding="ripButton" default-binding="true">
             <constraints/>
             <properties>
@@ -39,40 +46,13 @@
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="1" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <dividerLocation value="140"/>
+          <dividerLocation value="120"/>
           <dividerSize value="0"/>
           <oneTouchExpandable value="true"/>
         </properties>
         <border type="none"/>
         <children>
-          <splitpane id="aca7c" binding="verticalSplit">
-            <constraints>
-              <splitpane position="right"/>
-            </constraints>
-            <properties>
-              <continuousLayout value="false"/>
-              <dividerLocation value="300"/>
-              <orientation value="0"/>
-              <resizeWeight value="0.0"/>
-            </properties>
-            <border type="none"/>
-            <children>
-              <grid id="aa72b" binding="playerPanel" layout-manager="CardLayout" hgap="0" vgap="0">
-                <constraints>
-                  <splitpane position="right"/>
-                </constraints>
-                <properties/>
-                <border type="none"/>
-                <children/>
-              </grid>
-              <nested-form id="77342" form-file="diskong/app/detail/FileExplorer.form" binding="fileExplorerPane">
-                <constraints>
-                  <splitpane position="left"/>
-                </constraints>
-              </nested-form>
-            </children>
-          </splitpane>
-          <grid id="af752" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="af752" binding="leftPanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <splitpane position="left"/>
@@ -113,6 +93,16 @@
                 </properties>
               </component>
             </children>
+          </grid>
+          <grid id="86c89" binding="topPanel" custom-create="true" layout-manager="CardLayout" hgap="0" vgap="0">
+            <constraints>
+              <splitpane position="right"/>
+            </constraints>
+            <properties>
+              <preferredSize width="240" height="0"/>
+            </properties>
+            <border type="none"/>
+            <children/>
           </grid>
         </children>
       </splitpane>

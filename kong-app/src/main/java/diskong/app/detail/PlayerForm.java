@@ -20,7 +20,7 @@ import diskong.api.ApiConfigurationException;
 import diskong.api.EventListener;
 import diskong.api.GuiListener;
 import diskong.app.FlacPlayer;
-import diskong.app.track.TrackServiceImpl;
+import diskong.app.services.DataServiceImpl;
 import diskong.app.tagger.TaggerForm;
 import diskong.core.bean.AlbumVo;
 import diskong.core.bean.IAlbumVo;
@@ -58,7 +58,7 @@ public class PlayerForm implements EventListener {
     private final static Logger LOG = LoggerFactory.getLogger(PlayerForm.class);
 
     @Autowired
-    private TrackServiceImpl trackService;
+    private DataServiceImpl trackService;
 
     public JPanel getMainPanel1() {
         return mainPanel1;

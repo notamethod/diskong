@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package diskong.app.track;
+package diskong.app.album;
 
-import diskong.app.album.AlbumEntity;
+import diskong.core.bean.AlbumVo;
 import diskong.core.bean.TrackInfo;
 
 import javax.persistence.*;
+
 @Entity
-@Table(name = "track")
-public class TrackEntity {
+@Table(name = "album")
+public class AlbumEntity {
 
     @Id @GeneratedValue long id;
 
@@ -36,23 +37,12 @@ public class TrackEntity {
     @Column(length = 240, nullable = false)
     private String artist;
 
-    @Column(nullable = false)
-    private String path;
 
-    @ManyToOne
-    private AlbumEntity album ;
+    public AlbumEntity(){};
 
-    public TrackEntity(){};
+    public AlbumEntity(AlbumVo album) {
+        this.artist= (String) album.getArtist();
+        this.title = album.getTitle();
 
-    public TrackEntity(TrackInfo trackInfo) {
-        this.artist= (String) trackInfo.getArtist();
-        this.title = trackInfo.getTitle();
-        this.path = trackInfo.getfPath().getFile().getAbsolutePath();
-    }
-    public TrackEntity(TrackInfo trackInfo, AlbumEntity entity) {
-        this.artist= (String) trackInfo.getArtist();
-        this.title = trackInfo.getTitle();
-        this.path = trackInfo.getfPath().getFile().getAbsolutePath();
-        this.album = entity;
     }
 }

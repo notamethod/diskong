@@ -20,6 +20,7 @@ package diskong.app;
 import diskong.api.ListAlbumListener;
 import diskong.app.cdrip.GuiPreferences;
 import diskong.app.cdrip.RipForm;
+import diskong.app.detail.MainSelectForm;
 import diskong.app.detail.PlayerForm;
 import diskong.core.bean.AlbumVo;
 import diskong.app.detail.FileExplorer;
@@ -44,19 +45,29 @@ import static javax.swing.UIManager.setLookAndFeel;
 @SpringBootApplication
 public class DkMainApp implements ListAlbumListener {
     private final static Logger LOG = LoggerFactory.getLogger(DkMainApp.class);
+    final static String EXPLORER_PANEL = "explorerPanel";
+    public final static String TOP_PANEL = "topPanel";
 
     @Autowired
     PlayerForm playerForm;
 
+    @Autowired
+    private FileExplorer fileExplorerForm;
+
+    @Autowired
+    private MainSelectForm mainSelectForm;
+
     private JPanel mainPanel1;
     private JTree tree1;
-    @Autowired
-    private FileExplorer fileExplorerPane;
+
+
     private JButton ripButton;
     private JButton settingsButton;
     private JPanel playerPanel;
-    private JSplitPane verticalSplit;
     private JSplitPane hzSplit;
+    private JPanel leftPanel;
+    private JPanel topPanel;
+    private JButton addButton;
     private JFrame frame;
 
 
@@ -75,9 +86,7 @@ public class DkMainApp implements ListAlbumListener {
 
     public DkMainApp() {
         System.out.println("create APP");
-        Dimension minimumSize = new Dimension(800, 100);
-        fileExplorerPane.getMainPanel1().setMinimumSize(minimumSize);
-        fileExplorerPane.addListener(this);
+
         ripButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -104,6 +113,15 @@ public class DkMainApp implements ListAlbumListener {
             }
         });
 
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
+              CardLayout cl = (CardLayout) topPanel.getLayout();
+              cl.show(topPanel, EXPLORER_PANEL);
+
+            }
+        });
     }
 
     public void init() {
@@ -121,7 +139,13 @@ public class DkMainApp implements ListAlbumListener {
             e.printStackTrace();
         }
         frame.setIconImage(img);
-
+        final CardLayout cl = (CardLayout) topPanel.getLayout();
+        Dimension minimumSize = new Dimension(800, 100);
+        fileExplorerForm.getMainPanel1().setMinimumSize(minimumSize);
+        fileExplorerForm.addListener(this);
+        topPanel.add(mainSelectForm.getMainPanel1(), TOP_PANEL);
+        topPanel.add(fileExplorerForm.getMainPanel1(), EXPLORER_PANEL);
+        cl.show(topPanel, TOP_PANEL);
         frame.pack();
         frame.setVisible(true);
     }
@@ -145,6 +169,8 @@ public class DkMainApp implements ListAlbumListener {
 
         //create the tree by passing in the root node
         tree1 = new JTree(root);
+
+        topPanel = new JPanel(new CardLayout());
     }
 
     @Override
@@ -158,11 +184,9 @@ public class DkMainApp implements ListAlbumListener {
 
 //Loop through the components
         for (Component c : componentList) {
-
             //Remove it
             playerPanel.remove(c);
         }
-
 
         playerPanel.revalidate();
         playerPanel.repaint();

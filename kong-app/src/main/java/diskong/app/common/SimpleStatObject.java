@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package diskong.app.track;
+package diskong.app.common;
 
-import java.util.Collection;
 
-public interface TrackService {
+import lombok.Getter;
 
-    Collection<TrackEntity> findAll();
-    TrackEntity findOne(Long id);
-    TrackEntity create(TrackEntity greeting);
+@Getter
+public class SimpleStatObject {
+
+    private String label;
+    private Long   count;
+
+    public SimpleStatObject(String label, Long count) {
+        this.label = label;
+        this.count  = count;
+    }
+
 }

@@ -14,32 +14,24 @@
  * limitations under the License.
  */
 
-package diskong.app.track;
+package diskong.app.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import diskong.app.album.AlbumEntity;
+import diskong.app.common.SimpleStatObject;
+import diskong.app.track.TrackEntity;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
+import java.util.List;
 
-@Service
-public class TrackServiceImpl implements TrackService {
+public interface DataService {
 
-    @Autowired
-    private TrackRepository trackRepository;
+    Collection<TrackEntity> findAll();
+    TrackEntity findOne(Long id);
+    TrackEntity create(TrackEntity greeting);
+    AlbumEntity createAlbum(AlbumEntity album);
 
-    @Override
-    public Collection<TrackEntity> findAll() {
-        return null;
-    }
+    List<SimpleStatObject> findArtistCount();
 
-    @Override
-    public TrackEntity findOne(Long id) {
-        return null;
-    }
-
-    @Override
-    public TrackEntity create(TrackEntity track) {
-        TrackEntity savedGreeting = trackRepository.save(track);
-        return savedGreeting;
-    }
+    List<SimpleStatObject> findAlbumCount();
 }

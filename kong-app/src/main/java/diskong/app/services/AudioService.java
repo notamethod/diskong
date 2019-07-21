@@ -18,8 +18,8 @@ package diskong.app.services;
 
 import diskong.AlbumFactory;
 import diskong.Statistics;
+import diskong.app.album.AlbumEntity;
 import diskong.app.track.TrackEntity;
-import diskong.app.track.TrackServiceImpl;
 import diskong.core.*;
 import diskong.core.bean.AlbumVo;
 import diskong.core.bean.TrackInfo;
@@ -56,7 +56,7 @@ public class AudioService {
     AudioParser autoParser=new TikaAudioParser();
 
     @Autowired
-    private TrackServiceImpl trackService;
+    private DataServiceImpl dataService;
 
     public AudioService() throws Exception {
         System.out.println("creation audioservice");
@@ -165,6 +165,8 @@ public class AudioService {
         // check if all tracks in folder belong to same album
         if (metadata.get(Metadata.CONTENT_TYPE).contains("flac") || metadata.get(Metadata.CONTENT_TYPE).contains("vorbis")) {
             AlbumVo album = initAlbum(albums, metadata);
+            AlbumEntity entity= dataService.createAlbum(new AlbumEntity(album));
+
             if (album.getTitle() == null) {
                 album.setTitle(metadata.get(XMPDM.ALBUM));
             }
@@ -206,7 +208,7 @@ public class AudioService {
             }
             TrackInfo createdTrack = new TrackInfo(fPath, metadata);
             album.getTracks().add(createdTrack);
-            trackService.create(new TrackEntity(createdTrack));
+            dataService.create(new TrackEntity(createdTrack,entity));
 
             //FIXME
 //        } else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") ){

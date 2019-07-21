@@ -16,11 +16,32 @@
 
 package diskong.app.track;
 
+import diskong.app.common.SimpleStatObject;
 import diskong.app.track.TrackEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TrackRepository
-        extends CrudRepository<TrackEntity, String> {
+        extends JpaRepository<TrackEntity, String> {
+
+    @Query("SELECT " +
+            "    new diskong.app.common.SimpleStatObject(album.artist, COUNT(*)) " +
+            "FROM " +
+            "     TrackEntity track  join track.album album " +
+            "GROUP BY " +
+            "    album.artist")
+    List<SimpleStatObject> findArtistCount();
+
+    @Query("SELECT " +
+            "    new diskong.app.common.SimpleStatObject(album.title, COUNT(*)) " +
+            "FROM " +
+            "     TrackEntity track  join track.album album " +
+            "GROUP BY " +
+            "    album.title")
+    List<SimpleStatObject> findAlbumCount();
 }
