@@ -38,6 +38,7 @@ public class AlbumVo implements IAlbumVo, Cloneable {
     private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
     public final static String VARIOUS = "Various";
     public final static String UNKNOWN = "Unknown";
+    public final static String TAG_ALBUM_ARTIST = "album artist";
 
     private List<TrackInfo> tracks = new ArrayList<>();
     private String title;

@@ -65,7 +65,7 @@
                 <border type="none"/>
                 <children/>
               </grid>
-              <nested-form id="77342" form-file="diskong/gui/FileExplorer.form" binding="fileExplorerPane">
+              <nested-form id="77342" form-file="diskong/app/detail/FileExplorer.form" binding="fileExplorerPane">
                 <constraints>
                   <splitpane position="left"/>
                 </constraints>

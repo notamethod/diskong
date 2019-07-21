@@ -18,6 +18,8 @@ package diskong.app.services;
 
 import diskong.AlbumFactory;
 import diskong.Statistics;
+import diskong.app.track.TrackEntity;
+import diskong.app.track.TrackServiceImpl;
 import diskong.core.*;
 import diskong.core.bean.AlbumVo;
 import diskong.core.bean.TrackInfo;
@@ -30,6 +32,8 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -41,6 +45,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
+import static diskong.core.bean.AlbumVo.TAG_ALBUM_ARTIST;
+
+@Service
 public class AudioService {
 
     private final static Logger LOG = LoggerFactory.getLogger(AudioService.class);
@@ -48,7 +55,11 @@ public class AudioService {
     AlbumService albumService = new AlbumService();
     AudioParser autoParser=new TikaAudioParser();
 
+    @Autowired
+    private TrackServiceImpl trackService;
+
     public AudioService() throws Exception {
+        System.out.println("creation audioservice");
     }
 
 
@@ -106,7 +117,7 @@ public class AudioService {
      * @param entry
      * @return
      */
-    public void parseDirectory(Map.Entry<Path, List<FilePath>> entry)  {
+    public List<AlbumVo> parseDirectory(Map.Entry<Path, List<FilePath>> entry)  {
         //FIXME multi albums in one directory
         //AlbumVo album = AlbumFactory.getAlbum();
         Map<String, AlbumVo> albums = new HashMap<>();
@@ -138,6 +149,7 @@ public class AudioService {
         }
         executor.shutdown();
 
+        return new ArrayList<>(albums.values());
         //Statistics.getInstance().addStats(album);
 
     }
@@ -155,16 +167,9 @@ public class AudioService {
             AlbumVo album = initAlbum(albums, metadata);
             if (album.getTitle() == null) {
                 album.setTitle(metadata.get(XMPDM.ALBUM));
-            } else if (!album.getTitle().equals(metadata.get(XMPDM.ALBUM))) {
-                // wrong album ?
-                throw new WrongTrackAlbumException(metadata);
             }
             if (album.getArtist() == null) {
-                album.setArtist(metadata.get(XMPDM.ARTIST));
-            } else if (!album.getArtist().equals(metadata.get(XMPDM.ARTIST))) {
-                // wrong artist or various ?
-                album.setArtist(AlbumVo.VARIOUS);
-                //throw new WrongTrackArtistException(metadata);
+                album.setArtist(metadata.get(TAG_ALBUM_ARTIST));
             }
             if (album.getGenres() == null) {
                 album.setGenres(MetaUtils.getGenre(metadata));
@@ -199,8 +204,9 @@ public class AudioService {
                     }
                 }
             }
-
-            album.getTracks().add(new TrackInfo(fPath, metadata));
+            TrackInfo createdTrack = new TrackInfo(fPath, metadata);
+            album.getTracks().add(createdTrack);
+            trackService.create(new TrackEntity(createdTrack));
 
             //FIXME
 //        } else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") ){
@@ -222,10 +228,14 @@ public class AudioService {
         String title = metadata.get(XMPDM.ALBUM);
         if (title == null)
             title = AlbumVo.UNKNOWN;
-        String artist = metadata.get(XMPDM.ARTIST);
+        String artist = metadata.get(TAG_ALBUM_ARTIST);
+        System.out.println(artist);
         if (artist == null)
-            artist = AlbumVo.UNKNOWN;{
-        }
+            artist = metadata.get(XMPDM.ARTIST);
+        System.out.println(artist);
+        if (artist == null)
+            artist = AlbumVo.UNKNOWN;
+        System.out.println(artist);
         String key = DigestUtils.sha1Hex(artist+"---"+title);
         if (albums.get(key)!=null){
             return albums.get(key);

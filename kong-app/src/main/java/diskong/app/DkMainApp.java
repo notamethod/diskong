@@ -22,7 +22,7 @@ import diskong.app.cdrip.GuiPreferences;
 import diskong.app.cdrip.RipForm;
 import diskong.app.detail.PlayerForm;
 import diskong.core.bean.AlbumVo;
-import diskong.gui.FileExplorer;
+import diskong.app.detail.FileExplorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +50,7 @@ public class DkMainApp implements ListAlbumListener {
 
     private JPanel mainPanel1;
     private JTree tree1;
+    @Autowired
     private FileExplorer fileExplorerPane;
     private JButton ripButton;
     private JButton settingsButton;

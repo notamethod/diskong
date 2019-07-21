@@ -20,25 +20,26 @@ import diskong.core.bean.TrackInfo;
 
 import javax.persistence.*;
 @Entity
-@Table(name = "TRACK")
+@Table(name = "track")
 public class TrackEntity {
 
-    @Id
-    @Column(name = "ID", length = 240,  nullable = false)
-    private String id;
+    @Id @GeneratedValue long id;
 
-    @Column(name = "TITLE", length = 240, nullable = false)
+    @Column(length = 240, nullable = false)
     private String title;
 
-    @Column(name = "ARTIST", length = 240, nullable = false)
+    @Column(length = 240, nullable = false)
     private String artist;
+
+    @Column(nullable = false)
+    private String path;
 
     public TrackEntity(){};
 
     public TrackEntity(TrackInfo trackInfo) {
-        this.id="xxxx";
         this.artist= (String) trackInfo.getArtist();
         this.title = trackInfo.getTitle();
+        this.path = trackInfo.getfPath().getFile().getAbsolutePath();
 
     }
 }

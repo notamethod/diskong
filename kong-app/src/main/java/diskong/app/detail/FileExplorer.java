@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package diskong.gui;
+package diskong.app.detail;
 
 import diskong.api.ListAlbumListener;
 import diskong.core.bean.AlbumVo;
 import diskong.core.FilePath;
-import diskong.core.TagState;
+import diskong.gui.AlbumModel;
 import diskong.parser.DirectoryParser;
 import diskong.parser.NioDirectoryParser;
 import diskong.app.services.AlbumService;
@@ -28,6 +28,9 @@ import org.dpr.swingtools.TextEventListener;
 import org.dpr.swingtools.components.JDropText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
@@ -44,8 +47,10 @@ import java.util.Map;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
+@Component
+@Configurable
 public class FileExplorer implements TextEventListener {
-    private final static Logger LOG = LoggerFactory.getLogger(MainForm.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FileExplorer.class);
     protected AlbumService albumService = new AlbumService();
     private TableModelListener tListener;
 
@@ -54,7 +59,9 @@ public class FileExplorer implements TextEventListener {
     }
 
     private AlbumModel model;
-    private AudioService service = null;
+    @Autowired
+    private AudioService service;
+
     private Map<Path, List<FilePath>> fileMap;
     private List<AlbumVo> albums = new ArrayList<>();
 
@@ -75,13 +82,14 @@ public class FileExplorer implements TextEventListener {
     public void textChanged(String text) {
         SwingUtilities.invokeLater(() -> {
             /* Démarrage de l'interface graphique et du SwingWorker. */
+            System.out.println(service);
             worker = new RetrieveAlbumsTasks(model, 2);
             worker.execute();
         });
     }
 
     public FileExplorer() throws Exception {
-        service = new AudioService();
+        System.out.println("create filexplorer");
         listenToTableAlbum = new ArrayList<>();
         stopButton.addActionListener(actionEvent -> worker.cancel(true));
         pathField.addPropertyChangeListener(evt -> {
@@ -143,7 +151,6 @@ public class FileExplorer implements TextEventListener {
         model = new AlbumModel();
         table1 = new JTable(model);
 
-
         scrollPane1 = new JScrollPane(table1);
 
         Font topTopicsFont = new Font("Verdana",Font.PLAIN,12);
@@ -177,7 +184,7 @@ public class FileExplorer implements TextEventListener {
 
 
     class RetrieveAlbumsTasks extends
-            SwingWorker<List<AlbumVo>, AlbumVo> {
+            SwingWorker<List<AlbumVo>, List<AlbumVo>> {
         RetrieveAlbumsTasks(TableModel model, int numbersToFind) {
             //initialize
         }
@@ -213,17 +220,18 @@ public class FileExplorer implements TextEventListener {
                 }
                 long startTime = System.currentTimeMillis();
 
-                AlbumVo avo = null;
+                List<AlbumVo> avo = null;
                 try {
-                    avo = service.parseDirectoryForAlbum(entry);
+                  //  avo = service.parseDirectoryForAlbum(entry);
+                    avo = service.parseDirectory(entry);
                 } catch (Exception e) {
                     LOG.error(e.getLocalizedMessage(), e);
                 }
-                if (!avo.getState().equals(TagState.NOTRACKS)) {
-                    LOG.info("PUBLISH"+avo.getTitle());
-                    publish(avo);
-                }
-
+//                if (!avo.getState().equals(TagState.NOTRACKS)) {
+//                    LOG.info("PUBLISH"+avo.getTitle());
+//                    publish(avo);
+//                }
+                publish(avo);
 
 
 //                while (!enough && !isCancelled()) {
@@ -237,9 +245,12 @@ public class FileExplorer implements TextEventListener {
         }
 
         @Override
-        protected void process(List<AlbumVo> chunks) {
+        protected void process(List<List<AlbumVo>> chunks) {
             LOG.info("PROCESS" + chunks);
-            albums.addAll(chunks);
+            for (List<AlbumVo> tmp : chunks){
+                albums.addAll(tmp);
+            }
+
             LOG.info("PROCESS" + albums);
             model.setAlbums(albums);
 //            for (AlbumVo avo : chunks) {
