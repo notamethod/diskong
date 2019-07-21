@@ -37,6 +37,7 @@ import java.util.List;
 public class AlbumVo implements IAlbumVo, Cloneable {
     private final static Logger LOG = LoggerFactory.getLogger(AlbumVo.class);
     public final static String VARIOUS = "Various";
+    public final static String UNKNOWN = "Unknown";
 
     private List<TrackInfo> tracks = new ArrayList<>();
     private String title;
