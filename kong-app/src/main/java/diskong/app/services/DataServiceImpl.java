@@ -16,11 +16,11 @@
 
 package diskong.app.services;
 
-import diskong.app.album.AlbumEntity;
-import diskong.app.album.AlbumRepository;
+import diskong.app.data.album.AlbumEntity;
+import diskong.app.data.album.AlbumRepository;
 import diskong.app.common.SimpleStatObject;
-import diskong.app.track.TrackEntity;
-import diskong.app.track.TrackRepository;
+import diskong.app.data.track.TrackEntity;
+import diskong.app.data.track.TrackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,8 +47,7 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public TrackEntity create(TrackEntity track) {
-        TrackEntity savedGreeting = trackRepository.save(track);
-        return savedGreeting;
+        return trackRepository.save(track);
     }
 
     @Override
@@ -65,5 +64,10 @@ public class DataServiceImpl implements DataService {
     @Override
     public List<SimpleStatObject> findAlbumCount() {
         return trackRepository.findAlbumCount();
+    }
+
+    @Override
+    public List<TrackEntity> findTrackByArtist(String label) {
+        return trackRepository.findByArtistAlbum(label);
     }
 }

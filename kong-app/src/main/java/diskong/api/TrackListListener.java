@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package diskong.app.album;
+package diskong.api;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import diskong.core.bean.AlbumVo;
 
-@Repository
-public interface AlbumRepository
-        extends JpaRepository<AlbumEntity, String> {
+public interface TrackListListener {
+    void actionRequested(TrackList trackList);
+
 }

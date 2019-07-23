@@ -14,35 +14,13 @@
  * limitations under the License.
  */
 
-package diskong.app.album;
-
-import diskong.core.bean.AlbumVo;
-import diskong.core.bean.TrackInfo;
-
-import javax.persistence.*;
-
-@Entity
-@Table(name = "album")
-public class AlbumEntity {
-
-    @Id @GeneratedValue long id;
-
-    @Column(length = 240, nullable = false)
-    private String title;
-
-    public String getArtist() {
-        return artist;
-    }
-
-    @Column(length = 240, nullable = false)
-    private String artist;
+package diskong.app.data;
 
 
-    public AlbumEntity(){};
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
-    public AlbumEntity(AlbumVo album) {
-        this.artist= (String) album.getArtist();
-        this.title = album.getTitle();
+@SpringBootConfiguration
+@EnableAutoConfiguration
+public class DataTestConfiguration extends DataConfiguration {}
 
-    }
-}

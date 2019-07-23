@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,20 @@ package diskong.app.detail;
 import diskong.api.ApiConfigurationException;
 import diskong.api.EventListener;
 import diskong.api.GuiListener;
-import diskong.api.TrackList;
-import diskong.app.FlacPlayer;
+import diskong.app.services.AlbumService;
 import diskong.app.services.DataServiceImpl;
 import diskong.app.tagger.TaggerForm;
+import diskong.app.AlbumFlacPlayer;
+import diskong.app.data.track.TrackEntity;
 import diskong.core.bean.AlbumVo;
 import diskong.core.bean.IAlbumVo;
 import diskong.core.bean.TrackInfo;
-import diskong.app.data.track.TrackEntity;
 import diskong.gui.FullTrackModel;
 import diskong.gui.GenericForm;
 import diskong.gui.TableColumnAdjuster;
 import diskong.gui.TrackModel;
-import diskong.app.services.AlbumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -53,13 +49,11 @@ import java.util.List;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
-@Component
-@Configurable
-public class PlayerForm implements EventListener {
 
-    private final static Logger LOG = LoggerFactory.getLogger(PlayerForm.class);
+public class PlayerFormOld implements EventListener {
 
-    @Autowired
+    private final static Logger LOG = LoggerFactory.getLogger(PlayerFormOld.class);
+
     private DataServiceImpl trackService;
 
     public JPanel getMainPanel1() {
@@ -84,12 +78,11 @@ public class PlayerForm implements EventListener {
     private TrackModel oldModel;
     private FullTrackModel  model;
     private BasicSliderUI sliderUi;
-    private PlayerForm.MySwingWorker worker;
+    private PlayerFormOld.MySwingWorker worker;
     private List<GuiListener> listeners;
-    private TrackList trackList;
+    AlbumVo albumOri;
 
-
-    public PlayerForm() throws IOException {
+    public PlayerFormOld() throws IOException {
         //Test txo test 3
 
         LOG.info("CREATE PLAYERFORM");
@@ -98,7 +91,7 @@ public class PlayerForm implements EventListener {
         // musicSlider.setUI(sliderUi);
 
         musicSlider.setPaintTrack(true);
-        musicSlider.setUI(new PlayerForm.ColoredThumbSliderUI(musicSlider, Color.red));
+        musicSlider.setUI(new PlayerFormOld.ColoredThumbSliderUI(musicSlider, Color.red));
         musicSlider.setForeground(Color.red);
 
         musicSlider.addMouseMotionListener(new MouseMotionAdapter() {
@@ -151,31 +144,27 @@ public class PlayerForm implements EventListener {
 
 
 
-//        TableColumnAdjuster tca = new TableColumnAdjuster(table1);
-//        tca.setColumnHeaderIncluded(false);
-//        tca.adjustColumns();
+        TableColumnAdjuster tca = new TableColumnAdjuster(table1);
+        tca.setColumnHeaderIncluded(false);
+        tca.adjustColumns();
 
     }
 
-
-
-
-    public void init(TrackList trackList){
-
-       // this.
-        model.setElements(trackList.getTracks());
-        pageTitle.setText(trackList.getTitle());
-//        styles.setText(String.join(", ", albumOri.getStyles()));
-//        genres.setText(String.join(", ", albumOri.getGenres()));
-//        year.setText(albumOri.getYear());
+    public void init(AlbumVo albumIn){
+        this.albumOri = albumIn;
+        oldModel.setElements(albumOri.getTracks());
+        pageTitle.setText(albumOri.getArtist() + " - " + albumOri.getTitle());
+        styles.setText(String.join(", ", albumOri.getStyles()));
+        genres.setText(String.join(", ", albumOri.getGenres()));
+        year.setText(albumOri.getYear());
 
         analyseButton.addActionListener(event -> analyze());
 
         // setting (if any) image from folder
-        if (trackList.getFolderImagePath() != null) {
+        if (albumOri.getFolderImagePath() != null) {
             ImageIcon imgi;
             try {
-                imgi = new ImageIcon(new File(trackList.getFolderImagePath()).toURI().toURL());
+                imgi = new ImageIcon(new File(albumOri.getFolderImagePath()).toURI().toURL());
                 jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -189,7 +178,7 @@ public class PlayerForm implements EventListener {
                 if (selected && worker == null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            worker = new PlayerForm.MySwingWorker(model.getTracks(), 0);
+                            worker = new PlayerFormOld.MySwingWorker(albumOri, 0);
                             worker.execute();
 
                         }
@@ -225,7 +214,7 @@ public class PlayerForm implements EventListener {
                     } else {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                worker = new PlayerForm.MySwingWorker(((FullTrackModel)table.getModel()).getTracks(), row);
+                                worker = new PlayerFormOld.MySwingWorker(albumOri, row);
                                 worker.execute();
 
                             }
@@ -239,7 +228,93 @@ public class PlayerForm implements EventListener {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                ImageOnlyDialog dialog = new ImageOnlyDialog(trackList);
+                ImageOnlyDialog dialog = new ImageOnlyDialog(albumOri);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        });
+    }
+
+
+    public void init(List<TrackEntity> tracks, String title){
+
+        model.setElements(tracks);
+        pageTitle.setText(title);
+//        styles.setText(String.join(", ", albumOri.getStyles()));
+//        genres.setText(String.join(", ", albumOri.getGenres()));
+//        year.setText(albumOri.getYear());
+
+        analyseButton.addActionListener(event -> analyze());
+
+        // setting (if any) image from folder
+        if (albumOri.getFolderImagePath() != null) {
+            ImageIcon imgi;
+            try {
+                imgi = new ImageIcon(new File(albumOri.getFolderImagePath()).toURI().toURL());
+                jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+        togglePlayButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AbstractButton abstractButton = (AbstractButton) e.getSource();
+                boolean selected = abstractButton.getModel().isSelected();
+                if (selected && worker == null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            worker = new PlayerFormOld.MySwingWorker(albumOri, 0);
+                            worker.execute();
+
+                        }
+                    });
+                }
+                if (!selected && worker != null) {
+                    for (GuiListener listener : listeners) {
+                        listener.pauseRequested();
+                    }
+
+                }
+                if (selected && worker != null) {
+                    for (GuiListener listener : listeners) {
+                        listener.resumeRequested();
+                    }
+
+                }
+            }
+        });
+        table1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable table = (JTable) mouseEvent.getSource();
+                Point point = mouseEvent.getPoint();
+                final int row = table.rowAtPoint(point);
+                if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    togglePlayButton.setSelected(true);
+                    //worker not null: a track is playing
+                    if (worker != null) {
+                        for (GuiListener listener : listeners) {
+                            listener.selectTrackRequested(row);
+                        }
+                    } else {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                worker = new PlayerFormOld.MySwingWorker(albumOri, row);
+                                worker.execute();
+
+                            }
+                        });
+
+                    }
+                }
+            }
+        });
+        jlImg.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                ImageOnlyDialog dialog = new ImageOnlyDialog(albumOri);
                 dialog.pack();
                 dialog.setVisible(true);
             }
@@ -248,7 +323,6 @@ public class PlayerForm implements EventListener {
 
     private void analyze() {
         AlbumService albumService = new AlbumService();
-        AlbumVo albumOri = trackList.toAlbum();
         IAlbumVo a2 = null;
         try {
             a2 = albumService.searchAlbum(albumOri);
@@ -300,7 +374,7 @@ public class PlayerForm implements EventListener {
         });
     }
 
-    //select a row in the table (the row being played)
+    //select a row in the table (the row being payed)
     public void selectRow(int t) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -313,10 +387,11 @@ public class PlayerForm implements EventListener {
 
     private void updateComponents(int t) {
         System.out.println("update co");
-        if (trackList != null && trackList.getTracks() != null){
-            TrackEntity track = trackList.getTracks().get(t);
-            jlArtist.setText((String) track.getArtist() + " ("+track.getAlbum().getTitle()+")");
+        if (albumOri != null && albumOri.getTracks() != null){
+            TrackInfo track = albumOri.getTracks().get(t);
+            jlArtist.setText((String) track.getArtist() + " ("+albumOri.getTitle()+")");
             jlTitle.setText(track.getTitle());
+            TrackEntity savedGreeting = trackService.create(new TrackEntity(track));
 
         }
     }
@@ -337,7 +412,7 @@ public class PlayerForm implements EventListener {
             }
         }
         JFrame frame = new JFrame("FileExplorer");
-        PlayerForm pf = new PlayerForm();
+        PlayerFormOld pf = new PlayerFormOld();
         frame.setContentPane(pf.mainPanel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -360,7 +435,7 @@ public class PlayerForm implements EventListener {
         table1.getTableHeader().setUI(null);
         ((DefaultTableCellRenderer) table1.getDefaultRenderer(Object.class)).setOpaque(false);
         //autoresize columns
-       // table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // this is obvius part
+        table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // this is obvius part
     }
 
     @Override
@@ -381,19 +456,18 @@ public class PlayerForm implements EventListener {
 
 
     private class MySwingWorker extends
-            SwingWorker<List<TrackEntity>, Integer> {
+            SwingWorker<AlbumVo, Integer> {
         Integer row;
-        List<TrackEntity> tracks;
-        public MySwingWorker(List<TrackEntity> trackList, Integer intValue) {
+
+        public MySwingWorker(AlbumVo albumOri, Integer intValue) {
             row = intValue;
-            tracks=trackList;
         }
 
         @Override
-        protected List<TrackEntity> doInBackground() {
-            FlacPlayer player = new FlacPlayer(tracks);
+        protected AlbumVo doInBackground() {
+            AlbumFlacPlayer player = new AlbumFlacPlayer(albumOri);
             addListener(player.getListener());
-            player.addListener(PlayerForm.this);
+            player.addListener(PlayerFormOld.this);
             player.playAlbum(row);
             return null;
         }

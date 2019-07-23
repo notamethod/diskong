@@ -14,25 +14,31 @@
  * limitations under the License.
  */
 
-package diskong.app.services;
+package diskong.api;
 
-import diskong.app.data.album.AlbumEntity;
-import diskong.app.common.SimpleStatObject;
 import diskong.app.data.track.TrackEntity;
+import diskong.core.bean.AlbumVo;
+import lombok.Getter;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
-public interface DataService {
+@Getter
+public class TrackList {
+    private List<TrackEntity> tracks = new ArrayList<>();
+    private String title;
+    private String id;
 
-    Collection<TrackEntity> findAll();
-    TrackEntity findOne(Long id);
-    TrackEntity create(TrackEntity greeting);
-    AlbumEntity createAlbum(AlbumEntity album);
+    public TrackList(List<TrackEntity> tracks, String title) {
+        this.tracks = tracks;
+        this.title = title;
+    }
 
-    List<SimpleStatObject> findArtistCount();
+    public AlbumVo toAlbum() {
+        return null;
+    }
 
-    List<SimpleStatObject> findAlbumCount();
-
-    List<TrackEntity> findTrackByArtist(String label);
+    public String getFolderImagePath() {
+        return null;
+    }
 }

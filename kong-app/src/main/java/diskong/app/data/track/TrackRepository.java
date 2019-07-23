@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package diskong.app.track;
+package diskong.app.data.track;
 
 import diskong.app.common.SimpleStatObject;
-import diskong.app.track.TrackEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -44,4 +43,13 @@ public interface TrackRepository
             "GROUP BY " +
             "    album.title")
     List<SimpleStatObject> findAlbumCount();
+
+
+    @Query("SELECT " +
+            "    track " +
+            "FROM " +
+            "     TrackEntity track  join track.album album " +
+            "where " +
+            "    album.artist =?1")
+    List<TrackEntity> findByArtistAlbum(String artist);
 }

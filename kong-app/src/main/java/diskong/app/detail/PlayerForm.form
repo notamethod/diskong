@@ -18,7 +18,7 @@
         <children>
           <scrollpane id="6ec19" binding="scrollPane1" custom-create="true">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="8" fill="2" indent="2" use-parent-layout="false">
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="2" use-parent-layout="false">
                 <minimum-size width="-1" height="150"/>
                 <preferred-size width="-1" height="150"/>
               </grid>

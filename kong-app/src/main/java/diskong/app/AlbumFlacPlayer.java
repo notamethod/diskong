@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package diskong.app;
 
 import diskong.api.EventListener;
 import diskong.api.GuiListener;
-import diskong.app.data.track.TrackEntity;
+import diskong.app.Player;
 import diskong.core.bean.IAlbumVo;
 import diskong.core.bean.TrackInfo;
 import io.nayuki.flac.common.StreamInfo;
@@ -32,9 +32,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlacPlayer implements Player {
+public class AlbumFlacPlayer implements Player {
     private List<EventListener> listeners = new ArrayList<>();
-    private List<TrackEntity> tracks;
+    private IAlbumVo album;
     public Listener listener;
     final double[] seekRequest = {-1};
     private boolean hasNext;
@@ -45,20 +45,20 @@ public class FlacPlayer implements Player {
     public final int NEXT = -3;
     public final int PREVIOUS = -4;
 
-    public FlacPlayer(List<TrackEntity> tracks) {
-        this.tracks = tracks;
+    public AlbumFlacPlayer(IAlbumVo album) {
+        this.album = album;
     }
 
     public void playAlbum() {
         playAlbum(0);
     }
-
     public void playAlbum(int firstToPlay) {
         int playedTrack = firstToPlay;
+        List<TrackInfo> tracks = album.getTracks();
         int numTracks = tracks.size();
         try {
        while (playedTrack>=0){
-           int returnedPlayInfo = play(new File(tracks.get(playedTrack).getPath()), playedTrack<=numTracks, playedTrack);
+           int returnedPlayInfo = play(tracks.get(playedTrack).getfPath().getFile(), playedTrack<=numTracks, playedTrack);
            if (returnedPlayInfo == NEXT) {
                System.out.println("next req");
                playedTrack++;

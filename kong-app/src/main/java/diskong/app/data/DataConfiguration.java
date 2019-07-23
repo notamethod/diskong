@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package diskong.app.services;
+package diskong.app.data;
 
-import diskong.app.data.album.AlbumEntity;
-import diskong.app.common.SimpleStatObject;
-import diskong.app.data.track.TrackEntity;
 
-import java.util.Collection;
-import java.util.List;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-public interface DataService {
-
-    Collection<TrackEntity> findAll();
-    TrackEntity findOne(Long id);
-    TrackEntity create(TrackEntity greeting);
-    AlbumEntity createAlbum(AlbumEntity album);
-
-    List<SimpleStatObject> findArtistCount();
-
-    List<SimpleStatObject> findAlbumCount();
-
-    List<TrackEntity> findTrackByArtist(String label);
-}
+@Configuration
+@ComponentScan
+class DataConfiguration {}

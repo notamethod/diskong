@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package diskong.app.services;
+package diskong.app.data.album;
 
-import diskong.app.data.album.AlbumEntity;
-import diskong.app.common.SimpleStatObject;
-import diskong.app.data.track.TrackEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-
-public interface DataService {
-
-    Collection<TrackEntity> findAll();
-    TrackEntity findOne(Long id);
-    TrackEntity create(TrackEntity greeting);
-    AlbumEntity createAlbum(AlbumEntity album);
-
-    List<SimpleStatObject> findArtistCount();
-
-    List<SimpleStatObject> findAlbumCount();
-
-    List<TrackEntity> findTrackByArtist(String label);
+@Repository
+public interface AlbumRepository
+        extends JpaRepository<AlbumEntity, String> {
 }

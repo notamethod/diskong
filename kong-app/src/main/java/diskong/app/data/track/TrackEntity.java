@@ -14,30 +14,34 @@
  * limitations under the License.
  */
 
-package diskong.app.track;
+package diskong.app.data.track;
 
-import diskong.app.album.AlbumEntity;
+import diskong.app.data.album.AlbumEntity;
 import diskong.core.bean.TrackInfo;
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
+@Getter
+@Setter
 @Entity
 @Table(name = "track")
-public class TrackEntity {
+public class TrackEntity implements Comparable<TrackEntity>{
 
     @Id @GeneratedValue long id;
 
     @Column(length = 240, nullable = false)
     private String title;
 
-    public String getArtist() {
-        return artist;
-    }
-
     @Column(length = 240, nullable = false)
     private String artist;
 
     @Column(nullable = false)
     private String path;
+
+    @Column
+    private int number;
 
     @ManyToOne
     private AlbumEntity album ;
@@ -54,5 +58,17 @@ public class TrackEntity {
         this.title = trackInfo.getTitle();
         this.path = trackInfo.getfPath().getFile().getAbsolutePath();
         this.album = entity;
+        this.number=Integer.valueOf(trackInfo.getNumber());
     }
+
+    @Override
+    public int compareTo(@NotNull TrackEntity o) {
+
+                try {
+                    return (number - o.getNumber());
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
+            }
+
 }

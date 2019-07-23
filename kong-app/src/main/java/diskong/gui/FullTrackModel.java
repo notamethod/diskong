@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 org.dpr & croger
+ * Copyright 2019 org.dpr & croger
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,34 @@
 
 package diskong.gui;
 
+import diskong.app.data.track.TrackEntity;
 import diskong.core.bean.TrackInfo;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("SpellCheckingInspection")
-public class TrackModel extends AbstractTableModel{
 
-    private List<TrackInfo> tracks;
+public class FullTrackModel extends AbstractTableModel{
 
-    public TrackModel() {
+    private List<TrackEntity> tracks;
+
+    public List<TrackEntity> getTracks() {
+        return tracks;
+    }
+
+    public FullTrackModel() {
         super();
     }
 
     protected String[] colName=new String[]{"Num.", "Title","Artist", "Album"};
-    protected int[] prefSize=new int[]{10,150,80};
-    public TrackModel(List<TrackInfo> tracks) {
+
+    public FullTrackModel(List<TrackEntity> tracks) {
         this.tracks = tracks;
         Collections.sort(this.tracks);
     }
 
-    public void setElements(List<TrackInfo> tracks) {
+    public void setElements(List<TrackEntity> tracks) {
         this.tracks = tracks;
         fireTableDataChanged();
     }
@@ -64,7 +69,7 @@ public class TrackModel extends AbstractTableModel{
 
     @Override
     public Object getValueAt(int row, int column) {
-        TrackInfo track = tracks.get(row);
+        TrackEntity track = tracks.get(row);
 
         switch (column) {
 
@@ -74,6 +79,10 @@ public class TrackModel extends AbstractTableModel{
                 return track.getTitle();
             case 2:
                 return track.getArtist();
+
+            case 3:
+                return track.getAlbum().getTitle();
+
 
             default :
 
@@ -86,13 +95,8 @@ public class TrackModel extends AbstractTableModel{
         return "";
     }
 
-    public TrackInfo getRow(int row){
+    public TrackEntity getRow(int row){
         return tracks.get(row);
     }
 
-    public int getPrefSize(int i) {
-        if (prefSize.length<(i+1))
-            return 50;
-        return prefSize[i];
-    }
 }

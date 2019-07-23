@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class TrackInfo implements Comparable<TrackInfo> {
+	public final static String UNKNOWN_ARTIST = "Unknown Artist";
+	public final static String UNKNOWN_TITLE = "Unknown Title";
 
 
 	public Metadata getMetadata() {
@@ -44,43 +46,50 @@ public class TrackInfo implements Comparable<TrackInfo> {
 	public TrackInfo(FilePath fPath, @NotNull Metadata metadata) {
 		this.metadata=metadata;
 		this.fPath=fPath;
-		
+
 	}
 
-    public TrackInfo(Integer pos, String title, String artist) {
-	    metadata = new Metadata();
-        metadata.set(TikaCoreProperties.TITLE, title);
-        metadata.set(XMPDM.TRACK_NUMBER, String.valueOf(pos));
-        metadata.set(XMPDM.ARTIST, artist);
-    }
+	public TrackInfo(Integer pos, String title, String artist) {
+		metadata = new Metadata();
+		metadata.set(TikaCoreProperties.TITLE, title);
+		metadata.set(XMPDM.TRACK_NUMBER, String.valueOf(pos));
+		metadata.set(XMPDM.ARTIST, artist);
+	}
 
 	public String getTitle() {
-		return metadata.get(TikaCoreProperties.TITLE);
+		String value = metadata.get(TikaCoreProperties.TITLE);
+		if (null == value)
+			return UNKNOWN_TITLE;
+		return value;
 	}
 
-    public String getNumber() {
-        return metadata.get(XMPDM.TRACK_NUMBER);
-    }
+	public String getNumber() {
+		return metadata.get(XMPDM.TRACK_NUMBER);
+	}
 
-    public Object getArtist() {
-        return metadata.get(XMPDM.ARTIST);
-    }
+	public Object getArtist() {
 
-    @Override
-    public int compareTo(@NotNull TrackInfo o) {
+		String artist =  metadata.get(XMPDM.ARTIST);
+		if (null == artist)
+			return UNKNOWN_ARTIST;
+		return artist;
+	}
+
+	@Override
+	public int compareTo(@NotNull TrackInfo o) {
 
 
-	    if (this.getNumber() !=null) {
-            String thisNumber = this.getNumber().replaceAll("\\.", "");
-            if (o.getNumber() != null) {
-                String otherNumber = o.getNumber().replaceAll("\\.", "");
+		if (this.getNumber() !=null) {
+			String thisNumber = this.getNumber().replaceAll("\\.", "");
+			if (o.getNumber() != null) {
+				String otherNumber = o.getNumber().replaceAll("\\.", "");
 				try {
 					return (Integer.valueOf(thisNumber) - Integer.valueOf(otherNumber));
 				} catch (NumberFormatException e) {
 					return 0;
 				}
 			}
-        }
-        return 0;
-    }
+		}
+		return 0;
+	}
 }

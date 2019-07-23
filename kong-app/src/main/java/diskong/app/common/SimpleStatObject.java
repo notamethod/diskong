@@ -29,5 +29,9 @@ public class SimpleStatObject {
         this.label = label;
         this.count  = count;
     }
+    @Override
+    public String toString(){
+        return label +" "+count;
+    }
 
 }

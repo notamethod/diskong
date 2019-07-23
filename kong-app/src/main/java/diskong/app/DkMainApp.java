@@ -43,13 +43,11 @@ import java.util.ResourceBundle;
 import static javax.swing.UIManager.setLookAndFeel;
 
 @SpringBootApplication
-public class DkMainApp implements ListAlbumListener {
+public class DkMainApp {
     private final static Logger LOG = LoggerFactory.getLogger(DkMainApp.class);
     final static String EXPLORER_PANEL = "explorerPanel";
     public final static String TOP_PANEL = "topPanel";
 
-    @Autowired
-    PlayerForm playerForm;
 
     @Autowired
     private FileExplorer fileExplorerForm;
@@ -142,7 +140,6 @@ public class DkMainApp implements ListAlbumListener {
         final CardLayout cl = (CardLayout) topPanel.getLayout();
         Dimension minimumSize = new Dimension(800, 100);
         fileExplorerForm.getMainPanel1().setMinimumSize(minimumSize);
-        fileExplorerForm.addListener(this);
         topPanel.add(mainSelectForm.getMainPanel1(), TOP_PANEL);
         topPanel.add(fileExplorerForm.getMainPanel1(), EXPLORER_PANEL);
         cl.show(topPanel, TOP_PANEL);
@@ -173,40 +170,6 @@ public class DkMainApp implements ListAlbumListener {
         topPanel = new JPanel(new CardLayout());
     }
 
-    @Override
-    public void actionRequested(AlbumVo album) {
-        playerForm.init(album);
-        Dimension dim = playerForm.getMainPanel1().getSize();
-        playerPanel.setPreferredSize(dim);
 
-        //Get the components in the panel
-        Component[] componentList = playerPanel.getComponents();
-
-//Loop through the components
-        for (Component c : componentList) {
-            //Remove it
-            playerPanel.remove(c);
-        }
-
-        playerPanel.revalidate();
-        playerPanel.repaint();
-
-
-        final CardLayout cl = (CardLayout) playerPanel.getLayout();
-        playerPanel.add(playerForm.getMainPanel1(), BorderLayout.SOUTH);
-        playerForm.getMainPanel1().setVisible(true);
-
-
-        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this.mainPanel1);
-        if (frame != null) {
-            System.out.println("pack");
-            frame.pack();
-        }
-        if (topFrame != null) {
-            System.out.println("pack");
-            topFrame.pack();
-        }
-
-    }
 
 }

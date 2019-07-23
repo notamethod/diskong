@@ -18,8 +18,8 @@ package diskong.app.services;
 
 import diskong.AlbumFactory;
 import diskong.Statistics;
-import diskong.app.album.AlbumEntity;
-import diskong.app.track.TrackEntity;
+import diskong.app.data.album.AlbumEntity;
+import diskong.app.data.track.TrackEntity;
 import diskong.core.*;
 import diskong.core.bean.AlbumVo;
 import diskong.core.bean.TrackInfo;
@@ -207,6 +207,9 @@ public class AudioService {
                 }
             }
             TrackInfo createdTrack = new TrackInfo(fPath, metadata);
+            if (createdTrack.getArtist()==null){
+                System.out.println("null");
+            }
             album.getTracks().add(createdTrack);
             dataService.create(new TrackEntity(createdTrack,entity));
 

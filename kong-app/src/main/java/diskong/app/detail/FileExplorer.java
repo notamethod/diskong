@@ -119,8 +119,7 @@ public class FileExplorer implements TextEventListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JButton button = (JButton)e.getSource();
-                JPanel buttonPanel = (JPanel)button.getParent();
-                JPanel exPanel = (JPanel)buttonPanel.getParent();
+                JPanel exPanel = (JPanel)button.getParent().getParent().getParent();
                 JPanel cardLayoutPanel = (JPanel)exPanel.getParent();
                 CardLayout layout = (CardLayout)cardLayoutPanel.getLayout();
                 layout.show(cardLayoutPanel, TOP_PANEL);
@@ -170,7 +169,7 @@ public class FileExplorer implements TextEventListener {
 
         Font topTopicsFont = new Font("Verdana",Font.PLAIN,12);
         table1.setFont(topTopicsFont);
-        table1.setRowHeight(48);
+        //table1.setRowHeight(48);
         table1.setOpaque(false);
 
 

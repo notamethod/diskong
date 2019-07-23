@@ -16,6 +16,7 @@
 
 package diskong.app.detail;
 
+import diskong.api.TrackList;
 import diskong.core.bean.IAlbumVo;
 
 import javax.swing.*;
@@ -41,8 +42,23 @@ public class ImageOnlyDialog extends JDialog {
         }
     }
 
+    public ImageOnlyDialog(TrackList trackList) {
+        setContentPane(contentPane);
+        setModal(true);
+        // setting (if any) image from folder
+        if (trackList.getFolderImagePath() != null) {
+            ImageIcon imgi;
+            try {
+                imgi = new ImageIcon(new File(trackList.getFolderImagePath()).toURI().toURL());
+                imgLabel.setIcon(new ImageIcon(imgi.getImage()));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        ImageOnlyDialog dialog = new ImageOnlyDialog(null);
+        ImageOnlyDialog dialog = new ImageOnlyDialog((IAlbumVo) null);
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
