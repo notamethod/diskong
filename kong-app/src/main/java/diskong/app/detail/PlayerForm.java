@@ -84,7 +84,7 @@ public class PlayerForm implements EventListener {
     private JPanel titleInfoPanel;
     private JPanel sliderPanel;
     private JPanel remotePanel;
-    private JPanel trackListPanel;
+    private JTable table2;
     private TrackModel oldModel;
     private FullTrackModel  model;
     private BasicSliderUI sliderUi;
@@ -213,7 +213,7 @@ public class PlayerForm implements EventListener {
                 }
             }
         });
-        table1.addMouseListener(new MouseAdapter() {
+        table2.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 JTable table = (JTable) mouseEvent.getSource();
@@ -308,7 +308,7 @@ public class PlayerForm implements EventListener {
     public void selectRow(int t) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                table1.setRowSelectionInterval(t, t);
+                table2.setRowSelectionInterval(t, t);
                 updateComponents(t);
 
             }
@@ -352,17 +352,18 @@ public class PlayerForm implements EventListener {
     private void createUIComponents() {
         model = new FullTrackModel();
         table1 = new JTable(model);
+        table2 = new JTable(model);
         //make transparent background
         scrollPane1 = new JScrollPane(table1);
         scrollPane1.setOpaque(false);
         scrollPane1.setViewportBorder(null);
         scrollPane1.setBorder(BorderFactory.createEmptyBorder());
         table1.setBorder(BorderFactory.createEmptyBorder());
-        table1.setOpaque(false);
+        table2.setOpaque(false);
         //table1.setTableHeader(null);
         //don't show header
         table1.getTableHeader().setUI(null);
-        ((DefaultTableCellRenderer) table1.getDefaultRenderer(Object.class)).setOpaque(false);
+        ((DefaultTableCellRenderer) table2.getDefaultRenderer(Object.class)).setOpaque(false);
         //autoresize columns
        // table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // this is obvius part
     }
