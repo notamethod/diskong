@@ -50,6 +50,13 @@ public interface TrackRepository
             "FROM " +
             "     TrackEntity track  join track.album album " +
             "where " +
-            "    album.artist =?1")
+            "    album.artist =?1 order by track.number")
     List<TrackEntity> findByArtistAlbum(String artist);
+    @Query("SELECT " +
+            "    track " +
+            "FROM " +
+            "     TrackEntity track  join track.album album " +
+            "where " +
+            "    album.title =?1 order by track.number")
+    List<TrackEntity> findByAlbum(String label);
 }

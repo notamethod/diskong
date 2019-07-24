@@ -58,7 +58,12 @@ public class TrackEntity implements Comparable<TrackEntity>{
         this.title = trackInfo.getTitle();
         this.path = trackInfo.getfPath().getFile().getAbsolutePath();
         this.album = entity;
-        this.number=Integer.valueOf(trackInfo.getNumber());
+        try {
+            this.number=Integer.valueOf(trackInfo.getNumber());
+        } catch (NumberFormatException e) {
+            //e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override

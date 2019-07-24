@@ -81,6 +81,10 @@ public class PlayerForm implements EventListener {
     private JSlider musicSlider;
     private JLabel jlArtist;
     private JLabel jlTitle;
+    private JPanel titleInfoPanel;
+    private JPanel sliderPanel;
+    private JPanel remotePanel;
+    private JPanel trackListPanel;
     private TrackModel oldModel;
     private FullTrackModel  model;
     private BasicSliderUI sliderUi;

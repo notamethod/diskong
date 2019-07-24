@@ -35,4 +35,6 @@ public interface DataService {
     List<SimpleStatObject> findAlbumCount();
 
     List<TrackEntity> findTrackByArtist(String label);
+
+    List<TrackEntity> findTrackByAlbum(String label);
 }

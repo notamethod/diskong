@@ -68,12 +68,24 @@ public class MainSelectForm  implements TrackListListener {
                     int index = theList.locationToIndex(e.getPoint());
                     if (index >= 0) {
                         SimpleStatObject o = (SimpleStatObject) theList.getModel().getElementAt(index);
-                        System.out.println("Double-clicked on: " + o.getLabel());
                         List<TrackEntity> list = trackService.findTrackByArtist(o.getLabel());
-                        System.out.println(list.size());
                         TrackList tl = new TrackList(list, "toto");
                         actionRequested(tl);
                     }
+
+            }
+        });
+        albumList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JList theList = (JList) e.getSource();
+                int index = theList.locationToIndex(e.getPoint());
+                if (index >= 0) {
+                    SimpleStatObject o = (SimpleStatObject) theList.getModel().getElementAt(index);
+                    List<TrackEntity> list = trackService.findTrackByAlbum(o.getLabel());
+                    TrackList tl = new TrackList(list, "toto");
+                    actionRequested(tl);
+                }
 
             }
         });
@@ -89,7 +101,7 @@ public class MainSelectForm  implements TrackListListener {
         List<SimpleStatObject> albums = trackService.findAlbumCount();
         System.out.println(albums.size());
         for(SimpleStatObject album: albums){
-            albumModel.addElement(album.getLabel()+" "+album.getCount());
+            albumModel.addElement(album);
         }
 
     }

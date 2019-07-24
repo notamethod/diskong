@@ -70,4 +70,8 @@ public class DataServiceImpl implements DataService {
     public List<TrackEntity> findTrackByArtist(String label) {
         return trackRepository.findByArtistAlbum(label);
     }
+    @Override
+    public List<TrackEntity> findTrackByAlbum(String label) {
+        return trackRepository.findByAlbum(label);
+    }
 }
