@@ -149,11 +149,7 @@ public class FileExplorer implements TextEventListener {
 
     private void createUIComponents() {
         initializeAlbumTable();
-   //     scrollPane1 = new JScrollPane(table1);
-       // scrollPane1.setOpaque(false);
-      //  scrollPane1.getViewport().setOpaque(false);
-//        scrollPane1.setMinimumSize(new Dimension(-1,250));
-//        scrollPane1.setPreferredSize(new Dimension(-1,250));
+
 
         analyzeDirButton  = new JButton();
         pathField = new JDropText();
@@ -234,10 +230,10 @@ public class FileExplorer implements TextEventListener {
                 }
                 long startTime = System.currentTimeMillis();
 
-                List<AlbumVo> avo = null;
+                List<AlbumVo> avos = null;
                 try {
                   //  avo = service.parseDirectoryForAlbum(entry);
-                    avo = service.parseDirectory(entry);
+                    avos = service.parseDirectory(entry);
                 } catch (Exception e) {
                     LOG.error(e.getLocalizedMessage(), e);
                 }
@@ -245,7 +241,7 @@ public class FileExplorer implements TextEventListener {
 //                    LOG.info("PUBLISH"+avo.getTitle());
 //                    publish(avo);
 //                }
-                publish(avo);
+                publish(avos);
 
 
 //                while (!enough && !isCancelled()) {

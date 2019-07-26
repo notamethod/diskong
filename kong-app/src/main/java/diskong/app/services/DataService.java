@@ -18,7 +18,9 @@ package diskong.app.services;
 
 import diskong.app.data.album.AlbumEntity;
 import diskong.app.common.SimpleStatObject;
+import diskong.app.data.genre.GenreEntity;
 import diskong.app.data.track.TrackEntity;
+import diskong.core.bean.AlbumVo;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,4 +39,12 @@ public interface DataService {
     List<TrackEntity> findTrackByArtist(String label);
 
     List<TrackEntity> findTrackByAlbum(String label);
+
+    List<TrackEntity> findTrackByGenre(String label);
+
+    List<SimpleStatObject> findGenreCount();
+
+    GenreEntity findOrSaveGenre(String name);
+
+    AlbumEntity createAlbum(AlbumVo album);
 }

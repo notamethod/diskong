@@ -19,6 +19,7 @@ package diskong.app.services;
 import diskong.AlbumFactory;
 import diskong.Statistics;
 import diskong.app.data.album.AlbumEntity;
+import diskong.app.data.genre.GenreEntity;
 import diskong.app.data.track.TrackEntity;
 import diskong.core.*;
 import diskong.core.bean.AlbumVo;
@@ -39,10 +40,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static diskong.core.bean.AlbumVo.TAG_ALBUM_ARTIST;
@@ -121,6 +119,8 @@ public class AudioService {
         //FIXME multi albums in one directory
         //AlbumVo album = AlbumFactory.getAlbum();
         Map<String, AlbumVo> albums = new HashMap<>();
+        WeakHashMap<String, GenreEntity> mapGenres = new WeakHashMap<>();
+
         // parsedir
         LOG.debug("iteration");
 
@@ -165,14 +165,8 @@ public class AudioService {
         // check if all tracks in folder belong to same album
         if (metadata.get(Metadata.CONTENT_TYPE).contains("flac") || metadata.get(Metadata.CONTENT_TYPE).contains("vorbis")) {
             AlbumVo album = initAlbum(albums, metadata);
-            AlbumEntity entity= dataService.createAlbum(new AlbumEntity(album));
+            AlbumEntity albumEntity= dataService.createAlbum(album);
 
-            if (album.getTitle() == null) {
-                album.setTitle(metadata.get(XMPDM.ALBUM));
-            }
-            if (album.getArtist() == null) {
-                album.setArtist(metadata.get(TAG_ALBUM_ARTIST));
-            }
             if (album.getGenres() == null) {
                 album.setGenres(MetaUtils.getGenre(metadata));
             }
@@ -211,7 +205,7 @@ public class AudioService {
                 System.out.println("null");
             }
             album.getTracks().add(createdTrack);
-            dataService.create(new TrackEntity(createdTrack,entity));
+            dataService.create(new TrackEntity(createdTrack,albumEntity));
 
             //FIXME
 //        } else if (metadata.get(Metadata.CONTENT_TYPE).contains("image") ){
@@ -241,6 +235,26 @@ public class AudioService {
         if (artist == null)
             artist = AlbumVo.UNKNOWN;
         System.out.println(artist);
+        List<String> genres = MetaUtils.getGenre(metadata);
+        List<String> styles = MetaUtils.getStyle(metadata);
+
+        LocalDate ld = null;
+            //may be a date or a year (afaik)
+            String dateInString = metadata.get(XMPDM.RELEASE_DATE);
+            final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            if (dateInString != null) {
+                try {
+                   ld=  LocalDate.parse(dateInString, dtf);
+                } catch (DateTimeParseException e) {
+                    try {
+                        int a = Integer.parseInt(dateInString);
+                        ld = LocalDate.parse(dateInString + "-01-01", dtf);
+                    } catch (DateTimeParseException | NumberFormatException e1) {
+                        System.out.println("date error " + dateInString);
+                    }
+                }
+            }
+
         String key = DigestUtils.sha1Hex(artist+"---"+title);
         if (albums.get(key)!=null){
             return albums.get(key);
@@ -248,6 +262,10 @@ public class AudioService {
             AlbumVo album = AlbumFactory.getAlbum();
             album.setArtist(artist);
             album.setTitle(title);
+            album.setGenres(genres);
+            album.setStyles(styles);
+            if (ld != null)
+                album.setReleaseDate(ld);
             albums.put(key, album);
             return album;
         }

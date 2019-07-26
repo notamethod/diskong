@@ -36,7 +36,7 @@ public class FullTrackModel extends AbstractTableModel{
         super();
     }
 
-    protected String[] colName=new String[]{"Num.", "Title","Artist", "Album"};
+    protected String[] colName=new String[]{"Num.", "Title","Artist", "Album", "Year"};
 
     public FullTrackModel(List<TrackEntity> tracks) {
         this.tracks = tracks;
@@ -82,7 +82,8 @@ public class FullTrackModel extends AbstractTableModel{
 
             case 3:
                 return track.getAlbum().getTitle();
-
+            case 4:
+                return track.getAlbum().getYear();
 
             default :
 

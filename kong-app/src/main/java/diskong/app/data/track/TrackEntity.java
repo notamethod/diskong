@@ -20,9 +20,11 @@ import diskong.app.data.album.AlbumEntity;
 import diskong.core.bean.TrackInfo;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
+@Slf4j
 @Getter
 @Setter
 @Entity
@@ -61,8 +63,8 @@ public class TrackEntity implements Comparable<TrackEntity>{
         try {
             this.number=Integer.valueOf(trackInfo.getNumber());
         } catch (NumberFormatException e) {
-            //e.printStackTrace();
-            throw e;
+            this.number=0;
+            log.error("invalid track number: "+path);
         }
     }
 

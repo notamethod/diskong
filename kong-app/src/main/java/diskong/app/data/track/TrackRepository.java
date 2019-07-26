@@ -59,4 +59,12 @@ public interface TrackRepository
             "where " +
             "    album.title =?1 order by track.number")
     List<TrackEntity> findByAlbum(String label);
+    @Query("SELECT " +
+            "    track " +
+            "FROM " +
+            "     TrackEntity track  join track.album album join " +
+            "     album.genres genre " +
+            "where " +
+            "    genre.name =?1 order by track.number")
+    List<TrackEntity> findByGenre(String label);
 }

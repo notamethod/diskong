@@ -19,11 +19,16 @@ package diskong.app.services;
 import diskong.app.data.album.AlbumEntity;
 import diskong.app.data.album.AlbumRepository;
 import diskong.app.common.SimpleStatObject;
+import diskong.app.data.genre.GenreEntity;
+import diskong.app.data.genre.GenreRepository;
 import diskong.app.data.track.TrackEntity;
 import diskong.app.data.track.TrackRepository;
+import diskong.core.bean.AlbumVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,6 +39,9 @@ public class DataServiceImpl implements DataService {
 
     @Autowired
     private AlbumRepository albumRepository;
+
+    @Autowired
+    private GenreRepository genreRepository;
 
     @Override
     public List<TrackEntity> findAll() {
@@ -73,5 +81,49 @@ public class DataServiceImpl implements DataService {
     @Override
     public List<TrackEntity> findTrackByAlbum(String label) {
         return trackRepository.findByAlbum(label);
+    }
+
+    @Override
+    public List<TrackEntity> findTrackByGenre(String label) {
+        return trackRepository.findByGenre(label);
+    }
+
+    @Override
+    public List<SimpleStatObject> findGenreCount() {
+        return genreRepository.findGenreCount();
+    }
+
+    @Override
+    public GenreEntity findOrSaveGenre(String name) {
+        try {
+            GenreEntity genre = genreRepository.findByName(name);
+            if (genre!=null)
+                return genre;
+            else{
+                genre = new GenreEntity(name);
+                genreRepository.save(genre);
+                return genre;
+            }
+
+        } catch (EmptyResultDataAccessException e) {
+            GenreEntity genre = new GenreEntity(name);
+            genreRepository.save(genre);
+            return genre;
+        }
+    }
+
+    @Override
+    public AlbumEntity createAlbum(AlbumVo album) {
+        AlbumEntity entity =new AlbumEntity(album);
+        if (!album.getGenres().isEmpty()){
+            List<GenreEntity> entities = new ArrayList();
+
+            for (String genre : album.getGenres()){
+                entities.add(findOrSaveGenre(genre));
+            }
+            entity.setGenres(entities);
+        }
+        albumRepository.save(entity);
+        return entity;
     }
 }

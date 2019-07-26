@@ -31,10 +31,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.List;
 
 @Component
@@ -89,6 +86,21 @@ public class MainSelectForm  implements TrackListListener {
 
             }
         });
+        genreList.addComponentListener(new ComponentAdapter() {
+        });
+        genreList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JList theList = (JList) e.getSource();
+                int index = theList.locationToIndex(e.getPoint());
+                if (index >= 0) {
+                    SimpleStatObject o = (SimpleStatObject) theList.getModel().getElementAt(index);
+                    List<TrackEntity> list = trackService.findTrackByGenre(o.getLabel());
+                    TrackList tl = new TrackList(list, "toto");
+                    actionRequested(tl);
+                }
+            }
+        });
     }
 
 
@@ -102,6 +114,11 @@ public class MainSelectForm  implements TrackListListener {
         System.out.println(albums.size());
         for(SimpleStatObject album: albums){
             albumModel.addElement(album);
+        }
+        List<SimpleStatObject> genres = trackService.findGenreCount();
+        System.out.println(albums.size());
+        for(SimpleStatObject genre: genres){
+            genreModel.addElement(genre);
         }
 
     }

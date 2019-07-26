@@ -16,12 +16,20 @@
 
 package diskong.app.data.album;
 
+import diskong.app.data.genre.GenreEntity;
 import diskong.core.bean.AlbumVo;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static javax.persistence.CascadeType.PERSIST;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "album")
 public class AlbumEntity {
@@ -37,6 +45,9 @@ public class AlbumEntity {
     @Column
     private int year;
 
+    @ManyToMany
+    private Collection<GenreEntity> genres ;
+
 
     public AlbumEntity(){};
 
@@ -49,6 +60,10 @@ public class AlbumEntity {
     public AlbumEntity(AlbumVo album) {
         this.artist= (String) album.getArtist();
         this.title = album.getTitle();
+        if (!album.getYear().isEmpty())
+            this.year = Integer.parseInt(album.getYear());
+
 
     }
+
 }
