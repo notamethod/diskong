@@ -77,4 +77,5 @@ public interface IAlbumVo {
 	 AlbumVo clone();
 
 	String getYear();
+
 }

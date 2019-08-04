@@ -16,56 +16,26 @@
 
 package diskong.app.data.album;
 
-import diskong.app.data.genre.GenreEntity;
-import diskong.core.bean.AlbumVo;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.codec.digest.DigestUtils;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.Serializable;
 
-import static javax.persistence.CascadeType.PERSIST;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "album")
-@IdClass(AlbumId.class)
-public class AlbumEntity {
+public class AlbumId implements Serializable {
 
-    @Id
     private String title;
-    @Id
     private String artist;
 
-    @Column
-    private int year;
-
-    @Lob
-    private byte[] cover;
-
-    @Column
-    private int nbTracks;
-
-    @ManyToMany
-    private Collection<GenreEntity> genres ;
-
-
-    public String getHash(){
-        String key = DigestUtils.sha1Hex(artist+"---"+title);
-        return key;
-    }
-    public AlbumEntity(){};
-
-    public AlbumEntity(String title, String artist, int year) {
+    public AlbumId(String title, String artist) {
         this.title = title;
         this.artist = artist;
-        this.year = year;
     }
 
+    public AlbumId(){
 
-
+    }
 }

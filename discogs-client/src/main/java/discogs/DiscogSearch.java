@@ -169,7 +169,7 @@ public class DiscogSearch implements DatabaseSearch {
         List<IAlbumVo> masters = new ArrayList<>();
         try {
             for (IAlbumVo albumInfoTmp : albumMapping(jsonObject, album.getTitle())) {
-                IAlbumVo albumInfoTmp3 = findReleaseById(albumInfoTmp, URL_MASTER_);
+                IAlbumVo albumInfoTmp3 = findReleaseById(albumInfoTmp.getId(), URL_MASTER_);
 
                 albumInfo = albumInfoTmp;
                 masters.add(albumInfoTmp);
@@ -225,7 +225,7 @@ public class DiscogSearch implements DatabaseSearch {
         }
         fillAlbum(albumInfo, albumInfo2);
         //get detail from release
-        IAlbumVo albumInfo3 = findReleaseById(albumInfo2);
+        IAlbumVo albumInfo3 = findReleaseById(albumInfo2.getId());
         fillAlbum(albumInfo, albumInfo3);
 
         return albumInfo;
@@ -371,6 +371,45 @@ public class DiscogSearch implements DatabaseSearch {
         return albumInfo;
     }
 
+    private IAlbumVo mapAlbum(JSONObject jsonObject) throws JSONException, EmptyResultException {
+        IAlbumVo albumInfo = new AlbumVo();
+        JSONArray results = jsonObject.getJSONArray("tracklist");
+        if (results.length() == 0)
+            throw new EmptyResultException("no track info");
+
+        albumInfo.setTracks(results);
+
+
+        // TODO: multi genre
+        //artisits ?
+        albumInfo.setTitle(jsonObject.getString("title"));
+
+        try {
+            albumInfo.setStyles(jsonObject.getJSONArray("styles"));
+        } catch (JSONException j) {
+        }
+        try {
+            albumInfo.setGenres(jsonObject.getJSONArray("genres"));
+        } catch (JSONException j) {
+        }
+
+        //change it
+        try {
+            String image = jsonObject.getString("cover_image");
+            System.out.println("image"+image);
+            if (image != null)
+                albumInfo.setCoverImageUrl(jsonObject.getString("cover_image"));
+        } catch (JSONException j) {
+//            j.printStackTrace();
+        }
+
+
+//
+//        albumInfo.setId(result.getString("id"));
+        //imgae from master
+        //albumInfo.setImages(result.getJSONArray("image"));
+        return albumInfo;
+    }
     private IAlbumVo albumMappingList(JSONObject jsonObject, IAlbumVo albumOri, String masterFormat, int size) throws JSONException, EmptyResultException {
         IAlbumVo albumInfo = albumOri.clone();
         boolean searchMatch = false;
@@ -497,14 +536,14 @@ public class DiscogSearch implements DatabaseSearch {
      *
      * @see diskong.AbstractDatabase#getMasterReleaseQuery(diskong.AlbumVo)
      */
-    protected IAlbumVo findReleaseById(IAlbumVo album, String releaseType) throws EmptyResultException, ApiConfigurationException {
+    protected IAlbumVo findReleaseById(String id, String releaseType) throws EmptyResultException, ApiConfigurationException {
 
         client.removeAllFilters();
-        String urlQuery = URL_API + releaseType + album.getId();
+        String urlQuery = URL_API + releaseType + id;
 
         LOG.debug("find release by ID " + urlQuery);
         // Create a resource to be used to make Twitter API calls
-        WebResource resource = client.resource(URL_API + releaseType + album.getId());
+        WebResource resource = client.resource(URL_API + releaseType + id);
 
         // Add the filter to the resource
         DiscogsOAuth auth = new DiscogsOAuth();
@@ -513,7 +552,7 @@ public class DiscogSearch implements DatabaseSearch {
         try {
             // for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = resource.get(JSONObject.class);
-            return fullAlbumMapping(jsonObject, album);
+            return mapAlbum(jsonObject);
             // }
         } catch (JSONException ex) {
             LOG.error(DiscogSearch.class.getName(), ex);
@@ -522,8 +561,8 @@ public class DiscogSearch implements DatabaseSearch {
 
     }
 
-    public IAlbumVo findReleaseById(IAlbumVo album) throws EmptyResultException, ApiConfigurationException {
-        return findReleaseById(album, URL_RELEASES);
+    public IAlbumVo findReleaseById(String id) throws EmptyResultException, ApiConfigurationException {
+        return findReleaseById(id, URL_RELEASES);
     }
 
 

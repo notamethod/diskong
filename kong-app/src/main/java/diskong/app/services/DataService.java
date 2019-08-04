@@ -49,4 +49,6 @@ public interface DataService {
     AlbumEntity createAlbum(AlbumVo album);
 
     long countTrack();
+
+    void saveAlbum(AlbumEntity entity);
 }

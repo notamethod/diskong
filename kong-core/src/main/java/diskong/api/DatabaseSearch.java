@@ -24,7 +24,8 @@ import java.util.List;
 public interface DatabaseSearch {
 
 	IAlbumVo searchRelease(IAlbumVo album) throws EmptyResultException, ApiConfigurationException;
+	//IAlbumVo searchRelease(String title, String artist, int numTracks) throws EmptyResultException, ApiConfigurationException;
 	List<IAlbumVo> searchArtist(String artist, String title) throws EmptyResultException, ApiConfigurationException;
-	IAlbumVo findReleaseById(IAlbumVo album) throws  EmptyResultException, ApiConfigurationException;
+	IAlbumVo findReleaseById(String id) throws  EmptyResultException, ApiConfigurationException;
 	boolean isAPIAvailable();
 	}

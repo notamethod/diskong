@@ -16,10 +16,12 @@
 
 package diskong.app.services;
 
+import diskong.Utils;
 import diskong.api.ApiConfigurationException;
 import diskong.api.DatabaseSearch;
 import diskong.api.DatabaseSearchFactory;
 import diskong.api.SearchAPI;
+import diskong.app.data.album.AlbumEntity;
 import diskong.app.tagger.TaggerException;
 import diskong.core.bean.AlbumVo;
 import diskong.core.EmptyResultException;
@@ -33,21 +35,31 @@ import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.metadata.XMPDM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
+@Service
 public class AlbumService {
     private final static Logger LOG = LoggerFactory.getLogger(AlbumService.class);
     private static final String UNKNOWN = "Unknown";
     private boolean isSimulate = true;
     private SearchAPI searchAPI;
+
+    @Autowired
+    private DataServiceImpl dataService;
 
     public void setSimulate(boolean simulate) {
         isSimulate = simulate;
@@ -72,14 +84,15 @@ public class AlbumService {
 
         if (album.getId() != null) {
             try {
-                ds.findReleaseById(album);
+                ds.findReleaseById(album.getId());
             } catch (EmptyResultException e) {
                 e.printStackTrace();
             }
         }
     }
-    public IAlbumVo searchAlbum(IAlbumVo album) throws ApiConfigurationException {
 
+
+    public IAlbumVo searchAlbum(IAlbumVo album) throws ApiConfigurationException {
 
         int tagged = 0;
         IAlbumVo alInfos = null;
@@ -412,5 +425,34 @@ public class AlbumService {
 
         LOG.info("*** TAGGED TRACK ***" + tagged);
         return tagged;
+    }
+
+    public IAlbumVo retrieveData(AlbumEntity entity) {
+        IAlbumVo album = dataService.entityToDomain(entity);
+        IAlbumVo albumFound = null;
+        try {
+             albumFound = searchAlbum(album);
+            if (albumFound !=null){
+                if (albumFound.getCoverImageUrl() != null) {
+                    Path target = Paths.get(System.getProperty("java.io.tmpdir"));
+                    System.out.println(System.getProperty("java.io.tmpdir"));
+
+
+                    try {
+                        Path path =  target.resolve(entity.getHash()+".jpg");
+                        Utils.downloadFile(albumFound.getCoverImageUrl(),path);
+                        albumFound.setFolderImagePath(path.toString());
+                        byte[] fileContent = Files.readAllBytes(path);
+                        entity.setCover(fileContent);
+                        dataService.saveAlbum(entity);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (ApiConfigurationException e) {
+            e.printStackTrace();
+        }
+        return albumFound;
     }
 }

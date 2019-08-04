@@ -24,6 +24,7 @@ import diskong.app.data.genre.GenreRepository;
 import diskong.app.data.track.TrackEntity;
 import diskong.app.data.track.TrackRepository;
 import diskong.core.bean.AlbumVo;
+import diskong.core.bean.IAlbumVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -114,7 +115,8 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public AlbumEntity createAlbum(AlbumVo album) {
-        AlbumEntity entity =new AlbumEntity(album);
+        System.out.println("create album "+album);
+        AlbumEntity entity = domainToEntity(album);
         if (!album.getGenres().isEmpty()){
             List<GenreEntity> entities = new ArrayList();
 
@@ -127,8 +129,30 @@ public class DataServiceImpl implements DataService {
         return entity;
     }
 
+    private AlbumEntity domainToEntity(AlbumVo album) {
+        AlbumEntity entity = new AlbumEntity();
+        entity.setArtist(album.getArtist());
+        entity.setTitle(album.getTitle());
+        if (!album.getYear().isEmpty())
+            entity.setYear(Integer.parseInt(album.getYear()));
+        return entity;
+    }
+
+    public IAlbumVo entityToDomain(AlbumEntity entity) {
+        IAlbumVo album = new AlbumVo();
+        album.setArtist(entity.getArtist());
+        album.setTitle(entity.getTitle());
+        return album;
+    }
+
     @Override
     public long countTrack() {
         return trackRepository.count();
+    }
+
+    @Override
+    public void saveAlbum(AlbumEntity entity) {
+        albumRepository.save(entity);
+
     }
 }

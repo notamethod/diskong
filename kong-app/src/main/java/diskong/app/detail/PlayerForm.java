@@ -21,8 +21,10 @@ import diskong.api.EventListener;
 import diskong.api.GuiListener;
 import diskong.api.TrackList;
 import diskong.app.FlacPlayer;
+import diskong.app.data.album.AlbumEntity;
 import diskong.app.services.DataServiceImpl;
 import diskong.app.tagger.TaggerForm;
+import diskong.core.FilePath;
 import diskong.core.bean.AlbumVo;
 import diskong.core.bean.IAlbumVo;
 import diskong.app.data.track.TrackEntity;
@@ -42,13 +44,18 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
 import javax.swing.plaf.metal.MetalSliderUI;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
@@ -60,6 +67,9 @@ public class PlayerForm implements EventListener {
 
     @Autowired
     private DataServiceImpl trackService;
+
+    @Autowired
+    private AlbumService albumService;
 
     public JPanel getMainPanel1() {
         return mainPanel1;
@@ -193,7 +203,7 @@ public class PlayerForm implements EventListener {
 
        // this.
         model.setElements(trackList.getTracks());
-        pageTitle.setText(trackList.getTitle());
+        //pageTitle.setText(trackList.getTitle());
         switchList=true;
 //        styles.setText(String.join(", ", albumOri.getStyles()));
 //        genres.setText(String.join(", ", albumOri.getGenres()));
@@ -351,18 +361,28 @@ public class PlayerForm implements EventListener {
             //an image is found
             if (track.getAlbum().getCover()!=null) {
                 ImageIcon imgi;
+                System.out.println("read from database");
                 try {
+//                    ByteArrayInputStream bis = new ByteArrayInputStream(data);
+//                    try {
+//                        BufferedImage bImage2 = ImageIO.read(bis);
                     imgi = new ImageIcon(track.getAlbum().getCover());
                     jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-//            else{
-//                //we have to find an image
-//
-//                startImgSearch();
-//            }
+            else{
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                      RetrieveAlbumTask task   = new RetrieveAlbumTask(track.getAlbum());
+                        task.execute();
+
+                    }
+                });
+                System.out.println("quit");
+
+            }
 //            imgi = new ImageIcon(new File(albumOri.getFolderImagePath()).toURI().toURL());
 
         }
@@ -504,5 +524,39 @@ public class PlayerForm implements EventListener {
 //                slider.setBackground(savedColor);
             }
         }
+    }
+
+    class RetrieveAlbumTask extends
+            SwingWorker<IAlbumVo, List<IAlbumVo>> {
+        private AlbumEntity entity;
+        private IAlbumVo album;
+        RetrieveAlbumTask(AlbumEntity entity) {
+            //initialize
+            this.entity = entity;
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+            System.out.println("donne");
+            System.out.println(album);
+            if (album!=null){
+                ImageIcon imageIcon = new ImageIcon(album.getFolderImagePath()); // load the image to a imageIcon
+                Image newimg = imageIcon.getImage();
+                newimg = newimg.getScaledInstance(120, 120, Image.SCALE_SMOOTH); // scale it the smooth way
+                imageIcon = new ImageIcon(newimg);  // transform it back
+                jlImg.setIcon(imageIcon);
+            }
+
+
+        }
+
+        @Override
+        public IAlbumVo doInBackground() {
+            album = albumService.retrieveData(entity);
+            return album;
+
+        }
+
     }
 }
