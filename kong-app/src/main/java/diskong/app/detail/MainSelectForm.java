@@ -16,14 +16,12 @@
 
 package diskong.app.detail;
 
-import diskong.api.ListAlbumListener;
+import diskong.api.EventListener;
 import diskong.api.TrackList;
 import diskong.api.TrackListListener;
 import diskong.app.common.SimpleStatObject;
 import diskong.app.data.track.TrackEntity;
 import diskong.app.services.DataServiceImpl;
-import diskong.core.bean.AlbumVo;
-import diskong.gui.AlbumModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
@@ -36,7 +34,7 @@ import java.util.List;
 
 @Component
 @Configurable
-public class MainSelectForm  implements TrackListListener {
+public class MainSelectForm  implements TrackListListener, EventListener {
 
     DefaultListModel model;
     DefaultListModel albumModel;
@@ -52,10 +50,10 @@ public class MainSelectForm  implements TrackListListener {
 
 
     public MainSelectForm() {
-        refreshButton.addActionListener(new ActionListener() {
+        refreshButton1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                refresh();
+                refreshFilters();
             }
         });
         artistList.addMouseListener(new MouseAdapter() {
@@ -104,7 +102,7 @@ public class MainSelectForm  implements TrackListListener {
     }
 
 
-    private void refresh() {
+    private void refreshFilters() {
         List<SimpleStatObject> artists = trackService.findArtistCount();
         System.out.println(artists.size());
         for(SimpleStatObject artist: artists){
@@ -129,14 +127,17 @@ public class MainSelectForm  implements TrackListListener {
 
     @PostConstruct
     public void init(){
-        trackService.findAll();
+
+        final CardLayout cl = (CardLayout) playerPanel.getLayout();
+        playerPanel.add(playerForm.getMainPanel1(), BorderLayout.SOUTH);
+        playerForm.getMainPanel1().setVisible(false);
     }
 
     private JPanel mainPanel1;
     private JPanel topPanel;
     private JPanel playerPanel;
     private JList artistList;
-    private JButton refreshButton;
+    private JButton refreshButton1;
     private JList albumList;
     private JList genreList;
     private JPanel filterPanel;
@@ -152,34 +153,51 @@ public class MainSelectForm  implements TrackListListener {
 
     @Override
     public void actionRequested(TrackList trackList) {
-        playerForm.init(trackList);
-        Dimension dim = playerForm.getMainPanel1().getSize();
-        playerPanel.setPreferredSize(dim);
-
-        //Get the components in the panel
-        java.awt.Component[] componentList = playerPanel.getComponents();
-
-//Loop through the components
-        for (java.awt.Component c : componentList) {
-            //Remove it
-            playerPanel.remove(c);
-        }
-
-        playerPanel.revalidate();
-        playerPanel.repaint();
-
-
-        final CardLayout cl = (CardLayout) playerPanel.getLayout();
-        playerPanel.add(playerForm.getMainPanel1(), BorderLayout.SOUTH);
+        playerForm.update(trackList);
         playerForm.getMainPanel1().setVisible(true);
 
+    }
 
-        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this.mainPanel1);
+    @Override
+    public void componentUpdateRequested(double v) {
+        refreshFilters();
+    }
 
-        if (topFrame != null) {
-            System.out.println("pack");
-            topFrame.pack();
-        }
+    @Override
+    public void TableUpdateRequested(int row) {
 
     }
+
+
+//    public void actionRequestedOld(TrackList trackList) {
+//        playerForm.init(trackList);
+//        Dimension dim = playerForm.getMainPanel1().getSize();
+//        playerPanel.setPreferredSize(dim);
+//
+//        //Get the components in the panel
+//        java.awt.Component[] componentList = playerPanel.getComponents();
+//
+////Loop through the components
+//        for (java.awt.Component c : componentList) {
+//            //Remove it
+//            playerPanel.remove(c);
+//        }
+//
+//        playerPanel.revalidate();
+//        playerPanel.repaint();
+//
+//
+//        final CardLayout cl = (CardLayout) playerPanel.getLayout();
+//        playerPanel.add(playerForm.getMainPanel1(), BorderLayout.SOUTH);
+//        playerForm.getMainPanel1().setVisible(true);
+//
+//
+//        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this.mainPanel1);
+//
+//        if (topFrame != null) {
+//            System.out.println("pack");
+//            topFrame.pack();
+//        }
+//
+//    }
 }

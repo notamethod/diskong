@@ -466,7 +466,7 @@ public class PlayerFormOld implements EventListener {
         @Override
         protected AlbumVo doInBackground() {
             AlbumFlacPlayer player = new AlbumFlacPlayer(albumOri);
-            addListener(player.getListener());
+            addListener(player.getPlayerListener());
             player.addListener(PlayerFormOld.this);
             player.playAlbum(row);
             return null;

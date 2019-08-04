@@ -18,11 +18,14 @@ package diskong.app.services;
 
 import diskong.AlbumFactory;
 import diskong.Statistics;
+import diskong.Utils;
+import diskong.api.ApiConfigurationException;
 import diskong.app.data.album.AlbumEntity;
 import diskong.app.data.genre.GenreEntity;
 import diskong.app.data.track.TrackEntity;
 import diskong.core.*;
 import diskong.core.bean.AlbumVo;
+import diskong.core.bean.IAlbumVo;
 import diskong.core.bean.TrackInfo;
 import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
@@ -36,6 +39,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -366,6 +371,36 @@ public class AudioService {
         }
 
         return true;
+    }
+
+    /**
+     * Get image(s) for a track
+     * - Search in flacfile metadata
+     * - Search with web service
+     * - Search in folder
+     * @param album
+     */
+    public void retrieveImage(TrackEntity track, AlbumVo album ){
+        if (album.getFolderImagePath() == null || album.getFolderImagePath().isEmpty()) {
+            IAlbumVo a2 = null;
+            try {
+                a2 = albumService.searchAlbum(album);
+            } catch (ApiConfigurationException e) {
+                LOG.error("oauth error", e);
+                JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (a2.getCoverImageUrl() != null) {
+                Path target = album.getTracks().get(0).getfPath().getPath().getParent();
+
+                try {
+                    Utils.downloadFile(a2.getCoverImageUrl(), target.resolve("folder.jpg"));
+                    JOptionPane.showMessageDialog(null, "image recovered");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 

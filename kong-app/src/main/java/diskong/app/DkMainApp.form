@@ -24,19 +24,24 @@
             <constraints/>
             <properties>
               <actionCommand value="Add"/>
-              <text value="Button"/>
+              <icon value="images/20px-OOjs_UI_icon_add.svg.png"/>
+              <text value=""/>
             </properties>
           </component>
           <component id="51f4e" class="javax.swing.JButton" binding="ripButton" default-binding="true">
             <constraints/>
             <properties>
-              <text value="Rip"/>
+              <icon value="images/cd20.png"/>
+              <text value=""/>
+              <toolTipText value="CD Rip"/>
             </properties>
           </component>
           <component id="cb96f" class="javax.swing.JButton" binding="settingsButton" default-binding="true">
             <constraints/>
             <properties>
-              <text value="Settings"/>
+              <icon value="images/20px-OOjs_UI_icon_advanced.svg.png"/>
+              <text value=""/>
+              <toolTipText value="Settings"/>
             </properties>
           </component>
         </children>

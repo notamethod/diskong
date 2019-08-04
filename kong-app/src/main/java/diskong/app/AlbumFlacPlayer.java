@@ -227,7 +227,7 @@ public class AlbumFlacPlayer implements Player {
     }
 
     @Override
-    public GuiListener getListener() {
+    public GuiListener getPlayerListener() {
         return new GuiListenerImpl();
     }
 
@@ -298,6 +298,11 @@ public class AlbumFlacPlayer implements Player {
                 seekRequest.notify();
             }
 
+        }
+
+        @Override
+        public void stopRequested() {
+            //does nothing !
         }
     }
 

@@ -45,6 +45,9 @@ public class AlbumEntity {
     @Column
     private int year;
 
+    @Lob
+    private byte[] cover;
+
     @ManyToMany
     private Collection<GenreEntity> genres ;
 

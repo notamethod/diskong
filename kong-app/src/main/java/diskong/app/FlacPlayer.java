@@ -20,8 +20,6 @@ package diskong.app;
 import diskong.api.EventListener;
 import diskong.api.GuiListener;
 import diskong.app.data.track.TrackEntity;
-import diskong.core.bean.IAlbumVo;
-import diskong.core.bean.TrackInfo;
 import io.nayuki.flac.common.StreamInfo;
 import io.nayuki.flac.decode.FlacDecoder;
 
@@ -35,7 +33,7 @@ import java.util.List;
 public class FlacPlayer implements Player {
     private List<EventListener> listeners = new ArrayList<>();
     private List<TrackEntity> tracks;
-    public Listener listener;
+    public PlayerListener playerListener;
     final double[] seekRequest = {-1};
     private boolean hasNext;
     private boolean hasPrevious;
@@ -44,9 +42,11 @@ public class FlacPlayer implements Player {
     public final int PAUSE = -2;
     public final int NEXT = -3;
     public final int PREVIOUS = -4;
+    public final int STOP = -5;
 
     public FlacPlayer(List<TrackEntity> tracks) {
         this.tracks = tracks;
+        System.out.println("create player");
     }
 
     public void playAlbum() {
@@ -54,11 +54,13 @@ public class FlacPlayer implements Player {
     }
 
     public void playAlbum(int firstToPlay) {
+        System.out.println("PLAY");
         int playedTrack = firstToPlay;
         int numTracks = tracks.size();
         try {
-       while (playedTrack>=0){
-           int returnedPlayInfo = play(new File(tracks.get(playedTrack).getPath()), playedTrack<=numTracks, playedTrack);
+            int returnedPlayInfo=0;
+       while (playedTrack>=0 && returnedPlayInfo != STOP){
+            returnedPlayInfo = play(new File(tracks.get(playedTrack).getPath()), playedTrack<=numTracks, playedTrack);
            if (returnedPlayInfo == NEXT) {
                System.out.println("next req");
                playedTrack++;
@@ -83,24 +85,10 @@ public class FlacPlayer implements Player {
 
     }
 
-//    private int playTrack(@NotNull TrackInfo track) throws InterruptedException, IOException, LineUnavailableException {
-//
-//        return play(track.getfPath().getFile(), false);
-//    }
-
-    private void playFile(Path path) {
-
-    }
-
-
-    public void playTrack(int numTrack) {
-
-    }
-
     private int play(File inFile, boolean hasNext, int track) throws
             LineUnavailableException, IOException, InterruptedException {
 
-        listener = new Listener() {
+        playerListener = new PlayerListener() {
 
             @Override
             public void setPosition(double v) {
@@ -113,7 +101,7 @@ public class FlacPlayer implements Player {
             }
         };
         if (track>=0)
-            listener.selectRow(track);
+            playerListener.selectRow(track);
         // Process header metadata blocks
         FlacDecoder decoder = new FlacDecoder(inFile);
         while (decoder.readAndHandleMetadataBlock() != null) ;
@@ -141,7 +129,8 @@ public class FlacPlayer implements Player {
         // Buffers for data created and discarded within each loop iteration, but allocated outside the loop
         int[][] samples = new int[streamInfo.numChannels][65536];
         byte[] sampleBytes = new byte[65536 * streamInfo.numChannels * bytesPerSample];
-        while (true) {
+        boolean running=true;
+        while (running) {
 
             // Get and clear seek request, if any
             double seekReq;
@@ -167,6 +156,16 @@ public class FlacPlayer implements Player {
                 }
                 return PREVIOUS;
             }
+
+            else if (seekReq == STOP){
+                line.stop();
+//                synchronized (seekRequest) {
+//                    seekRequest[0] = -1;
+//                }
+                running=false;
+                return STOP;
+            }
+
             else if (seekReq <=-900){
                 line.stop();
                 synchronized (seekRequest) {
@@ -189,7 +188,7 @@ public class FlacPlayer implements Player {
 
             // Set display position
             double timePos = (line.getMicrosecondPosition() - startTime) / 1e6;
-            listener.setPosition(timePos * streamInfo.sampleRate / streamInfo.numSamples);
+            playerListener.setPosition(timePos * streamInfo.sampleRate / streamInfo.numSamples);
 
             // Wait when end of stream reached
             if (blockSamples == 0) {
@@ -218,6 +217,7 @@ public class FlacPlayer implements Player {
             }
             line.write(sampleBytes, 0, sampleBytesLen);
         }
+        return STOP;
 
     }
 
@@ -227,7 +227,7 @@ public class FlacPlayer implements Player {
     }
 
     @Override
-    public GuiListener getListener() {
+    public GuiListener getPlayerListener() {
         return new GuiListenerImpl();
     }
 
@@ -242,7 +242,7 @@ public class FlacPlayer implements Player {
         }
     }
 
-    public interface Listener {
+    public interface PlayerListener {
 
         void setPosition(double v);
         void selectRow(int row);
@@ -286,6 +286,15 @@ public class FlacPlayer implements Player {
         public void previousRequested() {
             synchronized (seekRequest) {
                 seekRequest[0] = PREVIOUS;
+                seekRequest.notify();
+            }
+
+        }
+
+        @Override
+        public void stopRequested() {
+            synchronized (seekRequest) {
+                seekRequest[0] = STOP;
                 seekRequest.notify();
             }
 

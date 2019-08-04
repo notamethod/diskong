@@ -16,6 +16,7 @@
 
 package diskong.app.detail;
 
+import diskong.api.EventListener;
 import diskong.api.ListAlbumListener;
 import diskong.core.bean.AlbumVo;
 import diskong.core.FilePath;
@@ -44,6 +45,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +82,8 @@ public class FileExplorer implements TextEventListener {
     private JPanel albumPanel;
     private JButton closeButton;
     private List<ListAlbumListener> listenToTableAlbum;
+    public List<EventListener> eventListener;
+
 
 
     @Override
@@ -87,6 +91,8 @@ public class FileExplorer implements TextEventListener {
         SwingUtilities.invokeLater(() -> {
             /* Démarrage de l'interface graphique et du SwingWorker. */
             System.out.println(service);
+            closeButton.setVisible(true);
+            stopButton.setVisible(true);
             worker = new RetrieveAlbumsTasks(model, 2);
             worker.execute();
         });
@@ -95,6 +101,7 @@ public class FileExplorer implements TextEventListener {
     public FileExplorer() throws Exception {
         System.out.println("create filexplorer");
         listenToTableAlbum = new ArrayList<>();
+        eventListener = new ArrayList<>();
         stopButton.addActionListener(actionEvent -> worker.cancel(true));
         pathField.addPropertyChangeListener(evt -> {
             //dunno
@@ -123,6 +130,9 @@ public class FileExplorer implements TextEventListener {
                 JPanel cardLayoutPanel = (JPanel)exPanel.getParent();
                 CardLayout layout = (CardLayout)cardLayoutPanel.getLayout();
                 layout.show(cardLayoutPanel, TOP_PANEL);
+                for (EventListener listener : eventListener){
+                    listener.componentUpdateRequested(0);
+                }
             }
         });
     }
@@ -191,6 +201,12 @@ public class FileExplorer implements TextEventListener {
     public void addListener(ListAlbumListener dkMainWindow) {
         listenToTableAlbum.add(dkMainWindow);
     }
+
+
+    public void addListener(EventListener listener) {
+        eventListener.add(listener);
+    }
+
 
 
     class RetrieveAlbumsTasks extends

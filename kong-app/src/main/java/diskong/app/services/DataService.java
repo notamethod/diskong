@@ -47,4 +47,6 @@ public interface DataService {
     GenreEntity findOrSaveGenre(String name);
 
     AlbumEntity createAlbum(AlbumVo album);
+
+    long countTrack();
 }

@@ -22,6 +22,7 @@ import diskong.app.cdrip.GuiPreferences;
 import diskong.app.cdrip.RipForm;
 import diskong.app.detail.MainSelectForm;
 import diskong.app.detail.PlayerForm;
+import diskong.app.services.DataServiceImpl;
 import diskong.core.bean.AlbumVo;
 import diskong.app.detail.FileExplorer;
 import org.slf4j.Logger;
@@ -54,6 +55,10 @@ public class DkMainApp {
 
     @Autowired
     private MainSelectForm mainSelectForm;
+
+    @Autowired
+    private DataServiceImpl trackService;
+
 
     private JPanel mainPanel1;
     private JTree tree1;
@@ -105,9 +110,7 @@ public class DkMainApp {
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                GuiPreferences gui = new GuiPreferences();
-                gui.pack();
-                gui.setVisible(true);
+               //do nothing yet
             }
         });
 
@@ -142,7 +145,11 @@ public class DkMainApp {
         fileExplorerForm.getMainPanel1().setMinimumSize(minimumSize);
         topPanel.add(mainSelectForm.getMainPanel1(), TOP_PANEL);
         topPanel.add(fileExplorerForm.getMainPanel1(), EXPLORER_PANEL);
-        cl.show(topPanel, TOP_PANEL);
+        fileExplorerForm.addListener(mainSelectForm);
+        if (trackService.countTrack()>0)
+            cl.show(topPanel, TOP_PANEL);
+        else
+            cl.show(topPanel, EXPLORER_PANEL);
         frame.pack();
         frame.setVisible(true);
     }

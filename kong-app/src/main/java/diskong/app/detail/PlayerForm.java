@@ -25,11 +25,9 @@ import diskong.app.services.DataServiceImpl;
 import diskong.app.tagger.TaggerForm;
 import diskong.core.bean.AlbumVo;
 import diskong.core.bean.IAlbumVo;
-import diskong.core.bean.TrackInfo;
 import diskong.app.data.track.TrackEntity;
 import diskong.gui.FullTrackModel;
 import diskong.gui.GenericForm;
-import diskong.gui.TableColumnAdjuster;
 import diskong.gui.TrackModel;
 import diskong.app.services.AlbumService;
 import org.slf4j.Logger;
@@ -38,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -71,7 +70,7 @@ public class PlayerForm implements EventListener {
     private JTable table1;
     private JButton prevBtn;
     private JToggleButton togglePlayButton;
-    private JButton button1;
+    private JButton nextBtn;
     private JLabel styles;
     private JLabel genres;
     private JLabel jlImg;
@@ -85,12 +84,14 @@ public class PlayerForm implements EventListener {
     private JPanel sliderPanel;
     private JPanel remotePanel;
     private JTable table2;
+    private JButton stop;
     private TrackModel oldModel;
     private FullTrackModel  model;
     private BasicSliderUI sliderUi;
     private PlayerForm.MySwingWorker worker;
     private List<GuiListener> listeners;
-    private TrackList trackList;
+    private TrackList trackList2;
+    private boolean switchList=false;
 
 
     public PlayerForm() throws IOException {
@@ -110,6 +111,7 @@ public class PlayerForm implements EventListener {
                 moveSlider(ev);
             }
         });
+        //TODO: move it
         musicSlider.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent ev) {
                 moveSlider(ev);
@@ -130,7 +132,7 @@ public class PlayerForm implements EventListener {
         togglePlayButton.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
         togglePlayButton.setSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_pause.svg.png"))));
 
-        button1.addActionListener(new ActionListener() {
+        nextBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (worker != null) {
@@ -154,37 +156,54 @@ public class PlayerForm implements EventListener {
         });
 
 
+        stop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (worker != null) {
+                    for (GuiListener listener : listeners) {
+                        listener.stopRequested();
+                    }
 
-//        TableColumnAdjuster tca = new TableColumnAdjuster(table1);
-//        tca.setColumnHeaderIncluded(false);
-//        tca.adjustColumns();
+                }
+            }
+        });
+    }
 
+    public void stopCurrentWorker(){
+        if (worker != null) {
+            for (GuiListener listener : listeners) {
+                listener.stopRequested();
+            }
+            int count=0;
+            while(!worker.isDone()||count<10){
+                count++;
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
     }
 
 
 
-
-    public void init(TrackList trackList){
+    public void update(TrackList trackList){
 
        // this.
         model.setElements(trackList.getTracks());
         pageTitle.setText(trackList.getTitle());
+        switchList=true;
 //        styles.setText(String.join(", ", albumOri.getStyles()));
 //        genres.setText(String.join(", ", albumOri.getGenres()));
 //        year.setText(albumOri.getYear());
 
-        analyseButton.addActionListener(event -> analyze());
+    }
 
-        // setting (if any) image from folder
-        if (trackList.getFolderImagePath() != null) {
-            ImageIcon imgi;
-            try {
-                imgi = new ImageIcon(new File(trackList.getFolderImagePath()).toURI().toURL());
-                jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
+    @PostConstruct
+    public void init(){
+        analyseButton.addActionListener(event -> analyze(null));
         togglePlayButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -221,12 +240,20 @@ public class PlayerForm implements EventListener {
                 final int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
                     togglePlayButton.setSelected(true);
+                    if (switchList){
+                        stopCurrentWorker();
+                    }
+                    if (worker!=null)
+                        System.out.println("worker "+worker.isDone());
                     //worker not null: a track is playing
-                    if (worker != null) {
+                    if (worker != null && !worker.isDone()) {
                         for (GuiListener listener : listeners) {
                             listener.selectTrackRequested(row);
                         }
                     } else {
+//                        if (worker != null && worker.isDone())
+//                            worker = null;
+                        switchList=false;
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 worker = new PlayerForm.MySwingWorker(((FullTrackModel)table.getModel()).getTracks(), row);
@@ -242,17 +269,16 @@ public class PlayerForm implements EventListener {
         jlImg.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                ImageOnlyDialog dialog = new ImageOnlyDialog(trackList);
-                dialog.pack();
-                dialog.setVisible(true);
+//                ImageOnlyDialog dialog = new ImageOnlyDialog(null);
+//                dialog.pack();
+//                dialog.setVisible(true);
             }
         });
     }
 
-    private void analyze() {
+    private void analyze( AlbumVo albumOri) {
         AlbumService albumService = new AlbumService();
-        AlbumVo albumOri = trackList.toAlbum();
+//        AlbumVo albumOri = trackList.toAlbum();
         IAlbumVo a2 = null;
         try {
             a2 = albumService.searchAlbum(albumOri);
@@ -317,10 +343,27 @@ public class PlayerForm implements EventListener {
 
     private void updateComponents(int t) {
         System.out.println("update co");
-        if (trackList != null && trackList.getTracks() != null){
-            TrackEntity track = trackList.getTracks().get(t);
+
+        if (model.getTracks() != null && !model.getTracks().isEmpty()){
+            TrackEntity track = model.getTracks().get(t);
             jlArtist.setText((String) track.getArtist() + " ("+track.getAlbum().getTitle()+")");
             jlTitle.setText(track.getTitle());
+            //an image is found
+            if (track.getAlbum().getCover()!=null) {
+                ImageIcon imgi;
+                try {
+                    imgi = new ImageIcon(track.getAlbum().getCover());
+                    jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+//            else{
+//                //we have to find an image
+//
+//                startImgSearch();
+//            }
+//            imgi = new ImageIcon(new File(albumOri.getFolderImagePath()).toURI().toURL());
 
         }
     }
@@ -392,12 +435,23 @@ public class PlayerForm implements EventListener {
         public MySwingWorker(List<TrackEntity> trackList, Integer intValue) {
             row = intValue;
             tracks=trackList;
+            LOG.info("worker init");
+
         }
 
         @Override
+        protected void done() {
+           LOG.info("Play work is done");
+           listeners.clear();
+           setPosition(0);
+        }
+
+
+        @Override
         protected List<TrackEntity> doInBackground() {
+            LOG.info("Worker start");
             FlacPlayer player = new FlacPlayer(tracks);
-            addListener(player.getListener());
+            addListener(player.getPlayerListener());
             player.addListener(PlayerForm.this);
             player.playAlbum(row);
             return null;

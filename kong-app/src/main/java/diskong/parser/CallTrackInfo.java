@@ -61,6 +61,7 @@ public class CallTrackInfo implements Callable<TrackInfo> {
 		}
 
 		if (LOG.isTraceEnabled()) {
+
 			LOG.trace("artist:" + metadata.get(XMPDM.ARTIST) + " album:" + metadata.get(XMPDM.ALBUM) + " track:no:"
 					+ metadata.get(XMPDM.TRACK_NUMBER) + " title:" + metadata.get(TikaCoreProperties.TITLE) );
 			for (String genre : metadata.getValues(XMPDM.GENRE)) {

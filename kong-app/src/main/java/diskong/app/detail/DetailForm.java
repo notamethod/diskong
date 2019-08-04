@@ -379,7 +379,7 @@ public class DetailForm extends JDialog implements EventListener {
         @Override
         protected AlbumVo doInBackground() {
             FlacPlayer player = new FlacPlayer(null);
-            addListener(player.getListener());
+            addListener(player.getPlayerListener());
             player.addListener(DetailForm.this);
             player.playAlbum(row);
             return null;

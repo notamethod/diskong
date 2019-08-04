@@ -23,5 +23,5 @@ import diskong.api.GuiListener;
 public interface Player {
     void addListener(EventListener myListener);
 
-    GuiListener getListener();
+    GuiListener getPlayerListener();
 }

@@ -57,6 +57,7 @@ public class RipForm {
     private JLabel jYear;
     private JLabel jOutput;
     private JButton stopButton;
+    private JButton jSettings;
     private JLabel coverImg2;
     private RipTasks worker;
     private boolean albumArt = true;
@@ -119,6 +120,14 @@ public class RipForm {
                  ah.stop();
 
                 worker.cancel(true);
+            }
+        });
+        jSettings.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GuiPreferences gui = new GuiPreferences();
+                gui.pack();
+                gui.setVisible(true);
             }
         });
     }

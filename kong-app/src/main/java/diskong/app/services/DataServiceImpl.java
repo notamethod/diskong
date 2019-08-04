@@ -126,4 +126,9 @@ public class DataServiceImpl implements DataService {
         albumRepository.save(entity);
         return entity;
     }
+
+    @Override
+    public long countTrack() {
+        return trackRepository.count();
+    }
 }
