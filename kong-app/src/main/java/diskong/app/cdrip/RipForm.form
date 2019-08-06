@@ -185,7 +185,7 @@
           <component id="8e2e9" class="javax.swing.JButton" binding="jSettings">
             <constraints/>
             <properties>
-              <icon value="images/20px-OOjs_UI_icon_advanced.svg.png"/>
+              <icon value="images/dark/20px-OOjs_UI_icon_advanced.svg.png"/>
               <text value=""/>
               <toolTipText value="Settings"/>
             </properties>

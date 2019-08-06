@@ -16,12 +16,12 @@
 
 package diskong;
 
+import diskong.app.common.SkinColor;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+@Slf4j
 public class Utils {
     /**
      * Download a file from an URL
@@ -45,4 +46,15 @@ public class Utils {
     }
 
 
+    public static ImageIcon getColorIcon(SkinColor color, String iconResource) {
+
+        try {
+            Image image =  ImageIO.read( Utils.class.getClassLoader().getResource(color.getPath() + iconResource));
+            return new ImageIcon(image);
+        } catch (IOException e) {
+           log.error("No image found", e);
+           return null;
+        }
+
+    }
 }

@@ -48,7 +48,7 @@ public class TrackEntity implements Comparable<TrackEntity>{
     @ManyToOne
     private AlbumEntity album ;
 
-    public TrackEntity(){};
+    public TrackEntity(){}
 
     public TrackEntity(TrackInfo trackInfo) {
         this.artist= (String) trackInfo.getArtist();

@@ -16,15 +16,16 @@
 
 package diskong.app.detail;
 
+import diskong.Utils;
 import diskong.api.ApiConfigurationException;
 import diskong.api.EventListener;
 import diskong.api.GuiListener;
 import diskong.api.TrackList;
 import diskong.app.FlacPlayer;
+import diskong.app.common.SkinColor;
 import diskong.app.data.album.AlbumEntity;
 import diskong.app.services.DataServiceImpl;
 import diskong.app.tagger.TaggerForm;
-import diskong.core.FilePath;
 import diskong.core.bean.AlbumVo;
 import diskong.core.bean.IAlbumVo;
 import diskong.app.data.track.TrackEntity;
@@ -44,18 +45,11 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
 import javax.swing.plaf.metal.MetalSliderUI;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static javax.swing.UIManager.setLookAndFeel;
 
@@ -64,6 +58,7 @@ import static javax.swing.UIManager.setLookAndFeel;
 public class PlayerForm implements EventListener {
 
     private final static Logger LOG = LoggerFactory.getLogger(PlayerForm.class);
+    private static final int IMAGE_SCALE = 120;
 
     @Autowired
     private DataServiceImpl trackService;
@@ -108,40 +103,16 @@ public class PlayerForm implements EventListener {
         //Test txo test 3
 
         LOG.info("CREATE PLAYERFORM");
-        sliderUi = new MetalSliderUI();
-        listeners = new ArrayList<>();
-        // musicSlider.setUI(sliderUi);
 
-        musicSlider.setPaintTrack(true);
-        musicSlider.setUI(new PlayerForm.ColoredThumbSliderUI(musicSlider, Color.red));
-        musicSlider.setForeground(Color.red);
+        SkinColor color = SkinColor.BLUE;
 
-        musicSlider.addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseDragged(MouseEvent ev) {
-                moveSlider(ev);
-            }
-        });
-        //TODO: move it
-        musicSlider.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent ev) {
-                moveSlider(ev);
-            }
-
-            public void mouseReleased(MouseEvent ev) {
-                moveSlider(ev);
-                //request seek to player
-                for (GuiListener listener : listeners) {
-                    listener.seekRequested((double) musicSlider.getValue() / musicSlider.getMaximum());
-                }
-
-            }
-        });
-        togglePlayButton.setDisabledIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
-        togglePlayButton.setDisabledSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
-        togglePlayButton.setPressedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
-        togglePlayButton.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
-        togglePlayButton.setSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_pause.svg.png"))));
-
+        togglePlayButton.setDisabledIcon(Utils.getColorIcon(color, "/20px-OOjs_UI_icon_play-ltr.svg.png"));
+        togglePlayButton.setDisabledSelectedIcon(Utils.getColorIcon(color, "/20px-OOjs_UI_icon_play-ltr.svg.png"));
+        togglePlayButton.setPressedIcon(Utils.getColorIcon(color, "/20px-OOjs_UI_icon_play-ltr.svg.png"));
+        togglePlayButton.setIcon(Utils.getColorIcon(color, "/20px-OOjs_UI_icon_play-ltr.svg.png"));
+        togglePlayButton.setSelectedIcon(Utils.getColorIcon(color, "/20px-OOjs_UI_icon_pause.svg.png"));
+        nextBtn.setIcon(Utils.getColorIcon(color, "/20px-OOjs_UI_icon_next-ltr.svg.png"));
+        prevBtn.setIcon(Utils.getColorIcon(color, "/20px-OOjs_UI_icon_previous-ltr.svg.png"));
         nextBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -213,6 +184,34 @@ public class PlayerForm implements EventListener {
 
     @PostConstruct
     public void init(){
+        sliderUi = new MetalSliderUI();
+        listeners = new ArrayList<>();
+        // musicSlider.setUI(sliderUi);
+
+        musicSlider.setPaintTrack(true);
+        musicSlider.setUI(new PlayerForm.ColoredThumbSliderUI(musicSlider, Color.red));
+        musicSlider.setForeground(Color.red);
+
+        musicSlider.addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseDragged(MouseEvent ev) {
+                moveSlider(ev);
+            }
+        });
+        //TODO: move it
+        musicSlider.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent ev) {
+                moveSlider(ev);
+            }
+
+            public void mouseReleased(MouseEvent ev) {
+                moveSlider(ev);
+                //request seek to player
+                for (GuiListener listener : listeners) {
+                    listener.seekRequested((double) musicSlider.getValue() / musicSlider.getMaximum());
+                }
+
+            }
+        });
         analyseButton.addActionListener(event -> analyze(null));
         togglePlayButton.addActionListener(new ActionListener() {
             @Override
@@ -284,6 +283,13 @@ public class PlayerForm implements EventListener {
 //                dialog.setVisible(true);
             }
         });
+        try {
+            Image image = ImageIO.read(getClass().getResource("/images/music-empty-128.png"));
+            ImageIcon imgi = new ImageIcon(image);
+            jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(IMAGE_SCALE, IMAGE_SCALE, Image.SCALE_DEFAULT)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void analyze( AlbumVo albumOri) {
@@ -356,7 +362,7 @@ public class PlayerForm implements EventListener {
 
         if (model.getTracks() != null && !model.getTracks().isEmpty()){
             TrackEntity track = model.getTracks().get(t);
-            jlArtist.setText((String) track.getArtist() + " ("+track.getAlbum().getTitle()+")");
+            jlArtist.setText(track.getArtist() + " ("+track.getAlbum().getTitle()+")");
             jlTitle.setText(track.getTitle());
             //an image is found
             if (track.getAlbum().getCover()!=null) {
@@ -367,7 +373,7 @@ public class PlayerForm implements EventListener {
 //                    try {
 //                        BufferedImage bImage2 = ImageIO.read(bis);
                     imgi = new ImageIcon(track.getAlbum().getCover());
-                    jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
+                    jlImg.setIcon(new ImageIcon(imgi.getImage().getScaledInstance(IMAGE_SCALE, IMAGE_SCALE, Image.SCALE_DEFAULT)));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -543,7 +549,7 @@ public class PlayerForm implements EventListener {
             if (album!=null){
                 ImageIcon imageIcon = new ImageIcon(album.getFolderImagePath()); // load the image to a imageIcon
                 Image newimg = imageIcon.getImage();
-                newimg = newimg.getScaledInstance(120, 120, Image.SCALE_SMOOTH); // scale it the smooth way
+                newimg = newimg.getScaledInstance(IMAGE_SCALE, IMAGE_SCALE, Image.SCALE_SMOOTH); // scale it the smooth way
                 imageIcon = new ImageIcon(newimg);  // transform it back
                 jlImg.setIcon(imageIcon);
             }

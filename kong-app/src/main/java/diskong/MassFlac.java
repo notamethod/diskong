@@ -26,7 +26,6 @@ import diskong.core.bean.AlbumVo;
 import diskong.core.bean.IAlbumVo;
 import diskong.core.bean.TrackInfo;
 import diskong.parser.*;
-import diskong.parser.MetaUtils;
 import diskong.app.services.AudioService;
 import diskong.tag.metatag.ArgAction;
 import diskong.tag.metatag.Arguments;
@@ -220,7 +219,7 @@ class MassFlac {
 			}
 
 			String title = regexx(album.getTitle(), "(cd\\d*\\s)|(!)|(&)|(:)|(,)|(Disc\\s\\d*)");
-			if (title != null && !title.equals("") && title != album.getTitle()) {
+			if (title != null && !title.equals("") && !title.equals(album.getTitle())) {
 				album.setExactMatch(false);
 				album.setTitle(title);
 				return searchAlbum(album);

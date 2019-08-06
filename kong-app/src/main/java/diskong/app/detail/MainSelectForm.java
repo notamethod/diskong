@@ -49,13 +49,9 @@ public class MainSelectForm  implements TrackListListener, EventListener {
 
 
 
+
     public MainSelectForm() {
-        refreshButton1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                refreshFilters();
-            }
-        });
+
         artistList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -102,7 +98,7 @@ public class MainSelectForm  implements TrackListListener, EventListener {
     }
 
 
-    private void refreshFilters() {
+    public void refreshFilters() {
         List<SimpleStatObject> artists = trackService.findArtistCount();
         System.out.println(artists.size());
         for(SimpleStatObject artist: artists){
@@ -128,6 +124,12 @@ public class MainSelectForm  implements TrackListListener, EventListener {
     @PostConstruct
     public void init(){
 
+        refreshButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshFilters();
+            }
+        });
         final CardLayout cl = (CardLayout) playerPanel.getLayout();
         playerPanel.add(playerForm.getMainPanel1(), BorderLayout.SOUTH);
         playerForm.getMainPanel1().setVisible(false);

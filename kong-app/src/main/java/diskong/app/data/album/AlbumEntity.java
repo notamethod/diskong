@@ -17,17 +17,12 @@
 package diskong.app.data.album;
 
 import diskong.app.data.genre.GenreEntity;
-import diskong.core.bean.AlbumVo;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
-import static javax.persistence.CascadeType.PERSIST;
 
 @Getter
 @Setter
@@ -58,7 +53,7 @@ public class AlbumEntity {
         String key = DigestUtils.sha1Hex(artist+"---"+title);
         return key;
     }
-    public AlbumEntity(){};
+    public AlbumEntity(){}
 
     public AlbumEntity(String title, String artist, int year) {
         this.title = title;

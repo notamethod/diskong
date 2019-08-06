@@ -37,7 +37,23 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
     </properties>
-
+    <profiles>
+        <profile>
+            <id>standard</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.boot.mainclass>diskong.app.DkMainApp</spring.boot.mainclass>
+            </properties>
+        </profile>
+        <profile>
+            <id>profile2</id>
+            <properties>
+                <spring.boot.mainclass>com.SomeOtherClass</spring.boot.mainclass>
+            </properties>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>

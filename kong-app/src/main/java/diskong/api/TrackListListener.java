@@ -16,8 +16,6 @@
 
 package diskong.api;
 
-import diskong.core.bean.AlbumVo;
-
 public interface TrackListListener {
     void actionRequested(TrackList trackList);
 

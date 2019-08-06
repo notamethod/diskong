@@ -82,17 +82,9 @@ public class DetailForm extends JDialog implements EventListener {
         musicSlider.setPaintTrack(true);
         musicSlider.setUI(new ColoredThumbSliderUIx(musicSlider, Color.red));
         //setPaintTrack(
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -103,50 +95,43 @@ public class DetailForm extends JDialog implements EventListener {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+
+        analyseButton.addActionListener(event -> {
+            AlbumService albumService = new AlbumService();
+            IAlbumVo a2 = null;
+            try {
+                a2 = albumService.searchAlbum(albumOri);
+            } catch (ApiConfigurationException e) {
+                LOG.error("oauth error", e);
+                JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-
-        analyseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                AlbumService albumService = new AlbumService();
-                IAlbumVo a2 = null;
-                try {
-                    a2 = albumService.searchAlbum(albumOri);
-                } catch (ApiConfigurationException e) {
-                    LOG.error("oauth error", e);
-                    JOptionPane.showMessageDialog(null, "Oauth authentication failed. Please check your credentials", "error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                if (a2 != null)
-                    //found: ok
-                    LOG.info(albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
-                    //JOptionPane.showMessageDialog(null, albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
-                else {
-                    GenericForm gf = new GenericForm();
-                    a2 = gf.manualSearch(albumOri);
-
-                }
-                if (a2 != null) {
-                    IAlbumVo albumNew = a2;
-                    if (a2.getTracks().size() == albumOri.getTracks().size()) {
-                        TaggerForm tf = new TaggerForm(albumOri, albumNew);
-                        tf.pack();
-
-                        tf.setVisible(true);
-                    } else
-                        JOptionPane.showMessageDialog(null, "nombre de pistes ne correspond pas " + albumService.getSearchAPI());
-                    styles.setText(String.join(", ", a2.getStyles()));
-
-                    genres.setText(String.join(", ", a2.getGenres()));
-                    year.setText(a2.getYear());
-                }
+            if (a2 != null)
+                //found: ok
+                LOG.info(albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
+                //JOptionPane.showMessageDialog(null, albumOri.getTitle() + " found using API: " + albumService.getSearchAPI());
+            else {
+                GenericForm gf = new GenericForm();
+                a2 = gf.manualSearch(albumOri);
 
             }
+            if (a2 != null) {
+                IAlbumVo albumNew = a2;
+                if (a2.getTracks().size() == albumOri.getTracks().size()) {
+                    TaggerForm tf = new TaggerForm(albumOri, albumNew);
+                    tf.pack();
+
+                    tf.setVisible(true);
+                } else
+                    JOptionPane.showMessageDialog(null, "nombre de pistes ne correspond pas " + albumService.getSearchAPI());
+                styles.setText(String.join(", ", a2.getStyles()));
+
+                genres.setText(String.join(", ", a2.getGenres()));
+                year.setText(a2.getYear());
+            }
+
         });
 
 
@@ -184,59 +169,48 @@ public class DetailForm extends JDialog implements EventListener {
 
             }
         });
-        togglePlayButton.setDisabledIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
-        togglePlayButton.setDisabledSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
-        togglePlayButton.setPressedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
-        togglePlayButton.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_play-ltr.svg.png"))));
-        togglePlayButton.setSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/20px-OOjs_UI_icon_pause.svg.png"))));
-        togglePlayButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                AbstractButton abstractButton = (AbstractButton) e.getSource();
-                boolean selected = abstractButton.getModel().isSelected();
-                if (selected && worker == null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            worker = new MySwingWorker(albumOri, 0);
-                            worker.execute();
+        togglePlayButton.setDisabledIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/dark/20px-OOjs_UI_icon_play-ltr.svg.png"))));
+        togglePlayButton.setDisabledSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/dark/20px-OOjs_UI_icon_play-ltr.svg.png"))));
+        togglePlayButton.setPressedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/dark/20px-OOjs_UI_icon_play-ltr.svg.png"))));
+        togglePlayButton.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/dark/20px-OOjs_UI_icon_play-ltr.svg.png"))));
+        togglePlayButton.setSelectedIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/dark/20px-OOjs_UI_icon_pause.svg.png"))));
+        togglePlayButton.addActionListener(e -> {
+            AbstractButton abstractButton = (AbstractButton) e.getSource();
+            boolean selected = abstractButton.getModel().isSelected();
+            if (selected && worker == null) {
+                SwingUtilities.invokeLater(() -> {
+                    worker = new MySwingWorker(albumOri, 0);
+                    worker.execute();
 
-                        }
-                    });
+                });
+            }
+            if (!selected && worker != null) {
+                for (GuiListener listener : listeners) {
+                    listener.pauseRequested();
                 }
-                if (!selected && worker != null) {
-                    for (GuiListener listener : listeners) {
-                        listener.pauseRequested();
-                    }
 
+            }
+            if (selected && worker != null) {
+                for (GuiListener listener : listeners) {
+                    listener.resumeRequested();
                 }
-                if (selected && worker != null) {
-                    for (GuiListener listener : listeners) {
-                        listener.resumeRequested();
-                    }
 
-                }
             }
         });
-        button1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (worker != null) {
-                    for (GuiListener listener : listeners) {
-                        listener.nextRequested();
-                    }
-
+        button1.addActionListener(e -> {
+            if (worker != null) {
+                for (GuiListener listener : listeners) {
+                    listener.nextRequested();
                 }
+
             }
         });
-        prevBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (worker != null) {
-                    for (GuiListener listener : listeners) {
-                        listener.previousRequested();
-                    }
-
+        prevBtn.addActionListener(e -> {
+            if (worker != null) {
+                for (GuiListener listener : listeners) {
+                    listener.previousRequested();
                 }
+
             }
         });
 
@@ -255,12 +229,10 @@ public class DetailForm extends JDialog implements EventListener {
                             listener.selectTrackRequested(row);
                         }
                     } else {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                worker = new MySwingWorker(albumOri, row);
-                                worker.execute();
+                        SwingUtilities.invokeLater(() -> {
+                            worker = new MySwingWorker(albumOri, row);
+                            worker.execute();
 
-                            }
                         });
 
                     }
@@ -292,22 +264,15 @@ public class DetailForm extends JDialog implements EventListener {
         if (Double.isNaN(t))
             return;
         final double val = Math.max(Math.min(t, 1), 0);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (!musicSlider.getValueIsAdjusting())
-                    musicSlider.setValue((int) Math.round(val * musicSlider.getMaximum()));
-            }
+        SwingUtilities.invokeLater(() -> {
+            if (!musicSlider.getValueIsAdjusting())
+                musicSlider.setValue((int) Math.round(val * musicSlider.getMaximum()));
         });
     }
 
     //select a row in the table (the row being payed)
     public void selectRow(int t) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                table1.setRowSelectionInterval(t, t);
-
-            }
-        });
+        SwingUtilities.invokeLater(() -> table1.setRowSelectionInterval(t, t));
     }
 
     private void moveSlider(MouseEvent ev) {

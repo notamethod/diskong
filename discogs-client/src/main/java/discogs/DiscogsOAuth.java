@@ -136,7 +136,7 @@ class DiscogsOAuth  {
 //		resource.addFilter(new LoggingFilter(System.out));
 //		resource.addFilter(new UserAgentFilter(HttpHeaders.USER_AGENT, "<<diskong-user-agent>>"));
 //		// make the request and print out the result
-//		System.out.println(resource.get(String.class));
+
 	}
 
 	public WebResource addAuthentificationFilters(WebResource resource) {

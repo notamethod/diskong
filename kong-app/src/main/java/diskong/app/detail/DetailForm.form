@@ -121,7 +121,7 @@
                 </constraints>
                 <properties>
                   <focusPainted value="false"/>
-                  <icon value="images/20px-OOjs_UI_icon_previous-ltr.svg.png"/>
+                  <icon value="images/dark/20px-OOjs_UI_icon_previous-ltr.svg.png"/>
                   <text value=""/>
                 </properties>
               </component>
@@ -141,7 +141,7 @@
                 </constraints>
                 <properties>
                   <focusPainted value="false"/>
-                  <icon value="images/20px-OOjs_UI_icon_next-ltr.svg.png"/>
+                  <icon value="images/dark/20px-OOjs_UI_icon_next-ltr.svg.png"/>
                   <text value=""/>
                 </properties>
               </component>

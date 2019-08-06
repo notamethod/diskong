@@ -123,7 +123,6 @@ public class NioDirectoryParser implements DirectoryParser {
 	// map.put(path.getParent(), l);
 	// }
 	// l.addTrack(new FilePath(new File(path. toUri()), path));
-	// // System.out.println(path.getFileName());
 	//
 	// }
 

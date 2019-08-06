@@ -53,7 +53,6 @@ public class GenericForm {
             if (a2 != null) {
                 //found: ok
                 JOptionPane.showMessageDialog(null, album.getTitle() + " found using API: " + albumService.getSearchAPI());
-                System.out.println(a2.toString());
                 a2.setArtist(albumToSearch.getArtist());
                 a2.setTitle(albumToSearch.getTitle());
                 return a2;

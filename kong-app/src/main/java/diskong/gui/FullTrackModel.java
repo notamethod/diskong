@@ -17,7 +17,6 @@
 package diskong.gui;
 
 import diskong.app.data.track.TrackEntity;
-import diskong.core.bean.TrackInfo;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.Collections;
@@ -62,7 +61,6 @@ public class FullTrackModel extends AbstractTableModel{
 
     @Override
     public int getColumnCount() {
-        System.out.println(colName.length);
         return colName.length;
     }
 

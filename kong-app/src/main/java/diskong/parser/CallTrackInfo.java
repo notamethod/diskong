@@ -54,7 +54,7 @@ public class CallTrackInfo implements Callable<TrackInfo> {
 		String mimeType = new Tika().detect(fPath.getFile());
 		metadata.set(Metadata.CONTENT_TYPE, mimeType);
 
-		try(InputStream is = Files.newInputStream(fPath.getPath(), StandardOpenOption.READ);) {
+		try(InputStream is = Files.newInputStream(fPath.getPath(), StandardOpenOption.READ)) {
 			callParser.parse(is, ch, metadata);
 		} catch (ParserException e) {
 			e.printStackTrace();

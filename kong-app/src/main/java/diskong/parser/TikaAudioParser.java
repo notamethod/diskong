@@ -142,13 +142,6 @@ public class TikaAudioParser implements AudioParser {
 			}
 		}
 		return metadata;
-		// for (int i = 0; i < metadata.names().length; i++) {
-		// String item = metadata.names()[i];
-		// //System.out.println(item + " -- " + metadata.get(item));
-		//
-		// }
-
-		// System.out.println(ch.toString());
 	}
 
 	@Override

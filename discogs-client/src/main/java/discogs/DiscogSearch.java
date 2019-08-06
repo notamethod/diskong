@@ -356,7 +356,6 @@ public class DiscogSearch implements DatabaseSearch {
         //change it
         try {
             String image = jsonObject.getString("cover_image");
-            System.out.println("image"+image);
             if (image != null)
                 albumInfo.setCoverImageUrl(jsonObject.getString("cover_image"));
         } catch (JSONException j) {
@@ -396,7 +395,6 @@ public class DiscogSearch implements DatabaseSearch {
         //change it
         try {
             String image = jsonObject.getString("cover_image");
-            System.out.println("image"+image);
             if (image != null)
                 albumInfo.setCoverImageUrl(jsonObject.getString("cover_image"));
         } catch (JSONException j) {

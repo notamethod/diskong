@@ -31,6 +31,7 @@ import diskong.parser.AudioParser;
 import diskong.parser.CallTrackInfo;
 import diskong.parser.MetaUtils;
 import diskong.parser.TikaAudioParser;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
@@ -51,6 +52,7 @@ import java.util.concurrent.*;
 import static diskong.core.bean.AlbumVo.TAG_ALBUM_ARTIST;
 
 @Service
+@Slf4j
 public class AudioService {
 
     private final static Logger LOG = LoggerFactory.getLogger(AudioService.class);
@@ -62,7 +64,7 @@ public class AudioService {
     private DataServiceImpl dataService;
 
     public AudioService() throws Exception {
-        System.out.println("creation audioservice");
+        log.debug("creation audioservice");
     }
 
 
@@ -200,15 +202,13 @@ public class AudioService {
                             int a = Integer.parseInt(dateInString);
                             album.setReleaseDate(LocalDate.parse(dateInString + "-01-01", dtf));
                         } catch (DateTimeParseException | NumberFormatException e1) {
-                            System.out.println("date error " + dateInString);
+                           log.error("date error " + dateInString, e1);
                         }
                     }
                 }
             }
             TrackInfo createdTrack = new TrackInfo(fPath, metadata);
-            if (createdTrack.getArtist()==null){
-                System.out.println("null");
-            }
+
             album.getTracks().add(createdTrack);
             dataService.create(new TrackEntity(createdTrack,albumEntity));
 
@@ -233,13 +233,10 @@ public class AudioService {
         if (title == null)
             title = AlbumVo.UNKNOWN;
         String artist = metadata.get(TAG_ALBUM_ARTIST);
-        System.out.println(artist);
         if (artist == null)
             artist = metadata.get(XMPDM.ARTIST);
-        System.out.println(artist);
         if (artist == null)
             artist = AlbumVo.UNKNOWN;
-        System.out.println(artist);
         List<String> genres = MetaUtils.getGenre(metadata);
         List<String> styles = MetaUtils.getStyle(metadata);
 
@@ -321,7 +318,7 @@ public class AudioService {
                             int a = Integer.parseInt(dateInString);
                             album.setReleaseDate(LocalDate.parse(dateInString + "-01-01", dtf));
                         } catch (DateTimeParseException | NumberFormatException e1) {
-                            System.out.println("date error " + dateInString);
+                            log.error("date error " + dateInString);
                         }
                     }
                 }

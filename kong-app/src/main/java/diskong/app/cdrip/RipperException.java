@@ -54,7 +54,7 @@ public class RipperException extends Throwable {
     public RipperException(String error, int exitCode, Throwable throwable) {
         super(error, throwable);
         //TODO: i18n
-        exitCode = exitCode;
+        this.exitCode = exitCode;
 
     }
 }

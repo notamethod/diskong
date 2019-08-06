@@ -115,7 +115,6 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public AlbumEntity createAlbum(AlbumVo album) {
-        System.out.println("create album "+album);
         AlbumEntity entity = domainToEntity(album);
         if (!album.getGenres().isEmpty()){
             List<GenreEntity> entities = new ArrayList();

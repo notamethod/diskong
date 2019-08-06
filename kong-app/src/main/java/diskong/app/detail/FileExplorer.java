@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -89,8 +90,6 @@ public class FileExplorer implements TextEventListener {
     @Override
     public void textChanged(String text) {
         SwingUtilities.invokeLater(() -> {
-            /* Démarrage de l'interface graphique et du SwingWorker. */
-            System.out.println(service);
             closeButton.setVisible(true);
             stopButton.setVisible(true);
             worker = new RetrieveAlbumsTasks(model, 2);
@@ -98,11 +97,15 @@ public class FileExplorer implements TextEventListener {
         });
     }
 
+    @PostConstruct
+    public void init(){
+        stopButton.addActionListener(actionEvent -> worker.cancel(true));
+    }
     public FileExplorer() throws Exception {
         System.out.println("create filexplorer");
         listenToTableAlbum = new ArrayList<>();
         eventListener = new ArrayList<>();
-        stopButton.addActionListener(actionEvent -> worker.cancel(true));
+
         pathField.addPropertyChangeListener(evt -> {
             //dunno
         });
@@ -272,12 +275,12 @@ public class FileExplorer implements TextEventListener {
 
         @Override
         protected void process(List<List<AlbumVo>> chunks) {
-            LOG.info("PROCESS" + chunks);
+            //LOG.debug("PROCESS" + chunks);
             for (List<AlbumVo> tmp : chunks){
                 albums.addAll(tmp);
             }
 
-            LOG.info("PROCESS" + albums);
+            //LOG.debug("PROCESS" + albums);
             model.setAlbums(albums);
 //            for (AlbumVo avo : chunks) {
 //                textArea.append(number + "\n");

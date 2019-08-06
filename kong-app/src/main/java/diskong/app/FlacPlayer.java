@@ -22,14 +22,15 @@ import diskong.api.GuiListener;
 import diskong.app.data.track.TrackEntity;
 import io.nayuki.flac.common.StreamInfo;
 import io.nayuki.flac.decode.FlacDecoder;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class FlacPlayer implements Player {
     private List<EventListener> listeners = new ArrayList<>();
     private List<TrackEntity> tracks;
@@ -62,15 +63,15 @@ public class FlacPlayer implements Player {
        while (playedTrack>=0 && returnedPlayInfo != STOP){
             returnedPlayInfo = play(new File(tracks.get(playedTrack).getPath()), playedTrack<=numTracks, playedTrack);
            if (returnedPlayInfo == NEXT) {
-               System.out.println("next req");
+               log.debug("next req");
                playedTrack++;
            }
            if (returnedPlayInfo == PREVIOUS && playedTrack>0) {
-               System.out.println("prev req");
+               log.debug("prev req");
                playedTrack--;
            }
            if (returnedPlayInfo >=0) {
-               System.out.println("play track req");
+               log.debug("play track req");
                playedTrack = returnedPlayInfo;
            }
        }
@@ -81,8 +82,6 @@ public class FlacPlayer implements Player {
         } catch (LineUnavailableException e) {
             e.printStackTrace();
         }
-        System.out.println(firstToPlay+"fin");
-
     }
 
     private int play(File inFile, boolean hasNext, int track) throws

@@ -48,7 +48,7 @@ public class AbcdeHandlerTest {
         Map<Integer, String> state = new HashMap<>();
         try {
             RipHandler handler = new AbcdeHandler();
-            handler.parseState(Arrays.asList(testLists), state, new ArrayList<String>(),1);
+            handler.parseState(Arrays.asList(testLists), state, new ArrayList<>(),1);
             int nbOk = 0;
             for (Map.Entry<Integer, String> cursor : state.entrySet()) {
                 System.out.println(cursor.getKey() + " | " + cursor.getValue());

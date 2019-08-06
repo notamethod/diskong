@@ -79,7 +79,6 @@ public class AlbumFlacPlayer implements Player {
         } catch (LineUnavailableException e) {
             e.printStackTrace();
         }
-        System.out.println(firstToPlay+"fin");
 
     }
 
@@ -115,108 +114,105 @@ public class AlbumFlacPlayer implements Player {
         if (track>=0)
             listener.selectRow(track);
         // Process header metadata blocks
-        FlacDecoder decoder = new FlacDecoder(inFile);
-        while (decoder.readAndHandleMetadataBlock() != null) ;
-        StreamInfo streamInfo = decoder.streamInfo;
-        if (streamInfo.numSamples == 0)
-            throw new IllegalArgumentException("Unknown audio length");
+        try (FlacDecoder decoder = new FlacDecoder(inFile)) {
+            while (decoder.readAndHandleMetadataBlock() != null) ;
+            StreamInfo streamInfo = decoder.streamInfo;
+            if (streamInfo.numSamples == 0)
+                throw new IllegalArgumentException("Unknown audio length");
 
-        // Start Java sound output API
-        AudioFormat format = new AudioFormat(streamInfo.sampleRate,
-                streamInfo.sampleDepth, streamInfo.numChannels, true, false);
-        DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-        SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
-        line.open(format);
-        line.start();
+            // Start Java sound output API
+            AudioFormat format = new AudioFormat(streamInfo.sampleRate,
+                    streamInfo.sampleDepth, streamInfo.numChannels, true, false);
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+            SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
+            line.open(format);
+            line.start();
 
-        // Create GUI object, event handler, communication object
+            // Create GUI object, event handler, communication object
 
 
-        /*-- Audio player loop --*/
+            /*-- Audio player loop --*/
 
-        // Decode and write audio data, handle seek requests, wait for seek when end of stream reached
-        int bytesPerSample = streamInfo.sampleDepth / 8;
-        long startTime = line.getMicrosecondPosition();
+            // Decode and write audio data, handle seek requests, wait for seek when end of stream reached
+            int bytesPerSample = streamInfo.sampleDepth / 8;
+            long startTime = line.getMicrosecondPosition();
 
-        // Buffers for data created and discarded within each loop iteration, but allocated outside the loop
-        int[][] samples = new int[streamInfo.numChannels][65536];
-        byte[] sampleBytes = new byte[65536 * streamInfo.numChannels * bytesPerSample];
-        while (true) {
+            // Buffers for data created and discarded within each loop iteration, but allocated outside the loop
+            int[][] samples = new int[streamInfo.numChannels][65536];
+            byte[] sampleBytes = new byte[65536 * streamInfo.numChannels * bytesPerSample];
+            while (true) {
 
-            // Get and clear seek request, if any
-            double seekReq;
-            synchronized (seekRequest) {
-                seekReq = seekRequest[0];
-                if (seekReq > -2)
-                    seekRequest[0] = -1;
-            }
-
-            // Decode next audio block, or seek and decode
-            int blockSamples;
-            if (seekReq == NEXT && hasNext){
-                line.stop();
+                // Get and clear seek request, if any
+                double seekReq;
                 synchronized (seekRequest) {
+                    seekReq = seekRequest[0];
+                    if (seekReq > -2)
                         seekRequest[0] = -1;
                 }
-                return NEXT;
-            }
-            else if (seekReq == PREVIOUS){
-                line.stop();
-                synchronized (seekRequest) {
-                    seekRequest[0] = -1;
-                }
-                return PREVIOUS;
-            }
-            else if (seekReq <=-900){
-                line.stop();
-                synchronized (seekRequest) {
-                    seekRequest[0] = -1;
-                }
-                return (int) (seekReq+1000);
-            }
 
-            else if (seekReq == PAUSE)
-                continue;
-            else if (seekReq == -1)
-                blockSamples = decoder.readAudioBlock(samples, 0);
-            else {
-                long samplePos = Math.round(seekReq * streamInfo.numSamples);
-                seekReq = -1;
-                blockSamples = decoder.seekAndReadAudioBlock(samplePos, samples, 0);
-                line.flush();
-                startTime = line.getMicrosecondPosition() - Math.round(samplePos * 1e6 / streamInfo.sampleRate);
-            }
-
-            // Set display position
-            double timePos = (line.getMicrosecondPosition() - startTime) / 1e6;
-            listener.setPosition(timePos * streamInfo.sampleRate / streamInfo.numSamples);
-
-            // Wait when end of stream reached
-            if (blockSamples == 0) {
-                if (hasNext) {
-                    return NEXT;
-                } else {
+                // Decode next audio block, or seek and decode
+                int blockSamples;
+                if (seekReq == NEXT && hasNext) {
+                    line.stop();
                     synchronized (seekRequest) {
-                        while (seekRequest[0] == -1) {
-                            seekRequest.wait();
-                        }
+                            seekRequest[0] = -1;
                     }
+                    return NEXT;
+                } else if (seekReq == PREVIOUS) {
+                    line.stop();
+                    synchronized (seekRequest) {
+                        seekRequest[0] = -1;
+                    }
+                    return PREVIOUS;
+                } else if (seekReq <= -900) {
+                    line.stop();
+                    synchronized (seekRequest) {
+                        seekRequest[0] = -1;
+                    }
+                    return (int) (seekReq + 1000);
+                } else if (seekReq == PAUSE)
                     continue;
+                else if (seekReq == -1)
+                    blockSamples = decoder.readAudioBlock(samples, 0);
+                else {
+                    long samplePos = Math.round(seekReq * streamInfo.numSamples);
+                    seekReq = -1;
+                    blockSamples = decoder.seekAndReadAudioBlock(samplePos, samples, 0);
+                    line.flush();
+                    startTime = line.getMicrosecondPosition() - Math.round(samplePos * 1e6 / streamInfo.sampleRate);
                 }
 
+                // Set display position
+                double timePos = (line.getMicrosecondPosition() - startTime) / 1e6;
+                listener.setPosition(timePos * streamInfo.sampleRate / streamInfo.numSamples);
 
-            }
+                // Wait when end of stream reached
+                if (blockSamples == 0) {
+                    if (hasNext) {
+                        return NEXT;
+                    } else {
+                        synchronized (seekRequest) {
+                            while (seekRequest[0] == -1) {
+                                seekRequest.wait();
+                            }
+                        }
+                        continue;
+                    }
 
-            // Convert samples to channel-interleaved bytes in little endian
-            int sampleBytesLen = 0;
-            for (int i = 0; i < blockSamples; i++) {
-                for (int ch = 0; ch < streamInfo.numChannels; ch++) {
-                    int val = samples[ch][i];
-                    for (int j = 0; j < bytesPerSample; j++, sampleBytesLen++)
-                        sampleBytes[sampleBytesLen] = (byte) (val >>> (j << 3));
+
                 }
+
+                // Convert samples to channel-interleaved bytes in little endian
+                int sampleBytesLen = 0;
+                for (int i = 0; i < blockSamples; i++) {
+                    for (int ch = 0; ch < streamInfo.numChannels; ch++) {
+                        int val = samples[ch][i];
+                        for (int j = 0; j < bytesPerSample; j++, sampleBytesLen++)
+                            sampleBytes[sampleBytesLen] = (byte) (val >>> (j << 3));
+                    }
+                }
+                line.write(sampleBytes, 0, sampleBytesLen);
             }
-            line.write(sampleBytes, 0, sampleBytesLen);
         }
 
     }

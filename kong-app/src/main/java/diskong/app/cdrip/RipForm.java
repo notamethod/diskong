@@ -86,7 +86,6 @@ public class RipForm {
             public void actionPerformed(ActionEvent actionEvent) {
 
                 File f = new File(ah.getRipProperties().getProperty(ah.OUTPUT_DIR));
-                System.out.println(f.getAbsolutePath());
                 if (!f.exists()) {
                     boolean isCreated = f.mkdirs();
                     JOptionPane.showMessageDialog(null,
@@ -330,7 +329,6 @@ public class RipForm {
             //FIXME: does not work
             if (this.isCancelled()) {
                 if (process != null && process.isAlive()) {
-                    System.out.println("yyyxxx");
                     try {
                         System.out.println("yyy");
 //                    process.destroy();                     // tell the process to stop

@@ -14,32 +14,16 @@
  * limitations under the License.
  */
 
-package diskong.app.data.genre;
+package diskong.app.common;
 
 import lombok.Getter;
 
-import javax.persistence.*;
-
 @Getter
-@Entity
-@Table(name = "genre")
-public class GenreEntity {
+public enum SkinColor {
+    BLUE("images/blue"), DARK("images/dark");
+    private String path;
 
-    @Id @GeneratedValue long id;
-
-    @Column(length = 240, nullable = false)
-    private String name;
-
-    @Column(length = 20, nullable = true)
-    private String type;
-
-
-
-    public GenreEntity(){}
-
-    public GenreEntity(String name) {
-        this.name = name;
-
+    SkinColor(String path) {
+        this.path = path;
     }
-
 }

@@ -57,7 +57,6 @@ public class TrackModel extends AbstractTableModel{
 
     @Override
     public int getColumnCount() {
-        System.out.println(colName.length);
         return colName.length;
     }
 
