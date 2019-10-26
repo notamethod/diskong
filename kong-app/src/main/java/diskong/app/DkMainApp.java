@@ -18,15 +18,13 @@ package diskong.app;
 
 
 import diskong.app.cdrip.RipForm;
+import diskong.app.detail.FileExplorer;
 import diskong.app.detail.MainSelectForm;
 import diskong.app.services.DataServiceImpl;
-import diskong.app.detail.FileExplorer;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ExitCodeGenerator;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -37,8 +35,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ResourceBundle;
 

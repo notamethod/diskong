@@ -28,7 +28,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "track")
+@Table(name = "track",uniqueConstraints={@UniqueConstraint(columnNames = "path")})
 public class TrackEntity implements Comparable<TrackEntity>{
 
     @Id @GeneratedValue long id;
@@ -39,7 +39,7 @@ public class TrackEntity implements Comparable<TrackEntity>{
     @Column(length = 240, nullable = false)
     private String artist;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique=true)
     private String path;
 
     @Column

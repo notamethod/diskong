@@ -22,4 +22,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AlbumRepository
         extends JpaRepository<AlbumEntity, String> {
+    AlbumEntity findByTitleAndArtist(String title, String artist);
+
+    // void findById_Title(String title);
 }

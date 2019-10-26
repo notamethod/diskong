@@ -17,6 +17,7 @@
 package diskong.app.services;
 
 import diskong.app.data.album.AlbumEntity;
+import diskong.app.data.album.AlbumId;
 import diskong.app.data.album.AlbumRepository;
 import diskong.app.common.SimpleStatObject;
 import diskong.app.data.genre.GenreEntity;
@@ -124,6 +125,10 @@ public class DataServiceImpl implements DataService {
             }
             entity.setGenres(entities);
         }
+        AlbumId albumId = new AlbumId(entity.getTitle(), entity.getArtist());
+
+        AlbumEntity albumEntity =  albumRepository.findByTitleAndArtist(entity.getTitle(), entity.getArtist());
+        System.out.println("create album "+entity.getTitle());
         albumRepository.save(entity);
         return entity;
     }
