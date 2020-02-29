@@ -67,8 +67,7 @@
         </dependency>
         <dependency>
             <groupId>org.gagravarr</groupId>
-            <version>0.9-SNAPSHOT</version>
-
+            <version>0.8</version>
             <artifactId>vorbis-java-core</artifactId>
         </dependency>
         <dependency>
