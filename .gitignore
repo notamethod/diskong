@@ -26,3 +26,6 @@
 .idea/
 *.iml
 *.iws
+/kong-app/target/
+/discogs-client/target/
+/kong-core/target/

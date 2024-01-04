@@ -3,9 +3,17 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/discogs-client" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/discogs-client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/discogs-client/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/distribution" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/kong-app" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kong-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kong-app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/kong-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kong-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kong-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

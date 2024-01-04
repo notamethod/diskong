@@ -2,21 +2,20 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="discogs-client" />
+        <module name="kong-core" />
         <module name="distribution" />
-        <module name="kong-app" />
         <module name="kong-common" />
+        <module name="kong-app" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="discogs-client" target="1.8" />
-      <module name="diskong" target="1.8" />
       <module name="distribution" target="1.8" />
-      <module name="kong-app" target="1.8" />
       <module name="kong-common" target="1.8" />
     </bytecodeTargetLevel>
   </component>
